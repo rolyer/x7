@@ -32,7 +32,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class TextParser{
 	
 	private static TextParser instance = null;
-	private  Map<String, Object> map = null;
 	
 	public static TextParser getInstance(){
 		if (instance == null){
@@ -43,16 +42,16 @@ public class TextParser{
 	private TextParser(){
 
 	}
+
+	private Map<String, Object> map = null;
 	
 	
-	public void load(String localAddress, String configSpace){
-		
-		map = Configs.referMap(configSpace);
+	public void load(String path,String[] ativeProfiles){
+
+		map = Configs.referMap();
 		
 		try{
-
-			readConfigs(localAddress + "/"+ configSpace, configSpace);
-
+			instance.readConfigs(path,ativeProfiles);
 		}catch (Exception e){
 			e.printStackTrace();
 			String notes = "无法启动";
@@ -63,9 +62,7 @@ public class TextParser{
 				Thread.sleep(20000);
 			} catch (InterruptedException e1) {
 				e1.printStackTrace();
-			}
-			System.exit(0);
-
+  			}
 		}
 	}
 	
@@ -125,39 +122,14 @@ public class TextParser{
 		}
 		return value;
 	}
-	
-	
-	public void readConfigs(String path, String space){
-		
-		File file = new File(path);
-		if (!file.isDirectory() || file.list().length == 0){
-			throw new RuntimeException("CONFIG KEY EXCEPTION: x7.config.localAddress, if relative path unavailable, try absolute path");
-		}
-		if (file.isDirectory()){
-			for (String childStr : file.list()){
-				if (childStr.endsWith(".txt") || childStr.endsWith(".properties") || childStr.endsWith(".cfg") || childStr.endsWith(".init")
-						|| childStr.endsWith(".js")
-						|| childStr.endsWith(".json")){
-					System.out.println("\n[" + space + "/" + childStr + "]");
-					readConfig(path+"/"+childStr, space);
-				}else if (! childStr.contains(".")){
-					if (space == null || space.equals("")){
-						readConfigs(path+"/"+childStr, childStr);
-					}else{
-						readConfigs(path+"/"+childStr, space+"."+childStr);
-					}
-				}
-			}
-			
-		}
-	}
-	 
+
+
 	/**
 	 × 读取文件存入configData中
 	 * @param path
 	 * @return
 	 */
-	public void readConfig(String path,String space){
+	public void readConfig(String path){
 		FileInputStream fis=null;
 		BufferedReader br=null;
 		try {
@@ -174,7 +146,7 @@ public class TextParser{
 					continue;
 				if(dataStr.contains("=")){
 					
-					put (key, value, space);
+					put (key, value);
 					key = null;
 					value = null;
 					
@@ -194,7 +166,7 @@ public class TextParser{
 				
 			}
 			
-			put (key, value, space);
+			put (key, value);
 			key = null;
 			value = null;
 		} catch (Exception e) {
@@ -210,12 +182,9 @@ public class TextParser{
 	}
 	
 	
-	private void put(String key, String value, String space) {
+	private void put(String key, String value) {
 		if (key!=null){
 			System.out.println(key + "=" + value);
-			if (space != null && !space.equals("")){
-				key = space + "." + key;
-			}
 			
 			value = value.trim();
 			
@@ -303,4 +272,41 @@ public class TextParser{
 	}
 
 
+	public void readConfigs(String path,String[] ativeProfiles){
+
+		File file = new File(path);
+		System.out.println("______path: " + file.getAbsolutePath());
+		if (!file.isDirectory() || file.list().length == 0){
+			throw new RuntimeException("CONFIG KEY EXCEPTION: x7.config.localAddress, if relative path unavailable, try absolute path");
+		}
+		if (file.isDirectory()){
+
+			for (File childFile : file.listFiles()){
+				if (! childFile.isDirectory()){
+					String name = childFile.getName().toLowerCase();
+					if (name.endsWith(".yml")
+							|| name.endsWith(".xlsx")
+							|| name.endsWith(".xls")
+							||name.endsWith(".doc")
+							|| name.endsWith(".class")
+							|| name.endsWith(".java"))
+
+						continue;
+
+					for (String profile : ativeProfiles){
+						if (name.contains("-"+profile+".")){
+							System.out.println("\n[" +  name+ "]");
+							readConfig(childFile.getPath());
+							break;
+						}
+					}
+
+				}else if (childFile.getName().equals("config")){
+
+					readConfigs(childFile.getPath(),ativeProfiles);
+				}
+			}
+
+		}
+	}
 }

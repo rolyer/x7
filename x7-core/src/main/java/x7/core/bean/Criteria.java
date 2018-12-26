@@ -41,6 +41,7 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 	private int rows;
 	private String orderBy;
 	private Direction direction = Direction.DESC;
+	private boolean isInConditionSort;
 
 	private List<Object> valueList = new ArrayList<Object>();
 	
@@ -108,6 +109,8 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 	}
 
 	public String getOrderBy() {
+		if (isInConditionSort)
+			return null;
 		return orderBy;
 	}
 
@@ -154,6 +157,14 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 
 	public void setDataPermission(DataPermission dataPermission) {
 		this.dataPermission = dataPermission;
+	}
+
+	public boolean isInConditionSort() {
+		return isInConditionSort;
+	}
+
+	public void setInConditionSort(boolean inConditionSort) {
+		isInConditionSort = inConditionSort;
 	}
 
 	public void paged(Paged paged) {

@@ -1,6 +1,5 @@
 package x7;
 
-import x7.core.config.Configs;
 import x7.repository.RepositoryBooter;
 
 import javax.sql.DataSource;
@@ -22,9 +21,8 @@ public class RepositoryStarter {
 
 	}
 
-	public static boolean isLocal(Boolean isRemote){
-		System.out.println("\n_________Will start repository: " + !isRemote + (isRemote?"\n":""));
-		return !isRemote;
-
+	public static boolean isRemote(Boolean isRemote){
+		System.out.println("\n_________Will start repository: " + isRemote + (isRemote?"\n":""));
+		return isRemote;
 	}
 }

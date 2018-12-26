@@ -37,6 +37,15 @@ public class CriteriaBuilder {
     private Criteria criteria;
     private CriteriaBuilder instance;
 
+    public CriteriaBuilder orderByFixed(List<? extends Object> inList){
+        if (criteria.isInConditionSort())
+            return instance;
+        if (Objects.nonNull(inList) && inList.size() > 0){
+            this.criteria.setInConditionSort(true);
+        }
+        return instance;
+    }
+
     public ConditionBuilder and() {
 
         X x = new X();
@@ -736,6 +745,9 @@ public class CriteriaBuilder {
     }
 
     private static void sort(StringBuilder sb, Criteria criteria) {
+
+        if (criteria.isInConditionSort())
+            return;
 
         if (StringUtil.isNotNull(criteria.getOrderBy())) {
             String orderBy = criteria.getOrderBy();

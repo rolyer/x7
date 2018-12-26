@@ -2,9 +2,12 @@ package io.xream.x7.demo;
 
 import x7.core.repository.X;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class Cat {
+public class Cat implements Serializable {
+
+	private static final long serialVersionUID = 5708147778966785698L;
 
 	@X.Key
 	private long id;

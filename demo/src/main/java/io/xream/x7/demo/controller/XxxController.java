@@ -1,5 +1,6 @@
 package io.xream.x7.demo.controller;
 
+import io.xream.x7.demo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,17 +11,11 @@ import x7.core.bean.condition.InCondition;
 import x7.core.bean.condition.RefreshCondition;
 import x7.core.web.Pagination;
 import x7.core.web.ViewEntity;
-import io.xream.x7.demo.CatRO;
-import io.xream.x7.demo.Cat;
-import io.xream.x7.demo.CatRepository;
-import io.xream.x7.demo.CatTest;
-import io.xream.x7.demo.CatTestRepository;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 
 @RestController
 @RequestMapping("/xxx")
@@ -34,6 +29,7 @@ public class XxxController {
 
 	@RequestMapping("/refresh")
 	public ViewEntity refreshByCondition(@RequestBody Cat cat){
+
 
 //		CriteriaBuilder builder = CriteriaBuilder.buildCondition();
 //		builder.and().eq("type","NL");
@@ -92,6 +88,7 @@ public class XxxController {
 		CriteriaBuilder.ResultMappedBuilder builder = CriteriaBuilder.buildResultMapped(CatTest.class,ro);
 //		builder.distinct("catTest.id").reduce(Criteria.ReduceType.COUNT,"catTest.id").groupBy("catTest.id");
 		builder.and().in("catTest.catFriendName", inList);
+		builder.orderByFixed(inList);
 
 
 //		builder.or().beginSub().eq("dogTest.userName","yyy")

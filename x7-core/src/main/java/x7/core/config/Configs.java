@@ -16,40 +16,37 @@
  */
 package x7.core.config;
 
+import org.springframework.core.env.Environment;
 import x7.core.util.KeyUtil;
 
 import java.util.List;
 import java.util.Map;
 import java.util.MissingResourceException;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Configs {
 
 	private static Map<String, Object> map = new ConcurrentHashMap<String, Object>();
 
-	private static String space = null;
-	
-	public static String localAddress;
-	public static String remoteAddress;
-	
-	public static void setConfigSpace(String configSpace) {
-		map.put("x7.config.space", configSpace);
-	}
-	
-	public static Map<String, Object> referMap(String s) {
-		space = s;
-		return map;
-	}
-	
-	private static String getKey(String key){
-		if (space == null || space.trim().equals(""))
-			return key;
-		return space+"."+key;
+
+	private static Environment environment;
+	public static void setEnvironment(Environment env){
+		environment = env;
 	}
 
+
+	public static Map<String, Object> referMap() {
+		return map;
+	}
+
+
 	public static Object get(String keyStr) {
-		
-		keyStr = getKey(keyStr);
+
+		String envObj = environment.getProperty(keyStr);
+		if (Objects.nonNull(envObj))
+			return envObj;
+
 		
 		List<String> keyList = KeyUtil.getKeyList(keyStr);
 
@@ -68,6 +65,11 @@ public class Configs {
 	}
 
 	public static int getIntValue(String key) {
+
+		String envObj = environment.getProperty(key);
+		if (Objects.nonNull(envObj)) {
+			return Integer.valueOf(envObj);
+		}
 		
 		Integer value = 0;
 
@@ -95,6 +97,10 @@ public class Configs {
 
 	public static String getString(String key) {
 
+		String envObj = environment.getProperty(key);
+		if (Objects.nonNull(envObj))
+			return envObj;
+
 		String value = "";
 
 		try {
@@ -110,10 +116,17 @@ public class Configs {
 			e.printStackTrace();
 
 		}
+
 		return value;
+
 	}
 
 	public static long getLongValue(String key) {
+
+		String envObj = environment.getProperty(key);
+		if (Objects.nonNull(envObj)) {
+			return Long.valueOf(envObj);
+		}
 
 		Long value = 0L;
 
@@ -134,6 +147,11 @@ public class Configs {
 	}
 
 	public static boolean isTrue(String key) {
+
+		String envObj = environment.getProperty(key);
+		if (Objects.nonNull(envObj)) {
+			return Boolean.parseBoolean(envObj);
+		}
 
 		String value = "";
 

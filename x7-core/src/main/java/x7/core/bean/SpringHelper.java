@@ -24,6 +24,7 @@ public class SpringHelper implements ApplicationContextAware {
 	public void setApplicationContext(ApplicationContext arg0) throws BeansException {
 		applicationContext = arg0;
 		getMapPaths();
+
 		logger.info("SpringHelper started, static methods[getContext,getObject,getRequestMapping] ");
 	}
 

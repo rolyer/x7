@@ -16,10 +16,6 @@
  */
 package x7.config;
 
-import x7.config.zk.ZkBase;
-import x7.core.config.Configs;
-import x7.core.util.StringUtil;
-
 public class ConfigBuilder {
 
 	private static ConfigBuilder instance;
@@ -30,35 +26,16 @@ public class ConfigBuilder {
 		return instance;
 	}
 	
-	public static void build(boolean centralized, String configSpace, String localAddress, String remoteAddress){
+	public static void build(String path,String[] ativeProfiles){
 		if (instance == null){
 			instance = new ConfigBuilder();
-			init(centralized,configSpace, localAddress, remoteAddress);
+			init(path,ativeProfiles);
 		}
 	}
 	
-	private static void init(boolean centralized, String configSpace, String localAddress, String remoteAddress) {
-		
-		Configs.setConfigSpace(configSpace);
+	private static void init(String path,String[] ativeProfiles) {
 
-		if (StringUtil.isNullOrEmpty(remoteAddress) && StringUtil.isNullOrEmpty(localAddress))
-			return;
-
-		if (centralized){
-			if (centralized && StringUtil.isNotNull(remoteAddress)){
-				ZkBase.getInstance().init(remoteAddress);
-				ZkBase.getInstance().add(ConfigKeeper.getInstance());
-			}
-			return;
-		}
-
-		if (StringUtil.isNotNull(localAddress)){
-			Configs.localAddress = localAddress;
-			TextParser.getInstance().load(localAddress, configSpace);
-		}else if (StringUtil.isNotNull(remoteAddress)){
-			ZkBase.getInstance().init(remoteAddress);
-			ZkBase.getInstance().add(ConfigKeeper.getInstance());
-		}
+		TextParser.getInstance().load(path,ativeProfiles);
 
 	}
 	

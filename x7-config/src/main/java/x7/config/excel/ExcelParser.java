@@ -111,9 +111,7 @@ public class ExcelParser {
 	public void init() throws Exception {
 		// 获取excel.xml配置路径
 
-		String root = Configs.localAddress;
-
-		File configFile = new File(root + "config/excel.xml");
+		File configFile = new File("/");
 		if (configFile.lastModified() <= configLastModifiedTime)
 			return;
 
@@ -167,11 +165,9 @@ public class ExcelParser {
 
 	public void parse() throws Exception {
 
-		// 获取当前运行路径
-		String root = Configs.localAddress;
 
 		// 获取当前路径对应的文件夹
-		File folder = new File(root + "config/excel/");
+		File folder = new File("/");
 		// 对该文件夹内的所有文件进行遍历
 		if (folder.listFiles() == null) {
 			return;
