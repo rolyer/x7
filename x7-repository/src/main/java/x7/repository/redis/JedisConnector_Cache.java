@@ -81,15 +81,12 @@ public class JedisConnector_Cache {
 		if (keyList == null || keyList.isEmpty())
 			return null;
 		
-		List<byte[]> byteList = null;
-
-		this.redisTemplate.opsForValue().multiGet(keyList);
+		List<byte[]> byteList = this.redisTemplate.opsForValue().multiGet(keyList);
 		
 		return byteList;
 	}
 	
 	public byte[] get(byte[] key){
-
 
 		Object obj = this.redisTemplate.opsForValue().get(key);
 		

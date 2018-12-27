@@ -90,9 +90,7 @@ public class JedisConnector_Persistence {
 		if (keyList == null || keyList.isEmpty())
 			return null;
 
-		List<byte[]> byteList = null;
-
-		this.redisTemplate.opsForValue().multiGet(keyList);
+		List<byte[]> byteList = this.redisTemplate.opsForValue().multiGet(keyList);
 
 		return byteList;
 	}
@@ -130,11 +128,7 @@ public class JedisConnector_Persistence {
 	}
 
 	public long hincrBy(String mapName, String key, long increment) {
-		long value = 0;
-
-		this.stringRedisTemplate.opsForHash().increment(mapName,key,increment);
-
-		return value;
+		return this.stringRedisTemplate.opsForHash().increment(mapName,key,increment);
 	}
 	
 	public boolean lock(String key){
