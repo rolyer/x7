@@ -9,6 +9,14 @@ public class ConfigStarter {
 
 	public ConfigStarter(String[] ativeProfiles){
 
+		if (ativeProfiles == null || ativeProfiles.length==0){
+			System.out.println("______Load configs of activeProfile: default");
+		}else {
+			for (String str : ativeProfiles){
+				System.out.println("______Load configs of activeProfile: "+str);
+			}
+		}
+
 		String path = ConfigStarter.class.getClassLoader().getResource("").getPath();
 		ConfigBuilder.build(path, ativeProfiles);
 	}

@@ -24,7 +24,7 @@ public class RefreshCondition<T> {
 
     public void setClz(Class clz) {
         this.clz = clz;
-        if (this.obj.getClass() != clz){
+        if (this.obj != null && this.obj.getClass() != clz){
             this.obj = (T)JsonX.toObject(this.obj,clz);
         }
     }

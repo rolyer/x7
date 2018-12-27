@@ -293,11 +293,17 @@ public class TextParser{
 
 						continue;
 
-					for (String profile : ativeProfiles){
-						if (name.contains("-"+profile+".")){
-							System.out.println("\n[" +  name+ "]");
-							readConfig(childFile.getPath());
-							break;
+					if (ativeProfiles == null || ativeProfiles.length==0){
+						System.out.println("\n[" +  name+ "]");
+						readConfig(childFile.getPath());
+					}else {
+
+						for (String profile : ativeProfiles) {
+							if (name.contains("-" + profile + ".")) {
+								System.out.println("\n[" + name + "]");
+								readConfig(childFile.getPath());
+								break;
+							}
 						}
 					}
 

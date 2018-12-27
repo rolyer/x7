@@ -22,7 +22,7 @@ public class RepositoryStarter {
 	}
 
 	public static boolean isRemote(Boolean isRemote){
-		System.out.println("\n_________Will start repository: " + isRemote + (isRemote?"\n":""));
+		System.out.println("\n_________Will start repository: " + !isRemote + (!isRemote?"\n":""));
 		return isRemote;
 	}
 }
