@@ -287,7 +287,7 @@ public class TextParser{
 					if (name.endsWith(".yml")
 							|| name.endsWith(".xlsx")
 							|| name.endsWith(".xls")
-							||name.endsWith(".doc")
+							|| name.endsWith(".doc")
 							|| name.endsWith(".class")
 							|| name.endsWith(".java"))
 
@@ -296,8 +296,10 @@ public class TextParser{
 					if (ativeProfiles == null || ativeProfiles.length==0){
 						System.out.println("\n[" +  name+ "]");
 						readConfig(childFile.getPath());
-					}else {
-
+					}else if (!name.contains("-")) {
+						System.out.println("\n[" +  name+ "]");
+						readConfig(childFile.getPath());
+					} else {
 						for (String profile : ativeProfiles) {
 							if (name.contains("-" + profile + ".")) {
 								System.out.println("\n[" + name + "]");
