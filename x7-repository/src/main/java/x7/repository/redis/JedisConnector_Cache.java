@@ -41,8 +41,8 @@ public class JedisConnector_Cache {
 	}
 
 	private void init(){
-		redisTemplate = SpringHelper.getObject(RedisTemplate.class);
-		stringRedisTemplate = SpringHelper.getObject(StringRedisTemplate.class);
+		redisTemplate = (RedisTemplate) SpringHelper.getObject("redisTemplate");
+		stringRedisTemplate = (StringRedisTemplate)SpringHelper.getObject("stringRedisTemplate");
 	}
 	
 	private JedisConnector_Cache(){

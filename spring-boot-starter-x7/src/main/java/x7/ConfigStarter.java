@@ -3,7 +3,11 @@ package x7;
 import x7.config.ConfigBuilder;
 import x7.core.util.StringUtil;
 
-import java.io.File;
+import java.io.*;
+import java.net.URL;
+import java.util.Enumeration;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 public class ConfigStarter {
 
@@ -17,7 +21,6 @@ public class ConfigStarter {
 			}
 		}
 
-		String path = ConfigStarter.class.getClassLoader().getResource("").getPath();
-		ConfigBuilder.build(path, ativeProfiles);
+		ConfigBuilder.build(ativeProfiles);
 	}
 }

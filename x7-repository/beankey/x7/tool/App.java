@@ -31,7 +31,7 @@ public class App {
 	
 	public static void main(String[] args) {
 		
-		ConfigBuilder.build("/generated", null);
+		ConfigBuilder.build( null);
 		
 		Config.BASE = "../"+Configs.getString("x7.bean.project") + "/generated/" ;
 		Config.PKG = Configs.getString("x7.bean.package");

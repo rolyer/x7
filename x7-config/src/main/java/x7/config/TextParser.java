@@ -21,12 +21,10 @@ import x7.core.util.KeyUtil;
 import x7.core.util.StringUtil;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.MissingResourceException;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 
 public class TextParser{
@@ -44,25 +42,162 @@ public class TextParser{
 	}
 
 	private Map<String, Object> map = null;
+
+
+	private void readConfig(JarFile jf, JarEntry je){
+
+		try {
+			InputStream is = jf.getInputStream(je);
+
+			BufferedReader br=null;
+			try {
+
+				br=new BufferedReader(new InputStreamReader(is,"utf-8"));
+				String dataStr="";
+
+				String key = null;
+				String value = null;
+
+				while((dataStr=br.readLine())!=null){
+
+					if (dataStr.startsWith("#"))
+						continue;
+					if(dataStr.contains("=")){
+
+						put (key, value);
+						key = null;
+						value = null;
+
+						//等号左边为key，等号右边为value
+						key=dataStr.substring(0,dataStr.indexOf("=")).trim();
+						value=dataStr.substring(dataStr.indexOf("=")+1);
+
+
+					}else{
+						if (StringUtil.isNullOrEmpty(dataStr))
+							continue;
+						if (dataStr.equals("\n"))
+							continue;
+						value += "\n";
+						value += dataStr;
+					}
+
+				}
+
+				put (key, value);
+				key = null;
+				value = null;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}finally{
+				try {
+					br.close();
+					is.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
 	
 	
-	public void load(String path,String[] ativeProfiles){
+	public void load(String[] ativeProfiles){
 
 		map = Configs.referMap();
-		
-		try{
-			instance.readConfigs(path,ativeProfiles);
-		}catch (Exception e){
-			e.printStackTrace();
-			String notes = "无法启动";
-			System.err.println("\n"+notes+"\n");			
-			String err = "加载配置文件出错,请检查配置文件config/*.txt";
-			System.err.println(err + "\n");
+
+		String path = this.getClass().getClassLoader().getResource("").getPath();
+
+		if (path.contains(".jar")){
+			// file:/data/deploy/ruhr-web-dev/ruhr-web-dev-1.0.0.jar!/BOOT-INF/classes!/
+			String[] arr = path.split(":");
+			String real = arr[1];
+
+			String[] pathFolder = real.split("!");
+
+			String jarPath = pathFolder[0];
+
+			String jarFolder = pathFolder[1];
+			jarFolder = jarFolder.substring(1);
+
 			try {
-				Thread.sleep(20000);
-			} catch (InterruptedException e1) {
-				e1.printStackTrace();
-  			}
+				JarFile jarFile = new JarFile(jarPath);
+
+				JarEntry je = jarFile.getJarEntry(jarFolder);
+
+				Enumeration<JarEntry> es = jarFile.entries();
+
+				while (es.hasMoreElements()){
+					JarEntry j = es.nextElement();
+					String name = j.getName();
+
+					if (!name.startsWith(jarFolder))
+						continue;
+
+					name = name.replace(jarFolder,"");
+
+					String xxx = name.toLowerCase();
+					if (xxx.endsWith(File.separator)
+							|| xxx.endsWith(".yml")
+							|| name.endsWith(".xlsx")
+							|| name.endsWith(".xls")
+							|| name.endsWith(".doc")
+							|| name.endsWith(".docx")
+							|| name.endsWith(".class")
+							|| name.endsWith(".java"))
+
+						continue;
+
+					if (ativeProfiles == null || ativeProfiles.length==0){
+						System.out.println("\n[" +  name+ "]");
+						readConfig(jarFile, j);
+						continue;
+					}else if (!name.contains("-")) {
+
+						if (name.endsWith("application.properties"))
+							continue;
+						System.out.println("\n[" +  name+ "]");
+						readConfig(jarFile, j);
+
+						continue;
+					} else {
+						for (String profile : ativeProfiles) {
+							if (name.contains("-" + profile + ".")) {
+								System.out.println("\n[" + name + "]");
+								readConfig(jarFile, j);
+								break;
+							}
+						}
+					}
+
+
+				}
+
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}else {
+
+
+			try {
+				instance.readConfigs(path, ativeProfiles);
+			} catch (Exception e) {
+				e.printStackTrace();
+				String notes = "无法启动";
+				System.err.println("\n" + notes + "\n");
+				String err = "加载配置文件出错,请检查配置文件config/*.txt";
+				System.err.println(err + "\n");
+				try {
+					Thread.sleep(20000);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+			}
 		}
 	}
 	
@@ -276,9 +411,9 @@ public class TextParser{
 
 		File file = new File(path);
 		System.out.println("______path: " + file.getAbsolutePath());
-		if (!file.isDirectory() || file.list().length == 0){
-			throw new RuntimeException("CONFIG KEY EXCEPTION: x7.config.localAddress, if relative path unavailable, try absolute path");
-		}
+
+		if (file == null)
+			return;
 		if (file.isDirectory()){
 
 			for (File childFile : file.listFiles()){
@@ -288,6 +423,7 @@ public class TextParser{
 							|| name.endsWith(".xlsx")
 							|| name.endsWith(".xls")
 							|| name.endsWith(".doc")
+							|| name.endsWith(".docx")
 							|| name.endsWith(".class")
 							|| name.endsWith(".java"))
 
@@ -297,6 +433,8 @@ public class TextParser{
 						System.out.println("\n[" +  name+ "]");
 						readConfig(childFile.getPath());
 					}else if (!name.contains("-")) {
+						if (name.endsWith("application.properties"))
+							continue;
 						System.out.println("\n[" +  name+ "]");
 						readConfig(childFile.getPath());
 					} else {
@@ -309,8 +447,7 @@ public class TextParser{
 						}
 					}
 
-				}else if (childFile.getName().equals("config")){
-
+				}else {
 					readConfigs(childFile.getPath(),ativeProfiles);
 				}
 			}

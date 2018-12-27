@@ -2,16 +2,20 @@ package io.xream.x7.demo.controller;
 
 import io.xream.x7.demo.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import x7.core.bean.Criteria;
 import x7.core.bean.CriteriaBuilder;
+import x7.core.bean.SpringHelper;
 import x7.core.bean.condition.InCondition;
 import x7.core.bean.condition.RefreshCondition;
 import x7.core.web.Pagination;
 import x7.core.web.ViewEntity;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,10 +31,29 @@ public class XxxController {
 	@Autowired
 	private CatRepository catRepository;// sample
 
+//	@Resource(name = "redisTemplate")
+//	private RedisTemplate template;
+//	@Resource(name = "stringRedisTemplate")
+//	private StringRedisTemplate stringRedisTemplate;
+
 	@RequestMapping("/refresh")
 	public ViewEntity refreshByCondition(@RequestBody Cat cat){
 
 
+		StringRedisTemplate stringRedisTemplate = (StringRedisTemplate) SpringHelper.getObject("stringRedisTemplate");
+//		stringRedisTemplate.opsForValue().set("xxx.test","ddddd");
+//		String test = stringRedisTemplate.opsForValue().get("xxx.test");
+
+//		System.out.println("_________: " + test);
+
+		RedisTemplate template = (RedisTemplate) SpringHelper.getObject("redisTemplate");
+		template.opsForValue().set("xxx.test".getBytes(),"ddddddddd".getBytes());
+		Object obytes = template.opsForValue().get("xxx.test".getBytes());
+		byte[] bytes = (byte[]) obytes;
+
+		System.out.println("__________: " + new String(bytes) );
+
+//		System.out.println("______: "  + test);
 //		CriteriaBuilder builder = CriteriaBuilder.buildCondition();
 //		builder.and().eq("type","NL");
 //		builder.and().eq("id",2);

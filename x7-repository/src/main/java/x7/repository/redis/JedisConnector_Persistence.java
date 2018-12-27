@@ -47,12 +47,11 @@ public class JedisConnector_Persistence {
 	}
 
 	private void init(){
-		redisTemplate = SpringHelper.getObject(RedisTemplate.class);
-		stringRedisTemplate = SpringHelper.getObject(StringRedisTemplate.class);
+		redisTemplate = (RedisTemplate) SpringHelper.getObject("redisTemplate");
+		stringRedisTemplate = (StringRedisTemplate)SpringHelper.getObject("stringRedisTemplate");
 	}
 
 	private JedisConnector_Persistence() {
-
 		init();
 	}
 

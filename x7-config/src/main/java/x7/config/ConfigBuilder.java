@@ -26,16 +26,16 @@ public class ConfigBuilder {
 		return instance;
 	}
 	
-	public static void build(String path,String[] ativeProfiles){
+	public static void build(String[] ativeProfiles){
 		if (instance == null){
 			instance = new ConfigBuilder();
-			init(path,ativeProfiles);
+			init(ativeProfiles);
 		}
 	}
 	
-	private static void init(String path,String[] ativeProfiles) {
+	private static void init(String[] ativeProfiles) {
 
-		TextParser.getInstance().load(path,ativeProfiles);
+		TextParser.getInstance().load(ativeProfiles);
 
 	}
 	
