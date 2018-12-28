@@ -30,6 +30,8 @@ import java.util.jar.JarFile;
 public class TextParser{
 	
 	private static TextParser instance = null;
+
+	private static String[] configFileSuffixArr = {".txt",".cfg",".properties",".cnf"};
 	
 	public static TextParser getInstance(){
 		if (instance == null){
@@ -124,10 +126,16 @@ public class TextParser{
 			String jarFolder = pathFolder[1];
 			jarFolder = jarFolder.substring(1);
 
+			{
+				final String testPathTag = "test-classes";
+				final String appPathTag ="classes";
+				if (jarFolder.contains(testPathTag)){
+					jarFolder = jarFolder.replace(testPathTag,appPathTag);
+				}
+			}
+
 			try {
 				JarFile jarFile = new JarFile(jarPath);
-
-				JarEntry je = jarFile.getJarEntry(jarFolder);
 
 				Enumeration<JarEntry> es = jarFile.entries();
 
@@ -140,31 +148,32 @@ public class TextParser{
 
 					name = name.replace(jarFolder,"");
 
-					String xxx = name.toLowerCase();
-					if (xxx.endsWith(File.separator)
-							|| xxx.endsWith(".yml")
-							|| name.endsWith(".xlsx")
-							|| name.endsWith(".xls")
-							|| name.endsWith(".doc")
-							|| name.endsWith(".docx")
-							|| name.endsWith(".class")
-							|| name.endsWith(".java"))
+					boolean ignored = true;
+					for (String suffix : configFileSuffixArr) {
+						if (name.endsWith(suffix)) {
+							ignored = false;
+							break;
+						}
+					}
 
+					if (ignored)
 						continue;
 
 					if (ativeProfiles == null || ativeProfiles.length==0){
 						System.out.println("\n[" +  name+ "]");
 						readConfig(jarFile, j);
 						continue;
-					}else if (!name.contains("-")) {
+					}else {
 
-						if (name.endsWith("application.properties"))
+						if (name.equals("application.properties"))
 							continue;
-						System.out.println("\n[" +  name+ "]");
-						readConfig(jarFile, j);
 
-						continue;
-					} else {
+						if (!name.contains("-")) {
+							System.out.println("\n[" + name + "]");
+							readConfig(jarFile, j);
+							continue;
+						}
+
 						for (String profile : ativeProfiles) {
 							if (name.contains("-" + profile + ".")) {
 								System.out.println("\n[" + name + "]");
@@ -172,19 +181,24 @@ public class TextParser{
 								break;
 							}
 						}
+						continue;
 					}
-
-
 				}
-
-
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}else {
 
-
 			try {
+
+				{
+					final String testPathTag = "test-classes";
+					final String appPathTag ="classes";
+					if (path.contains(testPathTag)){
+						path = path.replace(testPathTag,appPathTag);
+					}
+				}
+
 				instance.readConfigs(path, ativeProfiles);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -417,27 +431,35 @@ public class TextParser{
 		if (file.isDirectory()){
 
 			for (File childFile : file.listFiles()){
-				if (! childFile.isDirectory()){
-					String name = childFile.getName().toLowerCase();
-					if (name.endsWith(".yml")
-							|| name.endsWith(".xlsx")
-							|| name.endsWith(".xls")
-							|| name.endsWith(".doc")
-							|| name.endsWith(".docx")
-							|| name.endsWith(".class")
-							|| name.endsWith(".java"))
+				if (childFile.isDirectory()){
+					readConfigs(childFile.getPath(),ativeProfiles);
+				}else {
 
+					String name = childFile.getName().toLowerCase();
+
+					boolean ignored = true;
+					for (String suffix : configFileSuffixArr) {
+						if (name.endsWith(suffix)) {
+							ignored = false;
+							break;
+						}
+					}
+
+					if (ignored)
 						continue;
 
 					if (ativeProfiles == null || ativeProfiles.length==0){
 						System.out.println("\n[" +  name+ "]");
 						readConfig(childFile.getPath());
-					}else if (!name.contains("-")) {
+					}else {
 						if (name.endsWith("application.properties"))
 							continue;
-						System.out.println("\n[" +  name+ "]");
-						readConfig(childFile.getPath());
-					} else {
+						if (!name.contains("-")){
+							System.out.println("\n[" + name + "]");
+							readConfig(childFile.getPath());
+							continue;
+						}
+
 						for (String profile : ativeProfiles) {
 							if (name.contains("-" + profile + ".")) {
 								System.out.println("\n[" + name + "]");
@@ -447,8 +469,6 @@ public class TextParser{
 						}
 					}
 
-				}else {
-					readConfigs(childFile.getPath(),ativeProfiles);
 				}
 			}
 
