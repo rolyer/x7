@@ -82,7 +82,10 @@ public class JedisConnector_Persistence {
 
 	public String get(String key) {
 
-		return this.stringRedisTemplate.opsForValue().get(key);
+		String str = this.stringRedisTemplate.opsForValue().get(key);
+		if (str == null)
+			return str;
+		return str.trim();
 	}
 	public List<byte[]> mget(List<byte[]> keyList){
 
@@ -123,7 +126,7 @@ public class JedisConnector_Persistence {
 
 		if (obj== null)
 			return null;
-		return obj.toString();
+		return obj.toString().trim();
 	}
 
 	public long hincrBy(String mapName, String key, long increment) {

@@ -18,6 +18,7 @@ package x7.core.util;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
@@ -35,13 +36,26 @@ import java.util.Map;
 
 public class HttpClientUtil {
 
-	public static String post(String url, Object param) {
+
+
+	public static String post(String url, Object param){
+		return post(url,param,15000,15000);
+	}
+
+	public static String post(String url, Object param, int connectTimeoutMS, int readTimeoutMS) {
 
 		System.out.println("HttpClientUtil post, url: " + url);
 
 		CloseableHttpClient httpclient = HttpClients.createDefault();
 
 		HttpPost httpPost = new HttpPost(url);
+
+		RequestConfig requestConfig = RequestConfig.custom()
+				.setSocketTimeout(readTimeoutMS)
+				.setConnectTimeout(connectTimeoutMS)
+				.build();//设置请求和传输超时时间
+
+		httpPost.setConfig(requestConfig);
 
 		String json = "";
 		if (param != null) {
@@ -85,12 +99,17 @@ public class HttpClientUtil {
 	}
 
 	public static String getUrl(String urlString) {
+		return getUrl(urlString, 15000, 15000);
+	}
+
+	public static String getUrl(String urlString, int connectTimeoutMS, int readTimeoutMS) {
 		StringBuffer sb = new StringBuffer();
 		try {
 			URL url = new URL(urlString);
 
 			URLConnection conn = url.openConnection();
 
+			conn.setConnectTimeout(15000);
 			conn.setReadTimeout(15000);
 			BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 

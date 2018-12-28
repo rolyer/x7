@@ -376,7 +376,11 @@ public abstract class BaseRepository<T> implements X7Repository<T> {
                     + "PRIMARY KEY (`clzName`) "
                     + ") ENGINE=InnoDB DEFAULT CHARSET=utf8 ";
 
-            ManuRepository.execute(IdGenerator.class, sql);
+            try {
+                ManuRepository.execute(IdGenerator.class, sql);
+            }catch (Exception e) {
+
+            }
 
             System.out.println("-------------------------------------------------");
 
