@@ -29,6 +29,8 @@ public class SpringHelper implements ApplicationContextAware {
 	}
 
 	public static Object getObject(String beanName) {
+		if (applicationContext == null)
+			return null;
 		Object object = null;
 		try {
 			object = applicationContext.getBean(beanName);
@@ -43,6 +45,8 @@ public class SpringHelper implements ApplicationContextAware {
 	}
 
 	public static <T> T getObject(Class<T> clazz) {
+		if (applicationContext == null)
+			return null;
 		try {
 			return applicationContext.getBean(clazz);
 		} catch (Exception e) {

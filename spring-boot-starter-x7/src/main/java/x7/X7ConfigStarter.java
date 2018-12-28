@@ -1,17 +1,18 @@
 package x7;
 
+
+import org.springframework.core.env.Environment;
 import x7.config.ConfigBuilder;
-import x7.core.util.StringUtil;
+import x7.core.config.Configs;
 
-import java.io.*;
-import java.net.URL;
-import java.util.Enumeration;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 
-public class ConfigStarter {
+public class X7ConfigStarter {
 
-	public ConfigStarter(String[] ativeProfiles){
+	public X7ConfigStarter (Environment environment){
+
+		Configs.setEnvironment(environment);
+
+		String[] ativeProfiles = environment.getActiveProfiles();
 
 		if (ativeProfiles == null || ativeProfiles.length==0){
 			System.out.println("______Load configs of activeProfile: default");

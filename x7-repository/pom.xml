@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>io.xream.x7</groupId>
 		<artifactId>x7-parent</artifactId>
-		<version>1.2.0.RELEASE</version>
+		<version>1.5.0.RELEASE</version>
 	</parent>
 
 	<artifactId>x7-repository</artifactId>
@@ -14,6 +14,11 @@
 	<url>http://xream.io</url>
 
 	<dependencies>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -54,14 +59,14 @@
 		<dependency>
 			<groupId>io.xream.x7</groupId>
 			<artifactId>x7-core</artifactId>
-			<version>1.2.0.RELEASE</version>
+			<version>1.5.0.RELEASE</version>
 			<scope>compile</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>io.xream.x7</groupId>
 			<artifactId>x7-config</artifactId>
-			<version>1.2.0.RELEASE</version>
+			<version>1.5.0.RELEASE</version>
 			<scope>compile</scope>
 		</dependency>
 

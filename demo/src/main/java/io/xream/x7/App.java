@@ -5,6 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import x7.EnableTransactionManagementReadable;
+import x7.EnableX7Repository;
 
 /**
  *
@@ -14,6 +15,7 @@ import x7.EnableTransactionManagementReadable;
 @SpringBootApplication
 @EnableTransactionManagement
 @EnableTransactionManagementReadable
+@EnableX7Repository
 public class App {
     public static void main( String[] args )
     {
