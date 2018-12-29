@@ -25,7 +25,6 @@ import x7.core.repository.X;
 import x7.core.util.*;
 import x7.core.web.Direction;
 import x7.core.web.Pagination;
-import x7.repository.DbType;
 import x7.repository.ResultSetUtil;
 import x7.repository.exception.PersistenceException;
 import x7.repository.exception.RollbackException;
@@ -130,10 +129,7 @@ public class DaoImpl implements Dao {
 						pstmt.setObject(i++, value);
 					} else {
 
-						if ( ele.clz == Boolean.class && DbType.ORACLE.equals(DbType.value)){
-							Boolean b = (Boolean)value;
-							pstmt.setObject(i++, b.booleanValue() == true ? 1 : 0);
-						}else if (ele.isJson) {
+						if (ele.isJson) {
 							String str = JsonX.toJson(value);
 							pstmt.setObject(i++, str);
 						}else if (ele.clz.isEnum()) {
@@ -248,10 +244,7 @@ public class DaoImpl implements Dao {
 						value = 0;
 					pstmt.setObject(i++, value);
 				} else {
-					if ( ele.clz == Boolean.class && DbType.ORACLE.equals(DbType.value)) {
-						Boolean b = (Boolean) value;
-						pstmt.setObject(i++, b.booleanValue() == true ? 1 : 0);
-					}else if (ele.isJson) {
+					if (ele.isJson) {
 						String str = JsonX.toJson(value);
 						pstmt.setObject(i++, str);
 					}else if (ele.clz.isEnum()) {
@@ -321,12 +314,7 @@ public class DaoImpl implements Dao {
 			int i = 1;
 			for (Object value : refreshMap.values()) {
 				value = SqlUtil.filter(value);
-				if ( value instanceof Boolean && DbType.ORACLE.equals(DbType.value)) {
-					Boolean b = (Boolean) value;
-					pstmt.setObject(i++, b.booleanValue() == true ? 1 : 0);
-				}else {
-					pstmt.setObject(i++, value);
-				}
+				pstmt.setObject(i++, value);
 			}
 
 			/*
@@ -891,12 +879,7 @@ public class DaoImpl implements Dao {
 			int i = 1;
 			for (Object value : refreshMap.values()) {
 				value = SqlUtil.filter(value);
-				if ( value instanceof Boolean && DbType.ORACLE.equals(DbType.value)) {
-					Boolean b = (Boolean) value;
-					pstmt.setObject(i++, b.booleanValue() == true ? 1 : 0);
-				}else {
-					pstmt.setObject(i++, value);
-				}
+				pstmt.setObject(i++, value);
 			}
 
 			/*

@@ -123,6 +123,9 @@ public interface Mapper {
                     Date date = (Date) value;
                     Timestamp timestamp = new Timestamp(date.getTime());
                     return timestamp;
+                }else if (value instanceof Boolean){
+                    Boolean b = (Boolean)value;
+                    return b.booleanValue() == true ? 1 : 0;
                 }
             }
             return value;
