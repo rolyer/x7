@@ -22,6 +22,7 @@ import x7.core.repository.X;
 import x7.core.util.BeanUtil;
 import x7.core.util.BeanUtilX;
 import x7.core.util.StringUtil;
+import x7.repository.mapper.Mapper;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -246,6 +247,8 @@ public class SqlUtil {
 		if (value instanceof String) {
 			String str = (String) value;
 			value = str.replace("<", "&lt").replace(">", "&gt");
+		}else if (value instanceof Date){
+			value = Mapper.Dialect.filterValue(value);
 		}
 
 		return value;

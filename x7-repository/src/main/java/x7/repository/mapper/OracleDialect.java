@@ -3,6 +3,7 @@ package x7.repository.mapper;
 import x7.core.bean.BeanElement;
 import x7.core.util.JsonX;
 import x7.core.util.StringUtil;
+import x7.repository.DbType;
 import x7.repository.exception.SqlTypeException;
 
 import java.lang.reflect.Method;

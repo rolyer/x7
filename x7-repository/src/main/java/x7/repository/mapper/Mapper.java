@@ -17,85 +17,115 @@
 package x7.repository.mapper;
 
 import x7.core.bean.BeanElement;
+import x7.repository.DbType;
 
 import java.math.BigDecimal;
 import java.sql.ResultSet;
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public interface Mapper {
 
-	String CREATE = "CREATE";
-	String REFRESH = "REFRESH";
-	String REMOVE = "REMOVE";
-	String QUERY = "QUERY";
-	String LOAD = "LOAD";
-	String TAG = "TAG";
-	String CREATE_TABLE = "CREATE_TABLE";
-	
+    String CREATE = "CREATE";
+    String REFRESH = "REFRESH";
+    String REMOVE = "REMOVE";
+    String QUERY = "QUERY";
+    String LOAD = "LOAD";
+    String TAG = "TAG";
+    String CREATE_TABLE = "CREATE_TABLE";
 
-	interface Interpreter {
-		
-		String getTableSql(Class clz);
 
-		String getRefreshSql(Class clz);
+    interface Interpreter {
 
-		String getQuerySql(Class clz);
+        String getTableSql(Class clz);
 
-		String getLoadSql(Class clz);
+        String getRefreshSql(Class clz);
 
-		String getCreateSql(Class clz);
+        String getQuerySql(Class clz);
 
-		String getTagSql(Class clz);
-	}
-	
-	public static String getSqlTypeRegX(BeanElement be){
-	
-			Class clz = be.clz;
-			if (clz == Date.class || clz == java.sql.Date.class || clz == java.sql.Timestamp.class) {
-				return Dialect.DATE;
-			} else if (clz == String.class) {
-				return Dialect.STRING;
-			} else if (clz.isEnum()) {
-				return Dialect.STRING;
-			} else if (clz == int.class || clz == Integer.class) {
-				return Dialect.INT;
-			} else if (clz == long.class || clz == Long.class) {
-				return Dialect.LONG;
-			} else if (clz == double.class || clz == Double.class) {
-				return Dialect.BIG;
-			} else if (clz == float.class || clz == Float.class) {
-				return Dialect.BIG;
-			} else if (clz == BigDecimal.class) {
-				return Dialect.BIG;
-			} else if (clz == boolean.class || clz == Boolean.class) {
-				return Dialect.BYTE;
-			} else if (clz == short.class || clz == Short.class) {
-				return Dialect.INT;
-			} else if (clz == byte.class || clz == Byte.class) {
-				return Dialect.BYTE;
-			} 
-			return Dialect.TEXT;
-		
-	}
+        String getLoadSql(Class clz);
 
-	interface Dialect {
-		
-		String DATE = " ${DATE}";
-		String BYTE = " ${BYTE}";
-		String INT = " ${INT}";
-		String LONG = " ${LONG}";
-		String BIG = " ${BIG}";
-		String STRING = " ${STRING}";
-		String TEXT = " ${TEXT}";
-		String LONG_TEXT = " ${LONG_TEXT}";
-		String INCREAMENT = " ${INCREAMENT}";
-		String ENGINE = " ${ENGINE}";
-			
-		String match(String sql,long start, long rows);
+        String getCreateSql(Class clz);
 
-		String match(String sql, String sqlType);
-		
-		<T> void initObj(T obj, ResultSet rs, BeanElement tempEle, List<BeanElement> eles);
-	}
+        String getTagSql(Class clz);
+    }
+
+    public static String getSqlTypeRegX(BeanElement be) {
+
+        Class clz = be.clz;
+        if (clz == Date.class || clz == java.sql.Date.class || clz == java.sql.Timestamp.class) {
+            return Dialect.DATE;
+        } else if (clz == String.class) {
+            return Dialect.STRING;
+        } else if (clz.isEnum()) {
+            return Dialect.STRING;
+        } else if (clz == int.class || clz == Integer.class) {
+            return Dialect.INT;
+        } else if (clz == long.class || clz == Long.class) {
+            return Dialect.LONG;
+        } else if (clz == double.class || clz == Double.class) {
+            return Dialect.BIG;
+        } else if (clz == float.class || clz == Float.class) {
+            return Dialect.BIG;
+        } else if (clz == BigDecimal.class) {
+            return Dialect.BIG;
+        } else if (clz == boolean.class || clz == Boolean.class) {
+            return Dialect.BYTE;
+        } else if (clz == short.class || clz == Short.class) {
+            return Dialect.INT;
+        } else if (clz == byte.class || clz == Byte.class) {
+            return Dialect.BYTE;
+        }
+        return Dialect.TEXT;
+
+    }
+
+    interface Dialect {
+
+        String DATE = " ${DATE}";
+        String BYTE = " ${BYTE}";
+        String INT = " ${INT}";
+        String LONG = " ${LONG}";
+        String BIG = " ${BIG}";
+        String STRING = " ${STRING}";
+        String TEXT = " ${TEXT}";
+        String LONG_TEXT = " ${LONG_TEXT}";
+        String INCREAMENT = " ${INCREAMENT}";
+        String ENGINE = " ${ENGINE}";
+
+        String match(String sql, long start, long rows);
+
+        String match(String sql, String sqlType);
+
+
+        <T> void initObj(T obj, ResultSet rs, BeanElement tempEle, List<BeanElement> eles);
+
+        public static void filterValue(Map<String, Object> valueMap) {
+            if (DbType.ORACLE.equals(DbType.value)) {
+
+                for (String key : valueMap.keySet()) {
+                    Object value = valueMap.values();
+                    if (value instanceof Date) {
+                        Date date = (Date) value;
+                        Timestamp timestamp = new Timestamp(date.getTime());
+                        valueMap.put(key, timestamp);
+                    }
+                }
+            }
+        }
+
+        public static Object filterValue(Object value) {
+            if (DbType.ORACLE.equals(DbType.value)) {
+
+                if (value instanceof Date) {
+                    Date date = (Date) value;
+                    Timestamp timestamp = new Timestamp(date.getTime());
+                    return timestamp;
+                }
+            }
+            return value;
+        }
+    }
 }
