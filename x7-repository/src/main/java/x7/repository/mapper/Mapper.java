@@ -17,10 +17,14 @@
 package x7.repository.mapper;
 
 import x7.core.bean.BeanElement;
+import x7.core.bean.Parsed;
+import x7.core.bean.Parser;
+import x7.core.util.JsonX;
 import x7.repository.DbType;
 
 import java.math.BigDecimal;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
@@ -102,19 +106,79 @@ public interface Mapper {
 
         <T> void initObj(T obj, ResultSet rs, BeanElement tempEle, List<BeanElement> eles);
 
-        public static void filterValue(Map<String, Object> valueMap) {
+
+        public static Object mappedResult(String property, String mapper, ResultSet rs) throws SQLException {
+
+            Object obj = null;
+
             if (DbType.ORACLE.equals(DbType.value)) {
 
-                for (String key : valueMap.keySet()) {
-                    Object value = valueMap.values();
-                    if (value instanceof Date) {
-                        Date date = (Date) value;
-                        Timestamp timestamp = new Timestamp(date.getTime());
-                        valueMap.put(key, timestamp);
-                    }
+                if (property.contains(".")) {
+                    mapper = mapper.substring(mapper.indexOf(".") + 1).toUpperCase();
+                    obj = rs.getObject(mapper);
                 }
+
+            } else {
+                obj = rs.getObject(mapper);
             }
+
+            if (obj == null)
+                return null;
+
+            String[] arr = property.split("\\.");
+            String clzName = arr[0];
+            String p = arr[1];
+            Parsed parsed = Parser.get(clzName);
+            BeanElement element = parsed.getElement(p);
+
+            Class ec = element.clz;
+
+            if (obj instanceof BigDecimal && DbType.ORACLE.equals(DbType.value)) {
+
+                BigDecimal bg = (BigDecimal) obj;
+                if (ec == int.class || ec == Integer.class) {
+                    return bg.intValue();
+                } else if (ec == long.class || ec == Long.class) {
+                    return bg.longValue();
+                } else if (ec == double.class || ec == Double.class) {
+                    return bg.doubleValue();
+                } else if (ec == float.class || ec == Float.class) {
+                    return bg.floatValue();
+                }else if (ec == boolean.class || ec == Boolean.class) {
+                    int i = bg.intValue();
+                    return i == 0 ? false : true;
+                } else if (ec == Date.class ) {
+                    long l = bg.longValue();
+                    return new Date(l);
+                }  else if ( ec == java.sql.Date.class ) {
+                    long l = bg.longValue();
+                    return new java.sql.Date(l);
+                } else if (ec == Timestamp.class) {
+                    long l = bg.longValue();
+                    return new Timestamp(l);
+                } else if (ec == byte.class || ec == Byte.class) {
+                    return bg.byteValue();
+                }
+
+            }else if (obj instanceof Timestamp && ec == Date.class){
+                Timestamp ts = (Timestamp)obj;
+                return new Date(ts.getTime());
+            } if (ec.isEnum()) {
+                return Enum.valueOf(ec, obj.toString());
+            } else if (element.isJson){
+               if (ec == List.class){
+                   Class geneType = element.geneType;
+                   return JsonX.toList(obj.toString(),geneType);
+               }else if (ec == Map.class){
+                   return JsonX.toMap(obj);
+               }else{
+                   return JsonX.toObject(obj.toString(),ec);
+               }
+            }
+
+            return obj;
         }
+
 
         public static Object filterValue(Object value) {
             if (DbType.ORACLE.equals(DbType.value)) {

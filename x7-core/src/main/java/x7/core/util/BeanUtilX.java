@@ -163,7 +163,7 @@ public class BeanUtilX extends BeanUtil {
 				} else if (ec == boolean.class || ec == Boolean.class) {
 					element.sqlType = SqlFieldType.BYTE;
 					element.length = 1;
-				} else if (ec == Date.class || clz == java.sql.Date.class || ec == Timestamp.class) {
+				} else if (ec == Date.class || ec == java.sql.Date.class || ec == Timestamp.class) {
 					element.sqlType = SqlFieldType.DATE;
 				} else if (ec == String.class) {
 					element.sqlType = SqlFieldType.VARCHAR;

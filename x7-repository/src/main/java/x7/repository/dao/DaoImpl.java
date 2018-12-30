@@ -32,9 +32,11 @@ import x7.repository.mapper.Mapper;
 import x7.repository.mapper.MapperFactory;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.util.*;
 
 /**
@@ -1047,9 +1049,8 @@ public class DaoImpl implements Dao {
 
 		int start = (page - 1) * rows;
 
-		sql = dialect.match(sql, start, rows);
-
 		sql = sql.replace(SqlScript.STAR, criteriaResultMapped.getResultScript());
+		sql = dialect.match(sql, start, rows);
 
 		System.out.println(sql);
 
@@ -1063,21 +1064,24 @@ public class DaoImpl implements Dao {
 				pstmt.setObject(i++, obj);
 			}
 
-			List<String> resultKeyList = criteriaResultMapped.getResultList();
-			if (resultKeyList.isEmpty()) {
-				resultKeyList = criteriaResultMapped.listAllResultKey();
-			}
 
 			ResultSet rs = pstmt.executeQuery();
 
 			if (rs != null) {
+
+				List<String> resultKeyList = criteriaResultMapped.getResultList();
+				if (resultKeyList.isEmpty()) {
+					resultKeyList = criteriaResultMapped.listAllResultKey();
+				}
+
 				while (rs.next()) {
 					Map<String, Object> mapR = new HashMap<String, Object>();
 					pagination.getList().add(mapR);
 
 					for (String property : resultKeyList) {
 						String mapper = criteriaResultMapped.getMapMapper().mapper(property);
-						mapR.put(property, rs.getObject(mapper));
+						Object obj = Mapper.Dialect.mappedResult(property,mapper,rs);
+						mapR.put(property, obj);
 					}
 				}
 			}
@@ -1111,12 +1115,11 @@ public class DaoImpl implements Dao {
 
 		String sql = sqlArr[1];
 
-		sql = sql.replace(SqlScript.STAR, resultMapped.getResultScript());
-
 		int page = resultMapped.getPage();
 		int rows = resultMapped.getRows();
 		int start = (page - 1) * rows;
 
+		sql = sql.replace(SqlScript.STAR, resultMapped.getResultScript());
 		sql = dialect.match(sql, start, rows);
 
 		System.out.println(sql);
@@ -1133,21 +1136,23 @@ public class DaoImpl implements Dao {
 				pstmt.setObject(i++, obj);
 			}
 
-			List<String> columnList = resultMapped.getResultList();
-			if (columnList.isEmpty()) {
-				columnList = resultMapped.listAllResultKey();// FIXME ALLWAYS BUG
-			}
-
 			ResultSet rs = pstmt.executeQuery();
 
 			if (rs != null) {
+
+				List<String> columnList = resultMapped.getResultList();
+				if (columnList.isEmpty()) {
+					columnList = resultMapped.listAllResultKey();// FIXME ALLWAYS BUG
+				}
+
 				while (rs.next()) {
 					Map<String, Object> mapR = new HashMap<String, Object>();
 					list.add(mapR);
 
 					for (String property : columnList) {
 						String mapper = resultMapped.getMapMapper().mapper(property);
-						mapR.put(property, rs.getObject(mapper));
+						Object obj = Mapper.Dialect.mappedResult(property,mapper,rs);
+						mapR.put(property, obj);
 					}
 
 				}
@@ -1169,8 +1174,7 @@ public class DaoImpl implements Dao {
 	}
 
 	private <T> void initObj(T obj, ResultSet rs, BeanElement tempEle, List<BeanElement> eles)
-			throws SQLException, IllegalAccessException, IllegalArgumentException, InvocationTargetException,
-			NoSuchMethodException, SecurityException {
+			throws IllegalArgumentException, SecurityException {
 
 		ResultSetUtil.initObj(obj, rs, tempEle, eles);
 	}
