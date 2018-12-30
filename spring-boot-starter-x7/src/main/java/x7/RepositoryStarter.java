@@ -56,11 +56,6 @@ public class RepositoryStarter {
     @Order(2)
 	public X7Data enableData(){
 
-		isRemote(repositoryProperties.getIsRemote());
-		if (repositoryProperties.getIsRemote()) {
-			return new X7Data();
-		}
-
 		DataSource writeDataSource = dataSource;
 
 		/*
@@ -75,11 +70,6 @@ public class RepositoryStarter {
 		return new X7Data();
 	}
 
-
-	private static boolean isRemote(Boolean isRemote){
-		System.out.println("\n_________Will start repository: " + !isRemote + (!isRemote?"\n":""));
-		return isRemote;
-	}
 
 
 
