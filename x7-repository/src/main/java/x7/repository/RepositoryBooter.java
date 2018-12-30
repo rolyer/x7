@@ -46,7 +46,7 @@ public class RepositoryBooter {
                 @Override
                 public void execute() throws Exception {
                     try {
-                        Thread.sleep(1000);
+                        Thread.sleep(3000);
                         generateId();
                     } catch (Exception e) {
                         e.printStackTrace();
