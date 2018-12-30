@@ -74,41 +74,50 @@ public abstract class BaseRepository<T> implements X7Repository<T> {
         HealthChecker.repositoryList.add(this);
     }
 
+    /**
+     * FIXME
+     * @param methodName
+     * @param s
+     * @return
+     */
     protected Object find(String methodName, Object... s) {
 
-        boolean isOne = methodName.startsWith("get");
+//        boolean isOne = methodName.startsWith("get");
+//
+//        String sql = map.get(methodName);
+//        if (StringUtil.isNullOrEmpty(sql)) {
+//
+//
+//            Parsed parsed = Parser.get(this.clz);
+//
+//            String[] arr = methodName.split("By");
+//
+//            String conditionSql = arr[1];
+//
+//            String defaultKeyword = "eq";
+//            String[] keywordArr = {"And", "Or", "NotIn", "In", "Like", "IsNotNull", "IsNull", "Ne", "Eq", "Gte", "Gt", "Lte", "Lt"};
+//            String space = " ";
+//
+//            for (String keyword : keywordArr) {
+//                String target = space + keyword + space;
+//                conditionSql = conditionSql.replace(keyword, target);
+//            }
+//
+//        }
+//
+//        List<Object> conditionList = Arrays.asList(s);
+//        List<T> list = (List<T>) ManuRepository.list(clz, sql, conditionList);
+//
+//        if (isOne) {
+//            if (list.isEmpty())
+//                return null;
+//            return list.get(0);
+//        }
+//
+//        return list;
 
-        String sql = map.get(methodName);
-        if (StringUtil.isNullOrEmpty(sql)) {
+        return null;
 
-
-            Parsed parsed = Parser.get(this.clz);
-
-            String[] arr = methodName.split("By");
-
-            String conditionSql = arr[1];
-
-            String defaultKeyword = "eq";
-            String[] keywordArr = {"And", "Or", "NotIn", "In", "Like", "IsNotNull", "IsNull", "Ne", "Eq", "Gte", "Gt", "Lte", "Lt"};
-            String space = " ";
-
-            for (String keyword : keywordArr) {
-                String target = space + keyword + space;
-                conditionSql = conditionSql.replace(keyword, target);
-            }
-
-        }
-
-        List<Object> conditionList = Arrays.asList(s);
-        List<T> list = (List<T>) ManuRepository.list(clz, sql, conditionList);
-
-        if (isOne) {
-            if (list.isEmpty())
-                return null;
-            return list.get(0);
-        }
-
-        return list;
     }
 
     @Override
