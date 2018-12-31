@@ -19,13 +19,16 @@ package x7.repository;
 import x7.core.bean.BeanElement;
 import x7.repository.mapper.Mapper;
 
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 public class ResultSetUtil {
 
 	public static Mapper.Dialect dialect;
-	public static <T> void initObj(T obj, ResultSet rs, BeanElement tempEle, List<BeanElement> eles) {
+	public static <T> void initObj(T obj, ResultSet rs, BeanElement tempEle, List<BeanElement> eles) throws InvocationTargetException, SQLException, IllegalAccessException, IOException {
 		dialect.initObj(obj, rs, tempEle, eles);
 	}
 

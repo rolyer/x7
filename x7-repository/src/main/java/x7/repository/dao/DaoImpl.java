@@ -31,12 +31,11 @@ import x7.repository.exception.RollbackException;
 import x7.repository.mapper.Mapper;
 import x7.repository.mapper.MapperFactory;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
+import java.sql.*;
 import java.util.*;
 
 /**
@@ -133,7 +132,7 @@ public class DaoImpl implements Dao {
 
 						if (ele.isJson) {
 							String str = JsonX.toJson(value);
-							pstmt.setObject(i++, str);
+							this.dialect.setJSON(i++,str,pstmt);
 						}else if (ele.clz.isEnum()) {
 							String str = value.toString();
 							pstmt.setObject(i++, str);
@@ -248,7 +247,7 @@ public class DaoImpl implements Dao {
 				} else {
 					if (ele.isJson) {
 						String str = JsonX.toJson(value);
-						pstmt.setObject(i++, str);
+						this.dialect.setJSON(i++,str,pstmt);
 					}else if (ele.clz.isEnum()) {
 						String str = value.toString();
 						pstmt.setObject(i++, str);
@@ -316,7 +315,7 @@ public class DaoImpl implements Dao {
 			int i = 1;
 			for (Object value : refreshMap.values()) {
 				value = SqlUtil.filter(value);
-				pstmt.setObject(i++, value);
+				this.dialect.setObject(i++,value,pstmt);
 			}
 
 			/*
@@ -881,7 +880,7 @@ public class DaoImpl implements Dao {
 			int i = 1;
 			for (Object value : refreshMap.values()) {
 				value = SqlUtil.filter(value);
-				pstmt.setObject(i++, value);
+				this.dialect.setObject(i++,value,pstmt);
 			}
 
 			/*
@@ -1022,8 +1021,6 @@ public class DaoImpl implements Dao {
 
 	protected Pagination<Map<String, Object>> find(Criteria.ResultMapped criteriaResultMapped, Connection conn) {
 
-		Class clz = criteriaResultMapped.getClz();
-
 		List<Object> valueList = criteriaResultMapped.getValueList();
 
 		String[] sqlArr = CriteriaBuilder.parse(criteriaResultMapped);
@@ -1049,7 +1046,7 @@ public class DaoImpl implements Dao {
 
 		int start = (page - 1) * rows;
 
-		sql = sql.replace(SqlScript.STAR, criteriaResultMapped.getResultScript());
+		sql =  this.dialect.resultScript(sql);
 		sql = dialect.match(sql, start, rows);
 
 		System.out.println(sql);
@@ -1080,7 +1077,7 @@ public class DaoImpl implements Dao {
 
 					for (String property : resultKeyList) {
 						String mapper = criteriaResultMapped.getMapMapper().mapper(property);
-						Object obj = Mapper.Dialect.mappedResult(property,mapper,rs);
+						Object obj = this.dialect.mappedResult(property,mapper,rs);
 						mapR.put(property, obj);
 					}
 				}
@@ -1107,8 +1104,6 @@ public class DaoImpl implements Dao {
 
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 
-		Class clz = resultMapped.getClz();
-
 		List<Object> valueList = resultMapped.getValueList();
 
 		String[] sqlArr = CriteriaBuilder.parse(resultMapped);
@@ -1119,7 +1114,8 @@ public class DaoImpl implements Dao {
 		int rows = resultMapped.getRows();
 		int start = (page - 1) * rows;
 
-		sql = sql.replace(SqlScript.STAR, resultMapped.getResultScript());
+		String resultScript = this.dialect.resultScript(sql);
+		sql = sql.replace(SqlScript.STAR, resultScript);
 		sql = dialect.match(sql, start, rows);
 
 		System.out.println(sql);
@@ -1151,7 +1147,7 @@ public class DaoImpl implements Dao {
 
 					for (String property : columnList) {
 						String mapper = resultMapped.getMapMapper().mapper(property);
-						Object obj = Mapper.Dialect.mappedResult(property,mapper,rs);
+						Object obj = this.dialect.mappedResult(property,mapper,rs);
 						mapR.put(property, obj);
 					}
 
@@ -1174,7 +1170,7 @@ public class DaoImpl implements Dao {
 	}
 
 	private <T> void initObj(T obj, ResultSet rs, BeanElement tempEle, List<BeanElement> eles)
-			throws IllegalArgumentException, SecurityException {
+			throws IllegalArgumentException, SecurityException, SQLException, IOException, IllegalAccessException, InvocationTargetException {
 
 		ResultSetUtil.initObj(obj, rs, tempEle, eles);
 	}

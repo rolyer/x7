@@ -632,6 +632,7 @@ public class CriteriaBuilder {
             }
 
         } else {
+
             Parsed parsed = Parser.get(criteria.getClz());
             for (int i = 0; i < 3; i++) {
                 if (StringUtil.isNullOrEmpty(sqlArr[i]))

@@ -22,8 +22,12 @@ import x7.core.repository.X;
 import x7.core.util.BeanUtil;
 import x7.core.util.BeanUtilX;
 import x7.core.util.StringUtil;
+import x7.repository.DbType;
 import x7.repository.mapper.Mapper;
 
+import javax.swing.text.Element;
+import java.io.Reader;
+import java.io.StringReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -103,6 +107,13 @@ public class SqlUtil {
 		int size = refreshMap.size();
 		int i = 0;
 		for (String key : refreshMap.keySet()) {
+
+			BeanElement element = parsed.getElement(key);
+			if (element.isJson && DbType.ORACLE.equals(DbType.value)){
+				Object obj = refreshMap.get(key);
+				Reader reader = new StringReader(obj.toString());
+				refreshMap.put(key,reader);
+			}
 
 			String mapper = parsed.getMapper(key);
 			sb.append(mapper);

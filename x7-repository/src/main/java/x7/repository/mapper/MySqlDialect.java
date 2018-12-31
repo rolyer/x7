@@ -1,18 +1,25 @@
 package x7.repository.mapper;
 
 import x7.core.bean.BeanElement;
+import x7.core.bean.Parsed;
+import x7.core.bean.Parser;
 import x7.core.bean.SqlScript;
 import x7.core.util.JsonX;
 import x7.core.util.StringUtil;
+import x7.repository.DbType;
 import x7.repository.exception.SqlTypeException;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.*;
 
 public class MySqlDialect implements Mapper.Dialect {
 
@@ -60,14 +67,57 @@ public class MySqlDialect implements Mapper.Dialect {
 				.replace(INCREAMENT.trim(), increamentV).replace(ENGINE.trim(), engineV);
 	}
 
-	@Override
-	public <T> void initObj(T obj, ResultSet rs, BeanElement tempEle, List<BeanElement> eles) {
 
-		Object value = null;
-		try {
-			value = null;
+	private  Object getObject(final String mapper, ResultSet rs, BeanElement element) throws SQLException, IOException {
+
+		Class ec = element.clz;
+		Object obj = rs.getObject(mapper);
+
+		if (obj == null)
+			return null;
+
+		if (ec.isEnum()) {
+			return Enum.valueOf(ec, obj.toString());
+		} else if (element.isJson){
+			if (ec == List.class){
+				Class geneType = element.geneType;
+				return JsonX.toList(obj.toString(),geneType);
+			}else if (ec == Map.class){
+				return JsonX.toMap(obj);
+			}else{
+				return JsonX.toObject(obj.toString(),ec);
+			}
+		}else if (ec == BigDecimal.class) {
+			return new BigDecimal(String.valueOf(obj));
+		}else if (ec == double.class || ec == Double.class){
+			return Double.valueOf(obj.toString());
+		}
+
+		return obj;
+	}
+
+	@Override
+	public  Object mappedResult(String property, String mapper, ResultSet rs) throws SQLException, IOException {
+
+		String[] arr = property.split("\\.");
+		String clzName = arr[0];
+		String p = arr[1];
+		Parsed parsed = Parser.get(clzName);
+		BeanElement element = parsed.getElement(p);
+
+		if (mapper.contains("`")){
+			mapper = mapper.replace("`","");
+		}
+
+		return getObject(mapper, rs, element);
+
+	}
+
+	@Override
+	public <T> void initObj(T obj, ResultSet rs, BeanElement tempEle, List<BeanElement> eles) throws IOException, SQLException, InvocationTargetException, IllegalAccessException {
+
 			for (BeanElement ele : eles) {
-				tempEle = ele;
+
 				Method method = ele.setMethod;
 				String mapper = ele.getMapper();
 
@@ -75,55 +125,28 @@ public class MySqlDialect implements Mapper.Dialect {
 					mapper = mapper.replace("`","");
 				}
 
-				if (ele.clz.isEnum()) {
-					value = rs.getObject(mapper);
-					if (Objects.isNull(value))
-						continue;
-					String str = value.toString();
+				Object value = getObject(mapper, rs, ele);
+				method.invoke(obj, value);
 
-					Method m = ele.clz.getDeclaredMethod("valueOf", String.class);
-					Object e = m.invoke(null, str);
-					value = e;
-					method.invoke(obj, e);
-
-				} else if (ele.isJson) {
-					String str = rs.getString(mapper);
-					if (StringUtil.isNullOrEmpty(str))
-						continue;
-					value = str;
-					if (ele.clz == Map.class) {
-						method.invoke(obj, JsonX.toMap(str));
-					} else if (ele.clz == List.class) {
-						Object list = JsonX.toList(str, ele.geneType);
-						method.invoke(obj, list);
-					} else {
-						method.invoke(obj, JsonX.toObject(str, ele.clz));
-					}
-				} else if (ele.clz == BigDecimal.class) {
-
-					value = rs.getObject(mapper);
-					if (Objects.isNull(value))
-						continue;
-					method.invoke(obj, new BigDecimal((String.valueOf(value))));
-				} else {
-					value = rs.getObject(mapper);
-					if (Objects.isNull(value))
-						continue;
-
-					if (ele.clz == double.class || ele.clz == Double.class) {
-						method.invoke(obj, Double.valueOf(String.valueOf(value)));
-					} else {
-						method.invoke(obj, value);
-					}
-
-				}
 			}
-		} catch (Exception e) {
-			throw new SqlTypeException("clz:" + obj.getClass() + ", property: " + tempEle.getProperty() + ", type:"
-					+ tempEle.geneType + ", value; " + value);
-		}
+
 
 	}
 
+	@Override
+	public  String resultScript(String sql){
+		return sql;
+	}
 
+	public void setJSON(int i, String str, PreparedStatement pstmt) throws SQLException, IOException {
+
+		pstmt.setString(i, str);
+
+	}
+
+	public void setObject(int i, Object obj, PreparedStatement pstm) throws SQLException {
+
+		pstm.setObject(i, obj);
+
+	}
 }
