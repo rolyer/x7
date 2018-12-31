@@ -72,26 +72,43 @@ public class OracleDialect implements Mapper.Dialect {
         Class ec = element.clz;
 
         if (element.isJson) {
-            java.sql.Clob clob = rs.getClob(mapper);
-            Reader reader = clob.getCharacterStream();
-            char[] charArr = new char[(int) clob.length()];
-            reader.read(charArr);
-            reader.close();
+            obj = rs.getObject(mapper);
+            if (Objects.isNull(obj))
+                return null;
 
-            String str = new String(charArr);//FIXME UIF-8 ?
-            if (StringUtil.isNotNull(str)) {
-                if (!(str.startsWith("{") || str.startsWith("[")))
-                    return str;
-                if (ec == List.class) {
-                    Class geneType = element.geneType;
-                    return JsonX.toList(obj.toString(), geneType);
-                } else if (ec == Map.class) {
-                    return JsonX.toMap(obj);
-                } else {
-                    return JsonX.toObject(obj.toString(), ec);
-                }
+            String str = null;
+            if (obj instanceof String) {
+                str = obj.toString();
+            }else if (obj instanceof oracle.sql.NCLOB ){
+
+                oracle.sql.NCLOB clob = (oracle.sql.NCLOB) obj;
+
+                Reader reader = clob.getCharacterStream();
+
+                char[] charArr = new char[(int) clob.length()];
+                reader.read(charArr);
+                reader.close();
+
+                str = new String(charArr);//FIXME UIF-8 ?
+            }
+            if (StringUtil.isNullOrEmpty(str))
+                return null;
+
+            str = str.trim();
+
+            if (!(str.startsWith("{") || str.startsWith("[")))
+                return str;
+            if (ec == List.class) {
+                Class geneType = element.geneType;
+                return JsonX.toList(str, geneType);
+            } else if (ec == Map.class) {
+                return JsonX.toMap(str);
+            } else {
+                return JsonX.toObject(str, ec);
             }
         }
+
+
 
         obj = rs.getObject(mapper);
 
@@ -204,19 +221,21 @@ public class OracleDialect implements Mapper.Dialect {
 
     }
 
-    public  void setJSON(int i, String str, PreparedStatement pstmt) throws SQLException, IOException {
+    public void setJSON(int i, String str, PreparedStatement pstmt) throws SQLException, IOException {
 
-        Reader reader = new StringReader(str);
-        pstmt.setNClob(i, reader);
-        reader.close();//FIXME ?
+//        Reader reader = new StringReader(str);
+//        pstmt.setNClob(i, reader);
+//        reader.close();//FIXME ?
+
+        pstmt.setObject(i, str);
 
     }
 
     public void setObject(int i, Object obj, PreparedStatement pstm) throws SQLException {
-        if (obj instanceof Reader){
-            Reader reader = (Reader)obj;
+        if (obj instanceof Reader) {
+            Reader reader = (Reader) obj;
             pstm.setNClob(i, reader);
-        }else{
+        } else {
             pstm.setObject(i, obj);
         }
     }
