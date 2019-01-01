@@ -99,7 +99,6 @@ public class SqlCriteriaParser implements CriteriaParser {
          * select column
          */
         select(sb, criteria);
-
         /*
          * from table
          */
@@ -108,7 +107,6 @@ public class SqlCriteriaParser implements CriteriaParser {
          * StringList
          */
         x(sb, criteria);
-
         /*
          * group by
          */
