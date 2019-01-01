@@ -2,14 +2,14 @@ package x7.repository.dao;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import x7.core.bean.*;
-import x7.core.repository.Mapped;
 import x7.core.util.BeanUtil;
-import x7.core.util.BeanUtilX;
 import x7.core.util.StringUtil;
 import x7.repository.CriteriaParser;
 import x7.repository.mapper.Mapper;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class SqlCriteriaParser implements CriteriaParser {
 
@@ -115,92 +115,21 @@ public class SqlCriteriaParser implements CriteriaParser {
          */
         sort(sb, criteria);
 
-        String sql = sb.toString();
 
+        return sqlArr(sb, criteria);
+    }
+
+    private String[] sqlArr(StringBuilder sb, Criteria criteria){
         String[] sqlArr = new String[2];
         if (!criteria.isScroll()) {
-            sqlArr[0] = sql.replace(Mapped.TAG, criteria.getCountDistinct());
+            StringBuilder countSb = new StringBuilder();
+            countSb.append(SqlScript.SELECT).append(SqlScript.SPACE).append(criteria.getCountDistinct()).append(SqlScript.SPACE).append(sb);
+            sqlArr[0] = countSb.toString();
         }
 
-        sqlArr[1] = sql.replace(Mapped.TAG, criteria.resultAllScript());
-//
-//        boolean isResultMap = (criteria instanceof Criteria.ResultMapped);
-//        if (isResultMap) {
-//            // sqlArr[1]: core sql
-//
-//            String tabledSql = sqlArr[1];
-//            Criteria.ResultMapped resultMapped = (Criteria.ResultMapped) criteria;
-//            Map<String, List<String>> map = new HashMap<>();
-//
-//            String[] arr = tabledSql.split(SqlScript.SPACE); //origin ARR
-//            for (String ele : arr) {
-//                if (ele.contains(SqlScript.POINT)) {
-//                    ele = ele.replace(SqlScript.COMMA, SqlScript.NONE);//remove ","
-//                    ele = ele.trim();
-//                    String[] tc = ele.split("\\.");
-//                    String clzKey = tc[0];
-//                    String propertyKey = tc[1];
-//                    List<String> list = map.get(clzKey);
-//                    if (list == null) {
-//                        list = new ArrayList<>();
-//                        map.put(clzKey, list);
-//                    }
-//                    list.add(propertyKey);
-//                }
-//            }
-//
-//
-//            Criteria.MapMapper mapMapper = resultMapped.getMapMapper();//
-//
-//            Map<String, String> clzTableMapper = new HashMap<String, String>();
-//            {
-//                Set<Map.Entry<String, List<String>>> set = map.entrySet();
-//                for (Map.Entry<String, List<String>> entry : set) {
-//                    String key = entry.getKey();
-//                    List<String> list = entry.getValue();
-//                    Parsed parsed = Parser.get(key);
-//                    if (Objects.isNull(parsed))
-//                        throw new RuntimeException("Entity Bean Not Exist: " + BeanUtil.getByFirstUpper(key));
-//                    String tableName = parsed.getTableName();
-//                    clzTableMapper.put(key, tableName);// clzName, tableName
-//                    for (String property : list) {
-//                        String mapper = parsed.getMapper(property);
-//                        if (StringUtil.isNullOrEmpty(mapper)) {
-//                            mapper = property;// dynamic
-//                        }
-//                        mapMapper.put(key + SqlScript.POINT + property, tableName + SqlScript.POINT + mapper);
-//                    }
-//                }
-//            }
-
-//            for (int i = 0; i < 3; i++) {
-//                String temp = sqlArr[i];
-//                if (StringUtil.isNullOrEmpty(temp))
-//                    continue;
-//                if (!temp.endsWith(SqlScript.SPACE)) {
-//                    temp += SqlScript.SPACE;
-//                }
-//                for (String property : mapMapper.getPropertyMapperMap().keySet()) {
-//                    String key = SqlScript.SPACE + property + SqlScript.SPACE;
-//                    String value = SqlScript.SPACE + mapMapper.mapper(property) + SqlScript.SPACE;
-//                    temp = temp.replace(key, value);
-//                }
-//                for (String clzName : clzTableMapper.keySet()) {
-//                    String tableName = clzTableMapper.get(clzName);
-//                    temp = BeanUtilX.mapperName(temp, clzName, tableName);
-//                }
-//                sqlArr[i] = temp;
-//            }
-//
-//        } else {
-//
-//            Parsed parsed = Parser.get(criteria.getClz());
-//            for (int i = 0; i < 3; i++) {
-//                if (StringUtil.isNullOrEmpty(sqlArr[i]))
-//                    continue;
-//                sqlArr[i] = BeanUtilX.mapper(sqlArr[i], parsed);
-//            }
-//        }
+        StringBuilder sqlSb = new StringBuilder();
+        sqlSb.append(SqlScript.SELECT).append(SqlScript.SPACE).append(criteria.resultAllScript()).append(SqlScript.SPACE).append(sb);
+        sqlArr[1] = sqlSb.toString();
 
         System.out.println(sqlArr[1]);
 
@@ -311,8 +240,6 @@ public class SqlCriteriaParser implements CriteriaParser {
     }
 
     private void select(StringBuilder sb, Criteria criteria) {
-
-        sb.append(SqlScript.SELECT).append(SqlScript.SPACE).append(Mapped.TAG);
 
     }
 
