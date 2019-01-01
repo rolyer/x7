@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.xream.x7</groupId>
     <artifactId>x7-demo</artifactId>
-    <version>1.5.6-SNAPSHOT</version>
+    <version>1.5.6.RELEASE</version>
     <packaging>jar</packaging>
     <name>x7-demo</name>
     <url>http://xream.io</url>
