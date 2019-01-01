@@ -146,7 +146,7 @@ public class RepositoryBooter {
 
     private static void initDialect(Mapper.Dialect dialect) {
         MapperFactory.Dialect = dialect;
-        DaoImpl.dialect = dialect;
+        DaoImpl.getInstance().setDialect(dialect);
         ResultSetUtil.dialect = dialect;
     }
 

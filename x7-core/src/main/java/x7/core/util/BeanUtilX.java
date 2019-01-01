@@ -683,6 +683,7 @@ public class BeanUtilX extends BeanUtil {
 		}
 		return sql;
 	}
+
 	
 	public static String mapperName(String sql, Parsed parsed) {
 		

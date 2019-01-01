@@ -133,10 +133,6 @@ public class MySqlDialect implements Mapper.Dialect {
 
 	}
 
-	@Override
-	public  String resultScript(String sql){
-		return sql;
-	}
 
 	public void setJSON(int i, String str, PreparedStatement pstmt) throws SQLException, IOException {
 
@@ -148,5 +144,20 @@ public class MySqlDialect implements Mapper.Dialect {
 
 		pstm.setObject(i, obj);
 
+	}
+
+	public  Object filterValue(Object value) {
+
+		if (value instanceof String) {
+			String str = (String) value;
+			value = str.replace("<", "&lt").replace(">", "&gt");
+		}
+		return value;
+	}
+
+
+	@Override
+	public String filterResultKey(String key) {
+		return key;
 	}
 }

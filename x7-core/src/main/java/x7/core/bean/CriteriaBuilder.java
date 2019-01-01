@@ -37,10 +37,10 @@ public class CriteriaBuilder {
     private Criteria criteria;
     private CriteriaBuilder instance;
 
-    public CriteriaBuilder orderByFixed(List<? extends Object> inList){
+    public CriteriaBuilder orderByFixed(List<? extends Object> inList) {
         if (criteria.isInConditionSort())
             return instance;
-        if (Objects.nonNull(inList) && inList.size() > 0){
+        if (Objects.nonNull(inList) && inList.size() > 0) {
             this.criteria.setInConditionSort(true);
         }
         return instance;
@@ -323,8 +323,8 @@ public class CriteriaBuilder {
             if (tempList.isEmpty())
                 return instance;
 
-            if (tempList.size() == 1){
-                return eq(property,tempList.get(0));
+            if (tempList.size() == 1) {
+                return eq(property, tempList.get(0));
             }
 
             x.setPredicate(Predicate.IN);
@@ -352,8 +352,8 @@ public class CriteriaBuilder {
             if (tempList.isEmpty())
                 return instance;
 
-            if (tempList.size() == 1){
-                return ne(property,tempList.get(0));
+            if (tempList.size() == 1) {
+                return ne(property, tempList.get(0));
             }
 
             x.setPredicate(Predicate.NOT_IN);
@@ -435,7 +435,7 @@ public class CriteriaBuilder {
         this.instance = this;
     }
 
-    public static CriteriaBuilder buildCondition(){
+    public static CriteriaBuilder buildCondition() {
         Criteria criteria = new Criteria();
         CriteriaBuilder builder = new CriteriaBuilder(criteria);
         return builder;
@@ -517,458 +517,6 @@ public class CriteriaBuilder {
         return this.criteria.getClz();
     }
 
-
-    public static String parseCondition(CriteriaCondition criteriaCondition){
-        StringBuilder sb = new StringBuilder();
-        List<X> xList = criteriaCondition.getListX();
-        x(sb, xList, criteriaCondition, true);
-        return sb.toString();
-    }
-
-    public static String[] parse(Criteria criteria) {
-
-        StringBuilder sb = new StringBuilder();
-
-		/*
-         * select column
-		 */
-        select(sb, criteria);
-
-        /*
-         * from table
-		 */
-        criteria.sourceScript(sb);
-        /*
-         * StringList
-		 */
-        x(sb, criteria);
-
-        /*
-         * group by
-         */
-        groupBy(sb, criteria);
-        /*
-		 * sort
-		 */
-        sort(sb, criteria);
-
-        String sql = sb.toString();
-
-        String[] sqlArr = new String[3];
-        if (!criteria.isScroll()) {
-            sqlArr[0] = sql.replace(Mapped.TAG, criteria.getCountDistinct());
-        }
-
-        sqlArr[1] = sql.replace(Mapped.TAG, criteria.resultAllScript());
-        sqlArr[2] = sql;
-
-        boolean isResultMap = (criteria instanceof ResultMapped);
-        if (isResultMap) {
-            // sqlArr[1]: core sql
-
-            String tabledSql = sqlArr[1];
-            ResultMapped resultMapped = (ResultMapped) criteria;
-            Map<String, List<String>> map = new HashMap<>();
-            {
-                String[] arr = tabledSql.split(SqlScript.SPACE);
-                for (String ele : arr) {
-                    if (ele.contains(SqlScript.POINT)) {
-                        ele = ele.replace(SqlScript.COMMA, SqlScript.NONE);//remove ","
-                        ele = ele.trim();
-                        String[] tc = ele.split("\\.");
-                        List<String> list = map.get(tc[0]);
-                        if (list == null) {
-                            list = new ArrayList<>();
-                            map.put(tc[0], list);
-                        }
-                        list.add(tc[1]);
-                    }
-                }
-            }
-
-            Criteria.MapMapper mapMapper = resultMapped.getMapMapper();//
-            if (Objects.isNull(mapMapper)) {
-                mapMapper = new Criteria.MapMapper();
-                resultMapped.setMapMapper(mapMapper);
-            }
-            Map<String, String> clzTableMapper = new HashMap<String, String>();
-            {
-                Set<Entry<String, List<String>>> set = map.entrySet();
-                for (Entry<String, List<String>> entry : set) {
-                    String key = entry.getKey();
-                    List<String> list = entry.getValue();
-                    Parsed parsed = Parser.get(key);
-                    if (Objects.isNull(parsed))
-                        throw new RuntimeException("Entity Bean Not Exist: " + BeanUtil.getByFirstUpper(key));
-                    String tableName = parsed.getTableName();
-                    clzTableMapper.put(key, tableName);// clzName, tableName
-                    for (String property : list) {
-                        String mapper = parsed.getMapper(property);
-                        if (StringUtil.isNullOrEmpty(mapper)) {
-                            mapper = property;// dynamic
-                        }
-                        mapMapper.put(key + SqlScript.POINT + property, tableName + SqlScript.POINT + mapper);
-                    }
-                }
-            }
-
-            for (int i = 0; i < 3; i++) {
-                String temp = sqlArr[i];
-                if (StringUtil.isNullOrEmpty(temp))
-                    continue;
-                if (!temp.endsWith(SqlScript.SPACE)){
-                    temp += SqlScript.SPACE;
-                }
-                for (String property : mapMapper.getPropertyMapperMap().keySet()) {
-                    String key = SqlScript.SPACE + property + SqlScript.SPACE;
-                    String value = SqlScript.SPACE + mapMapper.mapper(property) + SqlScript.SPACE;
-                    temp = temp.replace(key,value);
-                }
-                for (String clzName : clzTableMapper.keySet()) {
-                    String tableName = clzTableMapper.get(clzName);
-                    temp = BeanUtilX.mapperName(temp, clzName, tableName);
-                }
-                sqlArr[i] = temp;
-            }
-
-        } else {
-
-            Parsed parsed = Parser.get(criteria.getClz());
-            for (int i = 0; i < 3; i++) {
-                if (StringUtil.isNullOrEmpty(sqlArr[i]))
-                    continue;
-                sqlArr[i] = BeanUtilX.mapper(sqlArr[i], parsed);
-            }
-        }
-
-        System.out.println(sqlArr[1]);
-
-        return sqlArr;
-    }
-
-    private static void select(StringBuilder sb, Criteria criteria) {
-
-        sb.append(SqlScript.SELECT).append(SqlScript.SPACE).append(Mapped.TAG);
-
-        if (!(criteria instanceof Criteria.ResultMapped))
-            return;
-
-        boolean flag = false;
-
-        ResultMapped resultMapped = (Criteria.ResultMapped) criteria;
-        StringBuilder column = new StringBuilder();
-
-        if (Objects.nonNull(resultMapped.getDistinct())) {
-
-            if (!flag) resultMapped.getResultList().clear();//去掉构造方法里设置的返回key
-
-            column.append(SqlScript.DISTINCT);
-            List<String> list = resultMapped.getDistinct().getList();
-            int size = list.size();
-            int i = 0;
-            for (String resultKey : list) {
-                column.append(resultKey).append(SqlScript.SPACE);
-                resultMapped.getResultList().add(resultKey);
-                i++;
-                if (i < size) {
-                    column.append(SqlScript.COMMA).append(SqlScript.SPACE);
-                }
-            }
-            criteria.setCountDistinct("COUNT(" + column.toString() + ") count");
-            flag = true;
-        }
-
-        List<Reduce> reduceList = resultMapped.getReduceList();
-
-        if (!reduceList.isEmpty()) {
-
-            if (!flag) resultMapped.getResultList().clear();//去掉构造方法里设置的返回key
-
-            Criteria.MapMapper mapMapper = resultMapped.getMapMapper();
-            if (Objects.isNull(mapMapper)) {
-                mapMapper = new Criteria.MapMapper();
-                resultMapped.setMapMapper(mapMapper);
-            }
-
-            for (Reduce reduce : reduceList) {
-                if (flag) {
-                    column.append(SqlScript.COMMA);
-                }
-                String alianName = reduce.getProperty() + SqlScript.UNDER_LINE + reduce.getType().toString().toLowerCase();//property_count
-                alianName = alianName.replace(SqlScript.POINT, SqlScript.UNDER_LINE);
-                column.append(reduce.getType())
-                        .append(SqlScript.SPACE).append(SqlScript.LEFT_PARENTTHESIS).append(SqlScript.SPACE)//" ( "
-                        .append(reduce.getProperty())
-                        .append(SqlScript.SPACE).append(SqlScript.RIGHT_PARENTTHESIS).append(SqlScript.SPACE)//" ) "
-                        .append(alianName);
-
-                String alainProperty = reduce.getProperty() + BeanUtil.getByFirstUpper(reduce.getType().toString().toLowerCase());
-                mapMapper.put(alainProperty, alianName);//REDUCE ALIAN NAME
-                resultMapped.getResultList().add(alainProperty);
-                flag = true;
-            }
-        }
-
-
-        String cs = column.toString();
-        if (StringUtil.isNullOrEmpty(cs)) {
-            criteria.setCustomedResultKey(null);
-        } else {
-            criteria.setCustomedResultKey(column.toString());
-        }
-
-    }
-
-    private static void groupBy(StringBuilder sb, Criteria criteria) {
-        if (criteria instanceof ResultMapped) {
-            ResultMapped rm = (ResultMapped) criteria;
-
-            String groupByS = rm.getGroupBy();
-            if (StringUtil.isNullOrEmpty(groupByS))
-                return;
-
-            sb.append(Conjunction.GROUP_BY.sql());
-
-            String[] arr = groupByS.split(SqlScript.COMMA);
-
-            int i = 0, l = arr.length;
-            for (String groupBy : arr) {
-                groupBy = groupBy.trim();
-                if (StringUtil.isNotNull(groupBy)) {
-                    sb.append(groupBy);
-                    i++;
-                    if (i<l){
-                        sb.append(SqlScript.COMMA);
-                    }
-                }
-            }
-        }
-    }
-
-    private static void sort(StringBuilder sb, Criteria criteria) {
-
-        if (criteria.isInConditionSort())
-            return;
-
-        if (StringUtil.isNotNull(criteria.getOrderBy())) {
-            String orderBy = criteria.getOrderBy();
-            List<String> orderByList = new ArrayList<>();
-            if (orderBy.contains(SqlScript.COMMA)){
-                String[] arr = orderBy.split(SqlScript.COMMA);
-                for (String ob : arr){
-                    orderByList.add(ob);
-                }
-            }else{
-                orderByList.add(orderBy);
-            }
-
-            sb.append(Conjunction.ORDER_BY.sql());
-            int size = orderByList.size();
-            int i = 0;
-            for (String ob : orderByList) {
-                sb.append(criteria.getOrderBy()).append(SqlScript.SPACE);
-                i++;
-                if (i < size){
-                    sb.append(SqlScript.COMMA).append(SqlScript.SPACE);
-                }
-            }
-            sb.append(criteria.getDirection());
-        }
-
-    }
-
-
-    private static void x(StringBuilder sb, List<X> xList, CriteriaCondition criteria, boolean isWhere) {
-        for (X x : xList) {
-
-            Object v = x.getValue();
-            if (Objects.isNull(v))
-                continue;
-
-            if(x.getPredicate() == Predicate.X){
-                appendConjunction(sb, x, criteria, isWhere);
-                sb.append(x.getValue());
-                continue;
-            }
-
-            if (Objects.nonNull(x.getConjunction())) {
-
-                List<X> subList = x.getSubList();
-                if (x.getSubList() != null) {
-                    StringBuilder xSb = new StringBuilder();
-
-                    x(xSb, subList, criteria, false);//sub concat
-
-                    String script = xSb.toString();
-                    if (StringUtil.isNotNull(script)) {
-                        final String and = Conjunction.AND.sql();
-                        final String or = Conjunction.OR.sql();
-                        if (script.startsWith(and)) {
-                            script = script.replaceFirst(and, SqlScript.NONE);
-                        } else if (script.startsWith(or)) {
-                            script = script.replaceFirst(or, SqlScript.NONE);
-                        }
-                        x.setScript(Predicate.SUB_BEGIN.sql() + script + Predicate.SUB_END.sql());
-                    }
-                }
-
-            }
-
-            if (Predicate.SUB_BEGIN == x.getPredicate()) {
-                continue;
-            } else if (Predicate.SUB_END == x.getPredicate()) {
-                continue;
-            }
-
-            if (StringUtil.isNotNull(x.getKey())) {
-                if (x.getKey().equals(Predicate.SUB.sql())) {
-                    if (Objects.nonNull(x.getScript())) {
-
-                        appendConjunction(sb, x, criteria, isWhere);
-                        sb.append(x.getScript());
-                    }
-                    continue;
-                }
-            }
-            x(x, criteria, isWhere);
-
-            if (Objects.nonNull(x.getScript())) {
-                sb.append(x.getScript());
-            }
-        }
-
-    }
-
-    private static void x(StringBuilder sb, Criteria criteria) {
-
-        List<X> xList = criteria.getListX();
-        x(sb, xList, criteria, true);
-
-    }
-
-
-    private static void appendConjunction(StringBuilder sb, X x, CriteriaCondition criteriaBuilder, boolean isWhere) {
-        if (Objects.isNull(x.getConjunction()))
-            return;
-        if (criteriaBuilder instanceof Criteria) {
-            Criteria criteria = (Criteria) criteriaBuilder;
-            if (isWhere && criteria.isWhere) {
-                criteria.isWhere = false;
-                sb.append(Conjunction.WHERE.sql());
-            } else {
-                sb.append(x.getConjunction().sql());
-            }
-        }else{
-            sb.append(x.getConjunction().sql());
-        }
-    }
-
-    private static void x(X x, CriteriaCondition criteria, boolean isWhere) {
-
-        StringBuilder sb = new StringBuilder();
-        Predicate p = x.getPredicate();
-        Object v = x.getValue();
-
-        if (p == Predicate.IN || p == Predicate.NOT_IN) {
-
-            appendConjunction(sb, x, criteria, isWhere);
-
-            sb.append(x.getKey()).append(p.sql());
-            List<Object> inList = (List<Object>) v;
-            in(sb, inList);
-        } else if (p == Predicate.BETWEEN) {
-
-            appendConjunction(sb, x, criteria, isWhere);
-
-            sb.append(x.getKey()).append(p.sql());
-            between(sb);
-
-            MinMax minMax = (MinMax) v;
-            List<Object> valueList = criteria.getValueList();
-            valueList.add(minMax.getMin());
-            valueList.add(minMax.getMax());
-
-        } else if (p == Predicate.IS_NOT_NULL || p == Predicate.IS_NULL) {
-
-            appendConjunction(sb, x, criteria, isWhere);
-
-            sb.append(v).append(p.sql());
-
-        } else {
-            if (StringUtil.isNullOrEmpty(x.getKey()))
-                return;
-
-            appendConjunction(sb, x, criteria, isWhere);
-
-            Class clz = v.getClass();
-            sb.append(x.getKey()).append(x.getPredicate().sql());
-            if (clz == String.class) {
-                String str = v.toString();
-                if (str.startsWith(SqlScript.WELL_NO) && str.endsWith(SqlScript.WELL_NO)) {
-                    str = str.replace(SqlScript.WELL_NO, SqlScript.NONE);
-                    sb.append(str);
-                    return;
-                } else {
-                    sb.append(SqlScript.PLACE_HOLDER);
-                }
-            } else {
-                sb.append(SqlScript.PLACE_HOLDER);
-            }
-
-            if (clz.getSuperclass().isEnum() || clz.isEnum()) {
-                criteria.getValueList().add(v.toString());
-            } else {
-                criteria.getValueList().add(v);
-            }
-        }
-        x.setScript(sb.toString());
-    }
-
-    private static void between(StringBuilder sb) {
-
-        sb.append(SqlScript.PLACE_HOLDER).append(Conjunction.AND.sql()).append(SqlScript.PLACE_HOLDER);
-
-    }
-
-    private static void in(StringBuilder sb, List<Object> inList) {
-
-        if (inList == null || inList.isEmpty())
-            return;
-
-        Object v = inList.get(0);
-
-        Class<?> vType = v.getClass();
-
-        boolean isNumber = (vType == long.class || vType == int.class || vType == Long.class || vType == Integer.class);
-
-        sb.append(SqlScript.LEFT_PARENTTHESIS).append(SqlScript.SPACE);//"( "
-
-        int length = inList.size();
-        if (isNumber) {
-            for (int j = 0; j < length; j++) {
-                Object id = inList.get(j);
-                if (id == null)
-                    continue;
-                sb.append(id);
-                if (j < length - 1) {
-                    sb.append(SqlScript.COMMA);
-                }
-            }
-        } else {
-            for (int j = 0; j < length; j++) {
-                Object id = inList.get(j);
-                if (id == null || StringUtil.isNullOrEmpty(id.toString()))
-                    continue;
-                sb.append(SqlScript.SINGLE_QUOTES).append(id).append(SqlScript.SINGLE_QUOTES);//'string'
-                if (j < length - 1) {
-                    sb.append(SqlScript.COMMA);
-                }
-            }
-        }
-
-        sb.append(SqlScript.SPACE).append(SqlScript.RIGHT_PARENTTHESIS);//"  )"
-
-    }
 
 
     private BeanElement getBeanElement(String property) {
@@ -1174,7 +722,7 @@ public class CriteriaBuilder {
             super.criteria.paged(paged);
             if (paged instanceof Fetched) {
                 xAddResultKey((Fetched) paged);
-            }else if (paged instanceof ResultMapping){
+            } else if (paged instanceof ResultMapping) {
                 xAddResultKey((ResultMapping) paged);
             }
             DataPermission.Chain.onBuild(super.criteria, paged);

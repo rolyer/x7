@@ -79,7 +79,7 @@ public class OracleDialect implements Mapper.Dialect {
             String str = null;
             if (obj instanceof String) {
                 str = obj.toString();
-            }else if (obj instanceof oracle.sql.NCLOB ){
+            } else if (obj instanceof oracle.sql.NCLOB) {
 
                 oracle.sql.NCLOB clob = (oracle.sql.NCLOB) obj;
 
@@ -107,7 +107,6 @@ public class OracleDialect implements Mapper.Dialect {
                 return JsonX.toObject(str, ec);
             }
         }
-
 
 
         obj = rs.getObject(mapper);
@@ -165,14 +164,13 @@ public class OracleDialect implements Mapper.Dialect {
         Parsed parsed = Parser.get(clzName);
         BeanElement element = parsed.getElement(p);
 
-        if (mapper.contains("`")) {
-            mapper = mapper.replace("`", "");
+        if (mapper.contains(SqlScript.KEY_SQL)) {
+            mapper = mapper.replace(SqlScript.KEY_SQL, SqlScript.NONE);
         }
 
-        if (mapper.contains(".")) {
-            mapper = mapper.replace(".", "#");
+        if (mapper.contains(SqlScript.POINT)) {
+            mapper = mapper.replace(SqlScript.POINT, SqlScript.WELL_NO);
         }
-
 
         return getObject(mapper, rs, element);
     }
@@ -196,30 +194,11 @@ public class OracleDialect implements Mapper.Dialect {
     }
 
     @Override
-    public String resultScript(String sql) {
-
-        String temp = sql.replaceFirst(SqlScript.SELECT, "");
-        String[] arr = temp.split(SqlScript.FROM);
-        String left = arr[0];
-        String right = arr[1];
-
-        String[] keyArr = left.split(",");
-        for (String origin : keyArr) {
-            origin = origin.trim();
-            String target = origin + " AS " + origin.replace(".", "#");
-            left = left.replace(origin, target);
-        }
-
-        StringBuffer sb = new StringBuffer();
-        sb.append(SqlScript.SELECT).append(SqlScript.SPACE);
-        sb.append(left);
-        sb.append(SqlScript.SPACE).append(SqlScript.FROM).append(SqlScript.SPACE);
-        sb.append(right);
-
-        return sb.toString();
-
-
+    public String filterResultKey(String key) {
+        String target = key + SqlScript.AS + key.replace(SqlScript.POINT, SqlScript.WELL_NO);
+        return target;
     }
+
 
     public void setJSON(int i, String str, PreparedStatement pstmt) throws SQLException, IOException {
 
@@ -238,6 +217,21 @@ public class OracleDialect implements Mapper.Dialect {
         } else {
             pstm.setObject(i, obj);
         }
+    }
+
+    public Object filterValue(Object value) {
+        if (value instanceof String) {
+            String str = (String) value;
+            value = str.replace("<", "&lt").replace(">", "&gt");
+        }else if (value instanceof Date) {
+            Date date = (Date) value;
+            Timestamp timestamp = new Timestamp(date.getTime());
+            return timestamp;
+        } else if (value instanceof Boolean) {
+            Boolean b = (Boolean) value;
+            return b.booleanValue() == true ? 1 : 0;
+        }
+        return value;
     }
 
 }

@@ -1,6 +1,7 @@
 package io.xream.x7;
 
 import io.xream.x7.demo.Cat;
+import io.xream.x7.demo.CatRO;
 import io.xream.x7.demo.controller.XxxController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -23,6 +24,18 @@ public class XxxTest {
         cat.setId(122);
 
         ViewEntity ve = this.controller.refreshByCondition(cat);
+
+        System.out.println("\n______Result: " + ve);
+
+    }
+
+    public  void test() {
+
+        CatRO cat = new CatRO();
+
+
+
+        ViewEntity ve = this.controller.test(cat);
 
         System.out.println("\n______Result: " + ve);
 

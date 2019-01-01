@@ -118,24 +118,10 @@ public interface Mapper {
 
         void setJSON(int i, String str, PreparedStatement pstmt) throws SQLException, IOException ;
 
-        String resultScript(String sql);
-
         Object mappedResult(String property, String mapper, ResultSet rs) throws SQLException, IOException;
 
+        Object filterValue(Object value);
 
-        public static Object filterValue(Object value) {
-            if (DbType.ORACLE.equals(DbType.value)) {
-
-                if (value instanceof Date) {
-                    Date date = (Date) value;
-                    Timestamp timestamp = new Timestamp(date.getTime());
-                    return timestamp;
-                }else if (value instanceof Boolean){
-                    Boolean b = (Boolean)value;
-                    return b.booleanValue() == true ? 1 : 0;
-                }
-            }
-            return value;
-        }
+        String filterResultKey(String key);
     }
 }

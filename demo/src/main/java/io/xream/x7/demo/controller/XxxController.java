@@ -109,7 +109,7 @@ public class XxxController {
 		inList.add("gggg");
 
 		CriteriaBuilder.ResultMappedBuilder builder = CriteriaBuilder.buildResultMapped(CatTest.class,ro);
-//		builder.distinct("catTest.id").reduce(Criteria.ReduceType.COUNT,"catTest.id").groupBy("catTest.id");
+		builder.distinct("catTest.id").reduce(Criteria.ReduceType.COUNT,"catTest.id").groupBy("catTest.id");
 		builder.and().in("catTest.catFriendName", inList);
 		builder.orderByFixed(inList);
 

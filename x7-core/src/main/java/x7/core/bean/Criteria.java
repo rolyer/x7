@@ -49,7 +49,7 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 
 	private transient DataPermission dataPermission;//String,Or List<String>   LikeRight | In
 
-	protected transient boolean isWhere = true;
+	public transient boolean isWhere = true;
 
 	public Criteria(){}
 
@@ -86,25 +86,24 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 		this.parsed = parsed;
 	}
 
-	protected boolean sourceScript(StringBuilder sb) {
-		sb.append(SqlScript.SPACE).append(SqlScript.FROM).append(SqlScript.SPACE).append(BeanUtil.getByFirstLower(getClz().getSimpleName()));
-		return false;
+	public String sourceScript() {
+		return BeanUtil.getByFirstLower(getClz().getSimpleName());
 	}
 
 	private transient String countDistinct = "COUNT(*) count";
-	protected void setCountDistinct(String str){
+	public void setCountDistinct(String str){
 		this.countDistinct = str;
 	}
-	protected String getCountDistinct(){
+	public String getCountDistinct(){
 		return this.countDistinct;
 	}
 
 	private transient String customedResultKey = SqlScript.STAR;
-	protected void setCustomedResultKey(String str){
+	public void setCustomedResultKey(String str){
 		this.customedResultKey = str;
 	}
 
-	protected String resultAllScript() {
+	public String resultAllScript() {
 		return customedResultKey;
 	}
 
@@ -268,24 +267,17 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 
 
 		@Override
-		protected boolean sourceScript(StringBuilder sb) {
+		public String sourceScript() {
 			if (sourceScript == null) {
-				sb.append(SqlScript.SPACE).append(SqlScript.FROM).append(SqlScript.SPACE).append(BeanUtil.getByFirstLower(getClz().getSimpleName()));
-				return false;
+				return BeanUtil.getByFirstLower(getClz().getSimpleName());
 			} else {
-				String temp = sourceScript.trim();
-				if (temp.startsWith(SqlScript.FROM) || temp.startsWith(SqlScript.FROM.toLowerCase())) {
-					sb.append(sourceScript);
-				} else {
-					sb.append(SqlScript.SPACE).append(SqlScript.FROM).append(SqlScript.SPACE).append(sourceScript);
-				}
-				return true;
+				return sourceScript;
 			}
 		}
 
 
 		@Override
-		protected String resultAllScript() {
+		public String resultAllScript() {
 			if (Objects.nonNull(super.customedResultKey)&&!super.customedResultKey.equals(SqlScript.STAR)){
 				return super.customedResultKey;
 			}else {

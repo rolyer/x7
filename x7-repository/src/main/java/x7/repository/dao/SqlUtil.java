@@ -22,10 +22,10 @@ import x7.core.repository.X;
 import x7.core.util.BeanUtil;
 import x7.core.util.BeanUtilX;
 import x7.core.util.StringUtil;
+import x7.repository.CriteriaParser;
 import x7.repository.DbType;
 import x7.repository.mapper.Mapper;
 
-import javax.swing.text.Element;
 import java.io.Reader;
 import java.io.StringReader;
 import java.lang.reflect.Field;
@@ -33,7 +33,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 
 public class SqlUtil {
@@ -137,7 +140,7 @@ public class SqlUtil {
 	 *
 	 */
 	protected static String concatRefresh(StringBuilder sb, Parsed parsed, Map<String, Object> refreshMap,
-										  RefreshCondition refreshCondition) {
+										  RefreshCondition refreshCondition, CriteriaParser criteriaParser) {
 
 		String keyOne = parsed.getKey(X.KEY_ONE);
 		Object keyOneValue = refreshMap.get(keyOne);
@@ -229,7 +232,7 @@ public class SqlUtil {
 			xList.add(0, x);
 		}
 
-		String conditionSql = CriteriaBuilder.parseCondition(condition);
+		String conditionSql = criteriaParser.parseCondition(condition);
 
 		conditionSql = BeanUtilX.mapper(conditionSql,parsed);
 
@@ -253,16 +256,6 @@ public class SqlUtil {
 		}
 	}
 
-	protected static Object filter(Object value) {
 
-		if (value instanceof String) {
-			String str = (String) value;
-			value = str.replace("<", "&lt").replace(">", "&gt");
-		}else if (value instanceof Date){
-			value = Mapper.Dialect.filterValue(value);
-		}
-
-		return value;
-	}
 
 }

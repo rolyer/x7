@@ -17,6 +17,7 @@
 package x7.repository.dao;
 
 import com.mysql.jdbc.Statement;
+import org.springframework.beans.factory.annotation.Autowired;
 import x7.core.bean.*;
 import x7.core.bean.condition.InCondition;
 import x7.core.bean.condition.ReduceCondition;
@@ -25,6 +26,7 @@ import x7.core.repository.X;
 import x7.core.util.*;
 import x7.core.web.Direction;
 import x7.core.web.Pagination;
+import x7.repository.CriteriaParser;
 import x7.repository.ResultSetUtil;
 import x7.repository.exception.PersistenceException;
 import x7.repository.exception.RollbackException;
@@ -54,9 +56,18 @@ public class DaoImpl implements Dao {
 	}
 
 	private DaoImpl() {
+		this.criteriaParser = new SqlCriteriaParser();
 	}
 
-	public static Mapper.Dialect dialect;
+	private CriteriaParser criteriaParser;
+
+	@Autowired
+	private Mapper.Dialect dialect;
+	public void setDialect(Mapper.Dialect dialect){
+		this.dialect = dialect;
+
+		this.criteriaParser.setDialect(dialect);
+	}
 
 
 
@@ -137,7 +148,7 @@ public class DaoImpl implements Dao {
 							String str = value.toString();
 							pstmt.setObject(i++, str);
 						} else {
-							value = SqlUtil.filter(value);
+							value = this.dialect.filterValue(value);
 							pstmt.setObject(i++, value);
 						}
 
@@ -252,7 +263,7 @@ public class DaoImpl implements Dao {
 						String str = value.toString();
 						pstmt.setObject(i++, str);
 					} else {
-						value = SqlUtil.filter(value);
+						value = this.dialect.filterValue(value);
 						pstmt.setObject(i++, value);
 					}
 
@@ -314,7 +325,7 @@ public class DaoImpl implements Dao {
 
 			int i = 1;
 			for (Object value : refreshMap.values()) {
-				value = SqlUtil.filter(value);
+				value = this.dialect.filterValue(value);
 				this.dialect.setObject(i++,value,pstmt);
 			}
 
@@ -582,7 +593,7 @@ public class DaoImpl implements Dao {
 
 		List<Object> valueList = criteria.getValueList();
 
-		String[] sqlArr = CriteriaBuilder.parse(criteria);
+		String[] sqlArr = this.criteriaParser.parse(criteria);
 
 		String sqlCount = sqlArr[0];
 		String sql = sqlArr[1];
@@ -665,7 +676,7 @@ public class DaoImpl implements Dao {
 		Class<?> clz = reduceCondition.getClz();
 		Parsed parsed = Parser.get(clz);
 
-		String conditionSql = CriteriaBuilder.parseCondition(reduceCondition.getCondition());
+		String conditionSql = this.criteriaParser.parseCondition(reduceCondition.getCondition());
 
 		String type = reduceCondition.getType().toString();
 		String returnStr = type.toLowerCase();
@@ -863,7 +874,7 @@ public class DaoImpl implements Dao {
 		String simpleName = BeanUtil.getByFirstLower(clz.getSimpleName());
 		StringBuilder sb = new StringBuilder();
 		sb.append(SqlScript.UPDATE).append(SqlScript.SPACE).append(simpleName).append(SqlScript.SPACE);
-		String sql = SqlUtil.concatRefresh(sb, parsed, refreshMap, refreshCondition);
+		String sql = SqlUtil.concatRefresh(sb, parsed, refreshMap, refreshCondition,this.criteriaParser);
 		sql = BeanUtilX.mapperName(sql, parsed);
 
 		System.out.println("________SQL: refreshByCondition: " + sql);
@@ -879,7 +890,7 @@ public class DaoImpl implements Dao {
 
 			int i = 1;
 			for (Object value : refreshMap.values()) {
-				value = SqlUtil.filter(value);
+				value = this.dialect.filterValue(value);
 				this.dialect.setObject(i++,value,pstmt);
 			}
 
@@ -1023,7 +1034,7 @@ public class DaoImpl implements Dao {
 
 		List<Object> valueList = criteriaResultMapped.getValueList();
 
-		String[] sqlArr = CriteriaBuilder.parse(criteriaResultMapped);
+		String[] sqlArr = this.criteriaParser.parse(criteriaResultMapped);
 
 		String sqlCount = sqlArr[0];
 		String sql = sqlArr[1];
@@ -1046,7 +1057,6 @@ public class DaoImpl implements Dao {
 
 		int start = (page - 1) * rows;
 
-		sql =  this.dialect.resultScript(sql);
 		sql = dialect.match(sql, start, rows);
 
 		System.out.println(sql);
@@ -1106,7 +1116,7 @@ public class DaoImpl implements Dao {
 
 		List<Object> valueList = resultMapped.getValueList();
 
-		String[] sqlArr = CriteriaBuilder.parse(resultMapped);
+		String[] sqlArr = this.criteriaParser.parse(resultMapped);
 
 		String sql = sqlArr[1];
 
@@ -1114,8 +1124,7 @@ public class DaoImpl implements Dao {
 		int rows = resultMapped.getRows();
 		int start = (page - 1) * rows;
 
-		String resultScript = this.dialect.resultScript(sql);
-		sql = sql.replace(SqlScript.STAR, resultScript);
+
 		sql = dialect.match(sql, start, rows);
 
 		System.out.println(sql);
