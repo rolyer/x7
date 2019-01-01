@@ -3,6 +3,7 @@ package x7.repository.dao;
 import org.springframework.beans.factory.annotation.Autowired;
 import x7.core.bean.*;
 import x7.core.util.BeanUtil;
+import x7.core.util.BeanUtilX;
 import x7.core.util.StringUtil;
 import x7.repository.CriteriaParser;
 import x7.repository.mapper.Mapper;
@@ -69,6 +70,8 @@ public class SqlCriteriaParser implements CriteriaParser {
 
         Class clz = criteria.getClz();
         Parsed parsed = Parser.get(clz);
+        if (key.equals(BeanUtilX.getByFirstLower(clz.getSimpleName())))
+            return parsed.getTableName();
         String value = parsed.getMapper(key);
         if (value == null)
             return key;
