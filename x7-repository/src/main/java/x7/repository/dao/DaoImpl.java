@@ -306,7 +306,7 @@ public class DaoImpl implements Dao {
 
 		Map<String, Object> refreshMap = BeanUtilX.getRefreshMap(parsed, obj);
 
-		String tableName = MapperFactory.getTableName(clz);
+		String tableName = parsed.getTableName();
 		StringBuilder sb = new StringBuilder();
 		sb.append(SqlScript.UPDATE).append(SqlScript.SPACE).append(tableName).append(SqlScript.SPACE);
 		String sql = SqlUtil.concatRefresh(sb, parsed, refreshMap);
@@ -871,11 +871,10 @@ public class DaoImpl implements Dao {
 
 		Map<String, Object> refreshMap = BeanUtilX.getRefreshMap(parsed, obj);
 
-		String simpleName = BeanUtil.getByFirstLower(clz.getSimpleName());
+		String tableName = parsed.getTableName();
 		StringBuilder sb = new StringBuilder();
-		sb.append(SqlScript.UPDATE).append(SqlScript.SPACE).append(simpleName).append(SqlScript.SPACE);
+		sb.append(SqlScript.UPDATE).append(SqlScript.SPACE).append(tableName).append(SqlScript.SPACE);
 		String sql = SqlUtil.concatRefresh(sb, parsed, refreshMap, refreshCondition,this.criteriaParser);
-		sql = BeanUtilX.mapperName(sql, parsed);
 
 		System.out.println("________SQL: refreshByCondition: " + sql);
 
@@ -894,13 +893,7 @@ public class DaoImpl implements Dao {
 				this.dialect.setObject(i++,value,pstmt);
 			}
 
-			/*
-			 * 处理KEY
-			 */
-			Field keyOneField = parsed.getKeyField(X.KEY_ONE);
-			if (Objects.isNull(keyOneField))
-				throw new PersistenceException("No setting of PrimaryKey by @X.Key");
-			SqlUtil.adpterRefreshCondition(pstmt, keyOneField, obj, i, refreshCondition.getCondition());
+			SqlUtil.adpterRefreshCondition(pstmt, i, refreshCondition.getCondition());
 
 			flag = pstmt.executeUpdate() == 0 ? false : true;
 

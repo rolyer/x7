@@ -59,8 +59,8 @@ public class SqlUtil {
 	}
 
 	protected static void adpterSqlKey(PreparedStatement pstmt, Field keyOneF,  Object obj, int i)
-			throws SQLException, NoSuchMethodException, SecurityException, IllegalAccessException,
-			IllegalArgumentException, InvocationTargetException {
+			throws SQLException, SecurityException, IllegalAccessException,
+			IllegalArgumentException{
 		/*
 		 * 处理KEY
 		 */
@@ -241,9 +241,9 @@ public class SqlUtil {
 		return sb.toString();
 	}
 
-	protected static void adpterRefreshCondition(PreparedStatement pstmt, Field keyOneF, Object obj,
-			int i, CriteriaCondition condition) throws SQLException, NoSuchMethodException, SecurityException,
-					IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+	protected static void adpterRefreshCondition(PreparedStatement pstmt,
+			int i, CriteriaCondition condition) throws SQLException, SecurityException,
+			IllegalArgumentException {
 
 		if (Objects.nonNull(condition)) {
 			for (Object v : condition.getValueList()) {
