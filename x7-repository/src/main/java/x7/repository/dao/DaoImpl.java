@@ -65,7 +65,6 @@ public class DaoImpl implements Dao {
 	private Mapper.Dialect dialect;
 	public void setDialect(Mapper.Dialect dialect){
 		this.dialect = dialect;
-
 		this.criteriaParser.setDialect(dialect);
 	}
 
@@ -126,7 +125,6 @@ public class DaoImpl implements Dao {
 			for (Object o : objList) {
 
 				int i = 1;
-
 				for (BeanElement ele : eles) {
 
 					Object value = ele.getMethod.invoke(o);
@@ -140,7 +138,6 @@ public class DaoImpl implements Dao {
 							value = 0;
 						pstmt.setObject(i++, value);
 					} else {
-
 						if (ele.isJson) {
 							String str = JsonX.toJson(value);
 							this.dialect.setJSON(i++,str,pstmt);
@@ -151,7 +148,6 @@ public class DaoImpl implements Dao {
 							value = this.dialect.filterValue(value);
 							pstmt.setObject(i++, value);
 						}
-
 					}
 
 				}
@@ -162,12 +158,11 @@ public class DaoImpl implements Dao {
 
 			pstmt.executeBatch();
 
-
 		} catch (Exception e) {
 			System.out.println("Exception occured, while create: " + obj);
 			e.printStackTrace();
 
-			throw new RollbackException("RollbackException: " + e.getMessage());
+			throw new RollbackException("RollbackException: " + e.getMessage() + ", while create: " + obj);
 
 		} finally {
 			DataSourceUtil.releaseConnection(conn);
@@ -212,7 +207,6 @@ public class DaoImpl implements Dao {
 	}
 
 	protected long create(Object obj, Connection conn) {
-		long id = -1;
 
 		Class clz = obj.getClass();
 
@@ -220,6 +214,7 @@ public class DaoImpl implements Dao {
 
 		List<BeanElement> eles = MapperFactory.getElementList(clz);
 
+		long id = -1;
 		PreparedStatement pstmt = null;
 		try {
 			Parsed parsed = Parser.get(clz);
@@ -301,14 +296,15 @@ public class DaoImpl implements Dao {
 
 		@SuppressWarnings("rawtypes")
 		Class clz = obj.getClass();
-
 		Parsed parsed = Parser.get(clz);
+
+		String tableName = parsed.getTableName();
+
+		StringBuilder sb = new StringBuilder();
+		sb.append(SqlScript.UPDATE).append(SqlScript.SPACE).append(tableName).append(SqlScript.SPACE);
 
 		Map<String, Object> refreshMap = BeanUtilX.getRefreshMap(parsed, obj);
 
-		String tableName = parsed.getTableName();
-		StringBuilder sb = new StringBuilder();
-		sb.append(SqlScript.UPDATE).append(SqlScript.SPACE).append(tableName).append(SqlScript.SPACE);
 		String sql = SqlUtil.concatRefresh(sb, parsed, refreshMap);
 
 		System.out.println("refresh normally: " + sql);
@@ -439,11 +435,10 @@ public class DaoImpl implements Dao {
 
 		sql = sql.replace("drop", SqlScript.SPACE).replace("delete", SqlScript.SPACE).replace("insert", SqlScript.SPACE).replace(";", SqlScript.SPACE); // 手动拼接SQL,
 																										// 必须考虑应用代码的漏
-
 		Parsed parsed = Parser.get(clz);
 
-		sql = BeanUtilX.mapper(sql, parsed);
-		sql = BeanUtilX.mapperForManu(sql, parsed);
+		sql = BeanUtilX.mapper(sql, parsed);//FIXME 解析之后, 替换,拼接
+		sql = BeanUtilX.mapperForManu(sql, parsed);//FIXME 解析之后, 替换,拼接
 
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 
@@ -730,7 +725,7 @@ public class DaoImpl implements Dao {
 	}
 
 	/**
-	 * Important getCount
+	 *  getCount
 	 * 
 	 * @param sql
 	 * @param set
@@ -829,7 +824,8 @@ public class DaoImpl implements Dao {
 
 	/**
 	 * 没有特殊需求，请不要调用此代码
-	 * 
+	 *
+	 * @param obj
 	 * @param sql
 	 */
 	@Deprecated
@@ -922,14 +918,9 @@ public class DaoImpl implements Dao {
 	@Override
 	public <T> List<T> in(InCondition inCondition) {
 
-		List<T> list = new ArrayList<T>();
-
 		Class<T> clz = inCondition.getClz();
 		String inProperty = inCondition.getProperty();
 		List<? extends Object> inList = inCondition.getInList();
-
-		String sql = MapperFactory.getSql(clz, Mapper.LOAD);
-		List<BeanElement> eles = MapperFactory.getElementList(clz);
 
 		Parsed parsed = Parser.get(clz);
 
@@ -945,7 +936,10 @@ public class DaoImpl implements Dao {
 					"Exception in method: <T> List<T> in(inCondition), no property: "
 							+ inProperty);
 
-		Class<?> keyType = be.getMethod.getReturnType();
+
+		String sql = MapperFactory.getSql(clz, Mapper.LOAD);
+		List<BeanElement> eles = MapperFactory.getElementList(clz);
+
 		String mapper = parsed.getMapper(inProperty);
 
 		StringBuilder sb = new StringBuilder();
@@ -953,6 +947,7 @@ public class DaoImpl implements Dao {
 		sb.append(sql).append(SqlScript.WHERE).append(mapper);
 		sb.append(SqlScript.IN).append(SqlScript.LEFT_PARENTTHESIS);//" IN ("
 
+		Class<?> keyType = be.getMethod.getReturnType();
 		boolean isNumber = (keyType == long.class || keyType == int.class || keyType == Long.class
 				|| keyType == Integer.class);
 		
@@ -984,6 +979,8 @@ public class DaoImpl implements Dao {
 		sql = sb.toString();
 
 		System.out.println(sql);
+
+		List<T> list = new ArrayList<T>();// return list
 
 		Connection conn = null;
 		PreparedStatement pstmt = null;

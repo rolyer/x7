@@ -17,25 +17,15 @@
 package x7.repository.mapper;
 
 import x7.core.bean.BeanElement;
-import x7.core.bean.Criteria;
-import x7.core.bean.Parsed;
-import x7.core.bean.Parser;
-import x7.core.util.JsonX;
-import x7.core.util.StringUtil;
-import x7.repository.DbType;
 
 import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 public interface Mapper {
 

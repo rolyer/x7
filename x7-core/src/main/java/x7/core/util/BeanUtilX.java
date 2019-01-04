@@ -649,12 +649,12 @@ public class BeanUtilX extends BeanUtil {
 		if (!sql.contains(COMMA))
 			return sql;
 
-		for (String property : parsed.getPropertyMapperMap().keySet()){
+		for (String property : parsed.getPropertyMapperMap().keySet()){//FIXME 解析之后, 替换,拼接
 			String key = SPACE+property+COMMA;
 			String value = SPACE+parsed.getMapper(property)+COMMA;
 			sql = sql.replaceAll(key, value);
 		}
-		for (String property : parsed.getPropertyMapperMap().keySet()){
+		for (String property : parsed.getPropertyMapperMap().keySet()){//FIXME 解析之后, 替换,拼接
 			String key = COMMA+property+COMMA;
 			String value = COMMA+parsed.getMapper(property)+COMMA;
 			sql = sql.replaceAll(key, value);
@@ -671,7 +671,7 @@ public class BeanUtilX extends BeanUtil {
 		sql = mapperName(sql, parsed);
 
 		boolean flag = sql.contains(SQL_REF);
-		for (String property : parsed.getPropertyMapperMap().keySet()){
+		for (String property : parsed.getPropertyMapperMap().keySet()){//FIXME 解析之后, 替换,拼接
 			String key = SPACE+property+SPACE;
 			String value = SPACE+parsed.getMapper(property)+SPACE;
 			sql = sql.replaceAll(key, value);

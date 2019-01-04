@@ -27,15 +27,19 @@ public class DataSourceUtil {
 
     public static Connection getConnection() {
 
-        DataSource ds = DataSourceRouter.getDataSource();
+        String key = DataSourceHolder.READABLE_DEFAULT;
+        DataSource ds = DataSourceHolder.getDataSource();
 
         return DataSourceUtils.getConnection(ds);
     }
 
     public static void releaseConnection(Connection conn){
 
-        DataSource ds = DataSourceRouter.getDataSource();
+        String key = DataSourceHolder.READABLE_DEFAULT;
+        DataSource ds = DataSourceHolder.get(key);
 
         DataSourceUtils.releaseConnection(conn,ds);
     }
+
+
 }

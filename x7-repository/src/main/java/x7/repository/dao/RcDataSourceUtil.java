@@ -147,9 +147,9 @@ public class RcDataSourceUtil {
     }
 
     private static DataSource getDataSourceReadable(){
-        DataSource ds = DataSourceRouter.getDataSourceReadable();
+        DataSource ds = DataSourceHolder.getReadableDataSource();
         if (ds == null) {
-            ds = DataSourceRouter.getDataSource();
+            ds = DataSourceHolder.getDataSource();
         }
         return ds;
     }

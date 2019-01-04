@@ -350,9 +350,17 @@ public class TextParser{
 						o = new ConcurrentHashMap<String,Object>();
 						mapObject.put(k, o);
 					}
-					mapObject = (Map<String, Object>) o;
+					if (mapObject instanceof Map) {
+                        mapObject = (Map<String, Object>) o;
+                    }else{
+					    System.err.println("_________Config unhappy for x7-config's map:  key = " + k);
+                    }
 				}
-				mapObject.put(keyList.get(length), value);
+				if (mapObject instanceof Map) {
+                    mapObject.put(keyList.get(length), value);
+                }else{
+                    System.err.println("_________Config unhappy for x7-config's map:  key = " + keyList.get(length));
+                }
 			}else {
 				map.put(key, value);
 			}

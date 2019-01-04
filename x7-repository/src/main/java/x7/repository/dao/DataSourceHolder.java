@@ -18,26 +18,43 @@ package x7.repository.dao;
 
 
 import javax.sql.DataSource;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-public class DataSourceRouter {
+public class DataSourceHolder {
+
+    public final static String WRITEABLE_DEFAULT = "dataSource";
+    public final static String READABLE_DEFAULT = "readableDataSource";
 
     private static DataSource dataSource;
-    private static DataSource dataSourceReadable;
+    private static DataSource readableDataSource;
 
     public static DataSource getDataSource() {
         return dataSource;
     }
 
     public static void setDataSource(DataSource dataSource) {
-        DataSourceRouter.dataSource = dataSource;
+        DataSourceHolder.dataSource = dataSource;
+        put(WRITEABLE_DEFAULT,dataSource);
     }
 
-    public static DataSource getDataSourceReadable() {
-        return dataSourceReadable;
+    public static DataSource getReadableDataSource() {
+        return readableDataSource;
     }
 
-    public static void setDataSourceReadable(DataSource dataSourceReadable) {
-        DataSourceRouter.dataSourceReadable = dataSourceReadable;
+    public static void setReadableDataSource(DataSource readableDatasource) {
+        DataSourceHolder.readableDataSource = readableDatasource;
+        put(READABLE_DEFAULT,readableDatasource);
+    }
+
+    private final static Map<String,DataSource> map = new ConcurrentHashMap<>();
+
+    public static void put(String key, DataSource dataSource){
+        map.put(key, dataSource);
+    }
+
+    public static DataSource get(String key) {
+        return map.get(key);
     }
 
 }

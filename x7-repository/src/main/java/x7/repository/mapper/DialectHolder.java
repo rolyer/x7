@@ -14,8 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package x7;
+package x7.repository.mapper;
 
-public class X7Env {
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+public class DialectHolder {
+
+    private static Map<String,Mapper.Dialect> map = new ConcurrentHashMap<>();
+
+    public static void put(String dataSourceId, Mapper.Dialect dialect) {
+        map.put(dataSourceId,dialect);
+    }
+
+    public static Mapper.Dialect get(String dataSourceId) {
+        return map.get(dataSourceId);
+    }
 
 }

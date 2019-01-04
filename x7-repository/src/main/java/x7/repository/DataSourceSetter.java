@@ -16,7 +16,7 @@
  */
 package x7.repository;
 
-import x7.repository.dao.DataSourceRouter;
+import x7.repository.dao.DataSourceHolder;
 
 import javax.sql.DataSource;
 
@@ -24,8 +24,8 @@ import javax.sql.DataSource;
 public class DataSourceSetter {
 	
 	protected static void set(DataSource dsW, DataSource dsR){
-		DataSourceRouter.setDataSource(dsW);
-		DataSourceRouter.setDataSourceReadable(dsR);
+		DataSourceHolder.setDataSource(dsW);
+		DataSourceHolder.setReadableDataSource(dsR);
 	}
 
 }

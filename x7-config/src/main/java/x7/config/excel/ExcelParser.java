@@ -29,7 +29,6 @@ import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import x7.core.async.ScheduledTaskService;
 import x7.core.bean.KV;
-import x7.core.config.Configs;
 import x7.core.template.ITemplateable;
 import x7.core.template.Templates;
 import x7.core.util.TimeUtil;
