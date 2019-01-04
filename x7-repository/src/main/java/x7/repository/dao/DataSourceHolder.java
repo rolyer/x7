@@ -35,7 +35,8 @@ public class DataSourceHolder {
 
     public static void setDataSource(DataSource dataSource) {
         DataSourceHolder.dataSource = dataSource;
-        put(WRITEABLE_DEFAULT,dataSource);
+        if (dataSource != null)
+            put(WRITEABLE_DEFAULT,dataSource);
     }
 
     public static DataSource getReadableDataSource() {
@@ -44,7 +45,8 @@ public class DataSourceHolder {
 
     public static void setReadableDataSource(DataSource readableDatasource) {
         DataSourceHolder.readableDataSource = readableDatasource;
-        put(READABLE_DEFAULT,readableDatasource);
+        if (readableDatasource != null)
+            put(READABLE_DEFAULT,readableDatasource);
     }
 
     private final static Map<String,DataSource> map = new ConcurrentHashMap<>();
