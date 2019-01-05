@@ -325,7 +325,7 @@ public class ExcelParser {
 					continue;
 
 				if (index >= rows)
-					break;
+					continue;
 
 				String str = rowArr[index].getContents();
 				if (str == null || str.trim().equals(""))
