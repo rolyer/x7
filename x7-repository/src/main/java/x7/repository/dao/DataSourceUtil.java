@@ -32,7 +32,6 @@ public class DataSourceUtil {
         DataSource ds = DataSourceHolder.getDataSource();
 
         Connection conn = DataSourceUtils.getConnection(ds);
-        conn.setAutoCommit(false);
 
         return conn;
     }
