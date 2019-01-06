@@ -43,13 +43,13 @@ public class XxxController {
 	public ViewEntity create(){
 
 		Cat cat = new Cat();
-		cat.setId(230);
+		cat.setId(232);
 		cat.setDogId(2);
 
 		this.catRepository.create(cat);
 
 		Cat cat2 = new Cat();
-		cat2.setId(231);
+		cat2.setId(233);
 		cat2.setDogId(2);
 
 		this.catRepository.create(cat2);
