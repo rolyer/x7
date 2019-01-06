@@ -35,7 +35,7 @@ public class XxxTest {
 
 
 
-        ViewEntity ve = this.controller.test(cat);
+        ViewEntity ve = this.controller.create();
 
         System.out.println("\n______Result: " + ve);
 

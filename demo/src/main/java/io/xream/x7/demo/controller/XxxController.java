@@ -4,6 +4,7 @@ import io.xream.x7.demo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,6 +24,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/xxx")
+@Transactional
 public class XxxController {
 
 	@Autowired
@@ -35,6 +37,27 @@ public class XxxController {
 //	private RedisTemplate template;
 //	@Resource(name = "stringRedisTemplate")
 //	private StringRedisTemplate stringRedisTemplate;
+
+	@RequestMapping("/create")
+	@Transactional
+	public ViewEntity create(){
+
+		Cat cat = new Cat();
+		cat.setId(230);
+		cat.setDogId(2);
+
+		this.catRepository.create(cat);
+
+		Cat cat2 = new Cat();
+		cat2.setId(231);
+		cat2.setDogId(2);
+
+		this.catRepository.create(cat2);
+
+//		throw new RuntimeException("-----------------------------> test wawawawa");
+
+		return ViewEntity.ok();
+	}
 
 	@RequestMapping("/refresh")
 	public ViewEntity refreshByCondition(@RequestBody Cat cat){

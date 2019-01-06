@@ -908,9 +908,14 @@ public class DaoImpl implements Dao {
 
 
 	@Override
-	public <T> boolean refreshByCondition(RefreshCondition<T> refreshCondition) {
+	public <T> boolean refreshByCondition(RefreshCondition<T> refreshCondition)  {
 
-		Connection conn = DataSourceUtil.getConnection();
+		Connection conn = null;
+		try {
+			conn = DataSourceUtil.getConnection();
+		} catch (Exception e) {
+			throw new RuntimeException("NO CONNECTION");
+		}
 
 		return refreshByCondition(refreshCondition, conn);
 	}

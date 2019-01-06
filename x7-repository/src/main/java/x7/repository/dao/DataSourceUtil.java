@@ -20,23 +20,27 @@ import org.springframework.jdbc.datasource.DataSourceUtils;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
+import java.sql.SQLException;
 
 
 public class DataSourceUtil {
 
 
-    public static Connection getConnection() {
+    public static Connection getConnection() throws SQLException {
 
-        String key = DataSourceHolder.READABLE_DEFAULT;
+        String key = DataSourceHolder.WRITEABLE_DEFAULT;
         DataSource ds = DataSourceHolder.getDataSource();
 
-        return DataSourceUtils.getConnection(ds);
+        Connection conn = DataSourceUtils.getConnection(ds);
+        conn.setAutoCommit(false);
+
+        return conn;
     }
 
     public static void releaseConnection(Connection conn){
 
-        String key = DataSourceHolder.READABLE_DEFAULT;
-        DataSource ds = DataSourceHolder.get(key);
+        String key = DataSourceHolder.WRITEABLE_DEFAULT;
+        DataSource ds = DataSourceHolder.getDataSource();
 
         DataSourceUtils.releaseConnection(conn,ds);
     }
