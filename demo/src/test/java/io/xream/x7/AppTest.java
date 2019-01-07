@@ -17,7 +17,7 @@ public class AppTest {
     @Test
     public void testAll(){
 
-        xxxTest.test();
+        xxxTest.testOne();
 
     }
 

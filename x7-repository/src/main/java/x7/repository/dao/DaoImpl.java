@@ -1086,6 +1086,10 @@ public class DaoImpl implements Dao {
 						mapR.put(property, obj);
 					}
 				}
+
+				String resultKey0 = resultKeyList.get(0);
+				if (!resultKey0.contains("."))
+					return pagination;
 			}
 
 		} catch (Exception e) {
@@ -1094,6 +1098,8 @@ public class DaoImpl implements Dao {
 			close(pstmt);
 			close(conn);
 		}
+
+
 
 		List<Map<String, Object>> stringKeyMapList = pagination.getList();
 		if (!stringKeyMapList.isEmpty()) {

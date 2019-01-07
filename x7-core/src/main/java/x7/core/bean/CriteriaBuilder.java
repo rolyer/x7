@@ -713,6 +713,8 @@ public class CriteriaBuilder {
             if (mappedKey == null)
                 return;
             String[] arr = mappedKey.getResultKeys();
+            if (arr == null || arr.length == 0)
+                return;
             List<String> list = Arrays.asList(arr);
             xAddResultKey(list);
         }

@@ -129,6 +129,7 @@ public class JedisConnector_Persistence {
 		return obj.toString().trim();
 	}
 
+
 	public long hincrBy(String mapName, String key, long increment) {
 		return this.stringRedisTemplate.opsForHash().increment(mapName,key,increment);
 	}

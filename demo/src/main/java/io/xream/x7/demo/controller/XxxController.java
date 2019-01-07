@@ -102,8 +102,6 @@ public class XxxController {
 	@RequestMapping("/test")
 	public ViewEntity test(@RequestBody CatRO ro) {
 
-
-		
 		{// sample, send the json by ajax from web page
 			Map<String, Object> catMap = new HashMap<>();
 			catMap.put("id", "");
@@ -121,8 +119,8 @@ public class XxxController {
 
 		String[] resultKeys = {
 				"catTest.id",
-//				"dotTest.number",
-//				"dotTest.userName"
+//				"dogTest.number",
+				"dogTest.userName"
 		};
 
 		ro.setResultKeys(resultKeys);
@@ -132,9 +130,9 @@ public class XxxController {
 		inList.add("gggg");
 
 		CriteriaBuilder.ResultMappedBuilder builder = CriteriaBuilder.buildResultMapped(CatTest.class,ro);
-		builder.distinct("catTest.id").reduce(Criteria.ReduceType.COUNT,"catTest.id").groupBy("catTest.id");
+//		builder.distinct("catTest.id").reduce(Criteria.ReduceType.COUNT,"catTest.id").groupBy("catTest.id");
 		builder.and().in("catTest.catFriendName", inList);
-		builder.orderByFixed(inList);
+//		builder.orderByFixed(inList);
 
 
 //		builder.or().beginSub().eq("dogTest.userName","yyy")
@@ -168,5 +166,43 @@ public class XxxController {
 	}
 
 
+
+	@RequestMapping("/testOne")
+	public ViewEntity testOne(@RequestBody CatRO ro) {
+
+
+		String[] resultKeys = {
+				"id",
+		};
+
+//		ro.setResultKeys(resultKeys);
+
+		List<Object> inList = new ArrayList<>();
+		inList.add("BL");
+		inList.add("NL");
+
+		CriteriaBuilder.ResultMappedBuilder builder = CriteriaBuilder.buildResultMapped(Cat.class,ro);
+//		builder.distinct("id").reduce(Criteria.ReduceType.COUNT,"dogId").groupBy("id");
+		builder.and().in("type", inList);
+//		builder.orderByFixed(inList);
+
+
+//		builder.or().beginSub().eq("dogTest.userName","yyy")
+//				.or().like("dogTest.userName",null)
+//				.or().likeRight("dogTest.userName", "xxx")
+//				.endSub();
+//		builder.or().beginSub().eq("dogTest.userName", "uuu").endSub();
+
+
+//		String sourceScript = "cat";
+
+		Criteria.ResultMapped resultMapped = builder.get();
+
+		Pagination<Map<String,Object>> pagination = repository.find(resultMapped);
+
+
+		return ViewEntity.ok(pagination);
+
+	}
 
 }

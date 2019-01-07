@@ -174,21 +174,36 @@ public class OracleDialect implements Mapper.Dialect {
     @Override
     public Object mappedResult(String property, String mapper, ResultSet rs) throws SQLException, IOException {
 
-        String[] arr = property.split("\\.");
-        String clzName = arr[0];
-        String p = arr[1];
-        Parsed parsed = Parser.get(clzName);
-        BeanElement element = parsed.getElement(p);
+        if (mapper == null)
+            throw new RuntimeException("Result key is empty?");
 
-        if (mapper.contains(SqlScript.KEY_SQL)) {
-            mapper = mapper.replace(SqlScript.KEY_SQL, SqlScript.NONE);
+        if (property.contains(".")) {
+            String[] arr = property.split("\\.");
+            String clzName = arr[0];
+            String p = arr[1];
+            Parsed parsed = Parser.get(clzName);
+            BeanElement element = parsed.getElement(p);
+
+            if (mapper.contains(SqlScript.KEY_SQL)) {
+                mapper = mapper.replace(SqlScript.KEY_SQL, SqlScript.NONE);
+            }
+
+            if (mapper.contains(SqlScript.POINT)) {
+                mapper = mapper.replace(SqlScript.POINT, SqlScript.WELL_NO);
+            }
+
+            if (element == null){
+                return rs.getObject(mapper);
+            }
+
+            return getObject(mapper, rs, element);
+        }else {
+            if (mapper.contains(SqlScript.KEY_SQL)) {
+                mapper = mapper.replace(SqlScript.KEY_SQL, SqlScript.NONE);
+            }
+            return rs.getObject(mapper);
         }
 
-        if (mapper.contains(SqlScript.POINT)) {
-            mapper = mapper.replace(SqlScript.POINT, SqlScript.WELL_NO);
-        }
-
-        return getObject(mapper, rs, element);
     }
 
     @Override

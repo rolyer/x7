@@ -174,7 +174,10 @@ public class SqlCriteriaParser implements CriteriaParser {
         Criteria.ResultMapped resultMapped = (Criteria.ResultMapped) criteria;
         StringBuilder column = new StringBuilder();
 
+        Criteria.MapMapper mapMapper = resultMapped.getMapMapper();
+
         if (Objects.nonNull(resultMapped.getDistinct())) {
+
 
             if (!flag) resultMapped.getResultList().clear();//去掉构造方法里设置的返回key
 
@@ -186,7 +189,8 @@ public class SqlCriteriaParser implements CriteriaParser {
 
                 String value = mapping(resultKey, criteria);
                 column.append(SqlScript.SPACE).append(value);
-//                resultMapped.getResultList().add(resultKey);
+                resultMapped.getResultList().add(resultKey);//返回值
+                mapMapper.put(resultKey, value);//REDUCE ALIAN NAME
                 i++;
                 if (i < size) {
                     column.append(SqlScript.COMMA);
@@ -202,8 +206,6 @@ public class SqlCriteriaParser implements CriteriaParser {
         if (!reduceList.isEmpty()) {
 
             if (!flag) resultMapped.getResultList().clear();//去掉构造方法里设置的返回key
-
-            Criteria.MapMapper mapMapper = resultMapped.getMapMapper();
 
 
             for (Reduce reduce : reduceList) {
@@ -222,7 +224,7 @@ public class SqlCriteriaParser implements CriteriaParser {
 
 //                String alianProperty = reduce.getProperty() + BeanUtil.getByFirstUpper(reduce.getType().toString().toLowerCase());
                 mapMapper.put(alianProperty, alianName);//REDUCE ALIAN NAME
-//                resultMapped.getResultList().add(alianProperty);
+                resultMapped.getResultList().add(alianProperty);
                 flag = true;
             }
         }
@@ -234,7 +236,7 @@ public class SqlCriteriaParser implements CriteriaParser {
 
             StringBuilder sb = new StringBuilder();
             if (resultList.isEmpty()) {
-                sb.append(SqlScript.SPACE).append(SqlScript.STAR).append(SqlScript.SPACE);
+                throw new RuntimeException("Suggest API: find(Criteria criteria)");
             } else {
                 int size = resultList.size();
                 for (int i = 0; i < size; i++) {
@@ -242,6 +244,8 @@ public class SqlCriteriaParser implements CriteriaParser {
                     String value = mapping(key,criteria);
 
                     value = this.dialect.filterResultKey(value);
+
+                    mapMapper.put(key, value);
 
                     sb.append(SqlScript.SPACE ).append(value);
                     if (i < size - 1) {
