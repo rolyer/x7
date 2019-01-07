@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.xream.x7</groupId>
     <artifactId>x7-parent</artifactId>
-    <version>1.5.8.RELEASE</version>
+    <version>1.5.9.RELEASE</version>
     <packaging>pom</packaging>
     <name>x7-parent</name>
     <description>x7 base on spring boot</description>
@@ -215,7 +215,7 @@
                     </execution>
                 </executions>
             </plugin>
-<!--
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
@@ -230,7 +230,7 @@
                     </execution>
                 </executions>
             </plugin>
--->
+
         </plugins>
         <resources>
             <resource>
