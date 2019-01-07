@@ -70,8 +70,6 @@ public class SqlCriteriaParser implements CriteriaParser {
 
             String value = parsed.getTableName() + SqlScript.POINT + parsed.getMapper(property);
 
-            getMapMapper(criteria).put(key, value);
-
             return value;
         }
 
@@ -243,9 +241,9 @@ public class SqlCriteriaParser implements CriteriaParser {
                     String key = resultList.get(i);
                     String value = mapping(key,criteria);
 
-                    value = this.dialect.filterResultKey(value);
-
                     mapMapper.put(key, value);
+
+                    value = this.dialect.filterResultKey(value);
 
                     sb.append(SqlScript.SPACE ).append(value);
                     if (i < size - 1) {

@@ -1,12 +1,13 @@
 package io.xream.x7.demo;
 
+import x7.core.web.Fetched;
 import x7.core.web.ResultMapping;
 import x7.core.web.TokenedAndPagedRo;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class CatRO extends TokenedAndPagedRo implements ResultMapping {
+public class CatRO extends TokenedAndPagedRo implements Fetched {
 
 	private String catFriendName;
 	
@@ -23,8 +24,13 @@ public class CatRO extends TokenedAndPagedRo implements ResultMapping {
 		this.resultKeyMap = resultKeyMap;
 	}
 
-	private String[] resultKeys;
 	@Override
+	public Map<String, Object> getResultKeyMap() {
+		return resultKeyMap;
+	}
+
+	private String[] resultKeys;
+
 	public String[] getResultKeys() {
 		return resultKeys;
 	}

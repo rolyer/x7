@@ -112,8 +112,8 @@ public class XxxController {
 			dogMap.put("number", "");
 			dogMap.put("userName", "");
 
-//			ro.getResultKeyMap().put("catTest", catMap);
-//			ro.getResultKeyMap().put("dogTest", dogMap);
+			ro.getResultKeyMap().put("catTest", catMap);
+			ro.getResultKeyMap().put("dogTest", dogMap);
 		}
 
 
@@ -123,7 +123,9 @@ public class XxxController {
 				"dogTest.userName"
 		};
 
-		ro.setResultKeys(resultKeys);
+//		ro.setResultKeys(resultKeys);
+
+//		ro.setResultKeyMap();
 
 		List<Object> inList = new ArrayList<>();
 		inList.add("xxxxx");

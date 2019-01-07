@@ -1146,22 +1146,26 @@ public class DaoImpl implements Dao {
 
 			if (rs != null) {
 
-				List<String> columnList = resultMapped.getResultList();
-				if (columnList.isEmpty()) {
-					columnList = resultMapped.listAllResultKey();// FIXME ALLWAYS BUG
+				List<String> resultKeyList = resultMapped.getResultList();
+				if (resultKeyList.isEmpty()) {
+					resultKeyList = resultMapped.listAllResultKey();// FIXME ALLWAYS BUG
 				}
 
 				while (rs.next()) {
 					Map<String, Object> mapR = new HashMap<String, Object>();
 					list.add(mapR);
 
-					for (String property : columnList) {
+					for (String property : resultKeyList) {
 						String mapper = resultMapped.getMapMapper().mapper(property);
 						Object obj = this.dialect.mappedResult(property,mapper,rs);
 						mapR.put(property, obj);
 					}
 
 				}
+
+				String resultKey0 = resultKeyList.get(0);
+				if (!resultKey0.contains("."))
+					return list;
 			}
 
 		} catch (Exception e) {
