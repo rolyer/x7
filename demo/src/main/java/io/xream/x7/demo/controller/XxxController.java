@@ -123,7 +123,8 @@ public class XxxController {
 				"dogTest.userName"
 		};
 
-//		ro.setResultKeys(resultKeys);
+		ro.setResultKeys(resultKeys);
+		ro.setScroll(true);
 
 //		ro.setResultKeyMap();
 
@@ -134,7 +135,7 @@ public class XxxController {
 		CriteriaBuilder.ResultMappedBuilder builder = CriteriaBuilder.buildResultMapped(CatTest.class,ro);
 //		builder.distinct("catTest.id").reduce(Criteria.ReduceType.COUNT,"catTest.id").groupBy("catTest.id");
 		builder.and().in("catTest.catFriendName", inList);
-//		builder.orderByFixed(inList);
+		builder.orderByFixed(inList);
 
 
 //		builder.or().beginSub().eq("dogTest.userName","yyy")

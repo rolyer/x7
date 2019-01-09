@@ -36,12 +36,12 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 	private Class<?> clz;
 	@JsonIgnore
 	private transient Parsed parsed;
-	private boolean isScroll;
+	private boolean isScroll = true;
 	private int page;
 	private int rows;
 	private String orderBy;
 	private Direction direction = Direction.DESC;
-	private boolean isInConditionSort;
+	private boolean isFixedSort;
 
 	private List<Object> valueList = new ArrayList<Object>();
 	
@@ -108,7 +108,7 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 	}
 
 	public String getOrderBy() {
-		if (isInConditionSort)
+		if (isFixedSort)
 			return null;
 		return orderBy;
 	}
@@ -158,12 +158,12 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 		this.dataPermission = dataPermission;
 	}
 
-	public boolean isInConditionSort() {
-		return isInConditionSort;
+	public boolean isFixedSort() {
+		return isFixedSort;
 	}
 
-	public void setInConditionSort(boolean inConditionSort) {
-		isInConditionSort = inConditionSort;
+	public void setFixedSort(boolean inConditionSort) {
+		this.isFixedSort = inConditionSort;
 	}
 
 	public void paged(Paged paged) {

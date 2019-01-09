@@ -38,10 +38,10 @@ public class CriteriaBuilder {
     private CriteriaBuilder instance;
 
     public CriteriaBuilder orderByFixed(List<? extends Object> inList) {
-        if (criteria.isInConditionSort())
+        if (criteria.isFixedSort())
             return instance;
         if (Objects.nonNull(inList) && inList.size() > 0) {
-            this.criteria.setInConditionSort(true);
+            this.criteria.setFixedSort(true);
         }
         return instance;
     }
@@ -471,11 +471,14 @@ public class CriteriaBuilder {
         return builder;
     }
 
+
     public static ResultMappedBuilder buildResultMapped(Class<?> clz, Fetched ro) {
         CriteriaBuilder b = new CriteriaBuilder();
         ResultMappedBuilder builder = b.new ResultMappedBuilder(clz);
 
         if (ro != null) {
+
+            builder.xAddResultKey(ro);
 
             if (ro instanceof Paged) {
                 builder.paged((Paged) ro);
@@ -491,6 +494,8 @@ public class CriteriaBuilder {
         ResultMappedBuilder builder = b.new ResultMappedBuilder(clz);
 
         if (ro != null) {
+
+            builder.xAddResultKey(ro);
 
             if (ro instanceof Paged) {
                 builder.paged((Paged) ro);
@@ -699,7 +704,7 @@ public class CriteriaBuilder {
             }
         }
 
-        private void xAddResultKey(Fetched fetchResult) {
+        private  void xAddResultKey(Fetched fetchResult) {
             if (fetchResult == null)
                 return;
             Map<String, Object> resultObjMap = fetchResult.getResultKeyMap();
@@ -709,7 +714,7 @@ public class CriteriaBuilder {
             xAddResultKey(xExpressionList);
         }
 
-        private void xAddResultKey(ResultMapping mappedKey) {
+        private  void xAddResultKey(ResultMapping mappedKey) {
             if (mappedKey == null)
                 return;
             String[] arr = mappedKey.getResultKeys();
@@ -722,11 +727,6 @@ public class CriteriaBuilder {
         @Override
         public void paged(Paged paged) {
             super.criteria.paged(paged);
-            if (paged instanceof Fetched) {
-                xAddResultKey((Fetched) paged);
-            } else if (paged instanceof ResultMapping) {
-                xAddResultKey((ResultMapping) paged);
-            }
             DataPermission.Chain.onBuild(super.criteria, paged);
         }
 

@@ -59,8 +59,10 @@ public class OracleDialect implements Mapper.Dialect {
 
     public String match(String sql, long start, long rows) {
 
-        return ORACLE_PAGINATION.replace(ORACLE_PAGINATION_REGX_END, String.valueOf(start + rows))
-                .replace(ORACLE_PAGINATION_REGX_BEGIN, String.valueOf(start)).replace(ORACLE_PAGINATION_REGX_SQL, sql);
+        if (rows > 0)
+            return ORACLE_PAGINATION.replace(ORACLE_PAGINATION_REGX_END, String.valueOf(start + rows))
+                    .replace(ORACLE_PAGINATION_REGX_BEGIN, String.valueOf(start)).replace(ORACLE_PAGINATION_REGX_SQL, sql);
+        return sql;
 
     }
 
@@ -192,12 +194,12 @@ public class OracleDialect implements Mapper.Dialect {
                 mapper = mapper.replace(SqlScript.POINT, SqlScript.WELL_NO);
             }
 
-            if (element == null){
+            if (element == null) {
                 return rs.getObject(mapper);
             }
 
             return getObject(mapper, rs, element);
-        }else {
+        } else {
             if (mapper.contains(SqlScript.KEY_SQL)) {
                 mapper = mapper.replace(SqlScript.KEY_SQL, SqlScript.NONE);
             }
@@ -254,7 +256,7 @@ public class OracleDialect implements Mapper.Dialect {
         if (value instanceof String) {
             String str = (String) value;
             value = str.replace("<", "&lt").replace(">", "&gt");
-        }else if (value instanceof Date) {
+        } else if (value instanceof Date) {
             Date date = (Date) value;
             Timestamp timestamp = new Timestamp(date.getTime());
             return timestamp;

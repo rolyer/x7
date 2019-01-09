@@ -304,7 +304,7 @@ public class SqlCriteriaParser implements CriteriaParser {
 
     private void sort(StringBuilder sb, Criteria criteria) {
 
-        if (criteria.isInConditionSort())
+        if (criteria.isFixedSort())
             return;
 
         if (StringUtil.isNotNull(criteria.getOrderBy())) {

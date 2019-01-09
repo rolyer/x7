@@ -603,7 +603,7 @@ public class DaoImpl implements Dao {
 
 		Pagination<T> pagination = new Pagination<T>();
 		pagination.setClz(clz);
-		pagination.setRows(rows);
+		pagination.setRows(rows == 0 ? Integer.MAX_VALUE : rows);
 		pagination.setPage(page);
 		pagination.setOrderBy(criteria.getOrderBy());
 		pagination.setDirection(criteria.getDirection());
@@ -1040,7 +1040,7 @@ public class DaoImpl implements Dao {
 		Pagination<Map<String, Object>> pagination = new Pagination<Map<String, Object>>();
 		pagination.setClz(Map.class);
 		pagination.setPage(page);
-		pagination.setRows(rows);
+		pagination.setRows(rows == 0 ? Integer.MAX_VALUE : rows);
 		pagination.setOrderBy(criteriaResultMapped.getOrderBy());
 		pagination.setDirection(criteriaResultMapped.getDirection());
 
