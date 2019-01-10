@@ -39,6 +39,8 @@ public class Pagination<T> implements Paged, Serializable{
 	
 	private static final long serialVersionUID = -3917421382413274341L;
 
+	private Class<T> clz;
+
 	private int rows = 20;
 	private int page = 1;
 	private long totalRows = -1;
@@ -50,8 +52,6 @@ public class Pagination<T> implements Paged, Serializable{
 	
 	private Tag tag;
 
-	private Class<T> clz;
-	
 	public Pagination(){
 	}
 	
@@ -79,6 +79,24 @@ public class Pagination<T> implements Paged, Serializable{
 		}
 		if (paged.getDirection() != null){
 			this.direction = paged.getDirection();
+		}
+	}
+
+	public Class<T> getClz() {
+		return clz;
+	}
+
+	public void setClz(Class clz) {
+		this.clz = clz;
+		if (Objects.nonNull(this.list) && this.list.size() > 0){
+
+			List tempList = new ArrayList<>();
+			tempList.addAll(this.list);
+
+			this.list.clear();
+
+			this.setList(tempList);
+
 		}
 	}
 
@@ -189,13 +207,6 @@ public class Pagination<T> implements Paged, Serializable{
 		this.tag = tag;
 	}
 
-	public Class<T> getClz() {
-		return clz;
-	}
-
-	public void setClz(Class clz) {
-		this.clz = clz;
-	}
 
 	public int getTotalPages() {
 		int totalPages = (int) (totalRows / getRows());
