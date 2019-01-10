@@ -224,9 +224,15 @@ public class Pagination<T> implements Paged, Serializable{
 	
 	@Override
 	public String toString() {
-		return "Pagination [rows=" + rows + ", page=" + page + ", totalRows=" + totalRows + ", list=" + list
-				+ ", keyList=" + keyList + ", isScroll=" + isScroll + ", orderBy=" + orderBy + ", sc=" + direction + ", tag="
-				+ tag + "]";
+		return "\nPagination [isScroll=" + isScroll + ", " +
+				"totalRows=" + totalRows + ", " +
+				"page=" + page + ", " +
+				"rows=" + rows + ", " +
+				"orderBy=" + orderBy + ", " +
+				"sc=" + direction + ", " +
+				"\n		list=" + list + ", " +
+				"\n		keyList=" + keyList  + ", " +
+				"\n		tag="+ tag + "\n]\n";
 	}
 
 }

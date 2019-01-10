@@ -124,7 +124,7 @@ public class XxxController {
 		};
 
 		ro.setResultKeys(resultKeys);
-		ro.setScroll(true);
+//		ro.setScroll(true);
 
 //		ro.setResultKeyMap();
 
@@ -206,6 +206,22 @@ public class XxxController {
 
 		return ViewEntity.ok(pagination);
 
+	}
+
+
+	public ViewEntity nonPaged(@RequestBody CatRO ro) {
+
+		CriteriaBuilder.ResultMappedBuilder builder = CriteriaBuilder.buildResultMapped(Cat.class);
+//		CriteriaBuilder builder = CriteriaBuilder.build(Cat.class);
+
+		builder.addResultKey("id").addResultKey("type");
+		builder.and().eq("type","NL");
+
+		Criteria criteria = builder.get();
+
+		Pagination p = catRepository.find(criteria);
+
+		return ViewEntity.ok(p);
 	}
 
 }

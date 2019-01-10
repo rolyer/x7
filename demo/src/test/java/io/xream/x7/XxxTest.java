@@ -52,4 +52,13 @@ public class XxxTest {
         System.out.println("\n______Result: " + ve);
 
     }
+
+    public void testNonPaged(){
+
+        CatRO ro = new CatRO();
+
+        ViewEntity ve = this.controller.nonPaged(ro);
+
+        System.out.println("\n______Result: " + ve);
+    }
 }

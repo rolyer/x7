@@ -1,14 +1,12 @@
 package io.xream.x7.demo;
 
-import x7.core.web.Fetched;
-import x7.core.web.ResultMapping;
+import x7.core.web.MapResult;
 import x7.core.web.TokenedAndPagedRo;
-import x7.core.web.TokenedRo;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class CatRO extends TokenedAndPagedRo implements ResultMapping {
+public class CatRO extends TokenedAndPagedRo implements MapResult {
 
 	private String catFriendName;
 	

@@ -177,7 +177,7 @@ public class SqlCriteriaParser implements CriteriaParser {
         if (Objects.nonNull(resultMapped.getDistinct())) {
 
 
-            if (!flag) resultMapped.getResultList().clear();//去掉构造方法里设置的返回key
+            if (!flag) resultMapped.getResultKeyList().clear();//去掉构造方法里设置的返回key
 
             column.append(SqlScript.DISTINCT);
             List<String> list = resultMapped.getDistinct().getList();
@@ -187,7 +187,7 @@ public class SqlCriteriaParser implements CriteriaParser {
 
                 String value = mapping(resultKey, criteria);
                 column.append(SqlScript.SPACE).append(value);
-                resultMapped.getResultList().add(resultKey);//返回值
+                resultMapped.getResultKeyList().add(resultKey);//返回值
                 mapMapper.put(resultKey, value);//REDUCE ALIAN NAME
                 i++;
                 if (i < size) {
@@ -203,7 +203,7 @@ public class SqlCriteriaParser implements CriteriaParser {
 
         if (!reduceList.isEmpty()) {
 
-            if (!flag) resultMapped.getResultList().clear();//去掉构造方法里设置的返回key
+            if (!flag) resultMapped.getResultKeyList().clear();//去掉构造方法里设置的返回key
 
 
             for (Reduce reduce : reduceList) {
@@ -222,7 +222,7 @@ public class SqlCriteriaParser implements CriteriaParser {
 
 //                String alianProperty = reduce.getProperty() + BeanUtil.getByFirstUpper(reduce.getType().toString().toLowerCase());
                 mapMapper.put(alianProperty, alianName);//REDUCE ALIAN NAME
-                resultMapped.getResultList().add(alianProperty);
+                resultMapped.getResultKeyList().add(alianProperty);
                 flag = true;
             }
         }
@@ -230,7 +230,7 @@ public class SqlCriteriaParser implements CriteriaParser {
 
         String cs = column.toString();
         if (StringUtil.isNullOrEmpty(cs)) {
-            List<String> resultList = resultMapped.getResultList();
+            List<String> resultList = resultMapped.getResultKeyList();
 
             StringBuilder sb = new StringBuilder();
             if (resultList.isEmpty()) {

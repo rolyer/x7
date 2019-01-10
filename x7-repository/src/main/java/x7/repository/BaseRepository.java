@@ -367,6 +367,8 @@ public abstract class BaseRepository<T> implements X7Repository<T> {
     @Override
     public Pagination<T> find(Criteria criteria) {
 
+        if (criteria instanceof Criteria.ResultMapped)
+            throw new RuntimeException("Codeing Exception: maybe {Criteria.ResultMapped criteria = builder.get();} instead of {Criteria criteria = builder.get();}");
         return SqlRepository.getInstance().find(criteria);
     }
 

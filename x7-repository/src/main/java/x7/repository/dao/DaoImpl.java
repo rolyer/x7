@@ -593,26 +593,20 @@ public class DaoImpl implements Dao {
 		String sqlCount = sqlArr[0];
 		String sql = sqlArr[1];
 
-		long count = 0;
-		if (!criteria.isScroll()) {
-			count = getCount(sqlCount, valueList);
-		}
-
 		int page = criteria.getPage();
 		int rows = criteria.getRows();
-
-		Pagination<T> pagination = new Pagination<T>();
-		pagination.setClz(clz);
-		pagination.setRows(rows == 0 ? Integer.MAX_VALUE : rows);
-		pagination.setPage(page);
-		pagination.setOrderBy(criteria.getOrderBy());
-		pagination.setDirection(criteria.getDirection());
-
-		pagination.setTotalRows(count);
 
 		int start = (page - 1) * rows;
 
 		sql = dialect.match(sql, start, rows);
+
+		Pagination<T> pagination = new Pagination<T>();
+		pagination.setClz(clz);
+		pagination.setPage(page == 0 ? 1 : page);
+		pagination.setRows(rows == 0 ? Integer.MAX_VALUE : rows);
+		pagination.setOrderBy(criteria.getOrderBy());
+		pagination.setDirection(criteria.getDirection());
+		pagination.setScroll(criteria.isScroll());
 
 		PreparedStatement pstmt = null;
 		BeanElement tempEle = null;
@@ -638,6 +632,18 @@ public class DaoImpl implements Dao {
 					initObj(obj, rs, tempEle, eles);
 
 				}
+
+				long count = 0;
+				if (!criteria.isScroll()) {
+					int size = pagination.getList().size();
+					if (page == 0){
+						count = size;
+					}else if (size > 0){
+						count = getCount(sqlCount, valueList);
+					}
+					pagination.setTotalRows(count);
+				}
+
 			}
 
 		} catch (Exception e) {
@@ -1037,24 +1043,19 @@ public class DaoImpl implements Dao {
 		int page = criteriaResultMapped.getPage();
 		int rows = criteriaResultMapped.getRows();
 
-		Pagination<Map<String, Object>> pagination = new Pagination<Map<String, Object>>();
-		pagination.setClz(Map.class);
-		pagination.setPage(page);
-		pagination.setRows(rows == 0 ? Integer.MAX_VALUE : rows);
-		pagination.setOrderBy(criteriaResultMapped.getOrderBy());
-		pagination.setDirection(criteriaResultMapped.getDirection());
-
-		long count = 0;
-		if (!criteriaResultMapped.isScroll()) {
-			count = getCount(sqlCount, valueList);
-		}
-		pagination.setTotalRows(count);
-
 		int start = (page - 1) * rows;
 
 		sql = dialect.match(sql, start, rows);
 
 		System.out.println(sql);
+
+		Pagination<Map<String, Object>> pagination = new Pagination<Map<String, Object>>();
+		pagination.setClz(Map.class);
+		pagination.setPage(page == 0 ? 1 : page);
+		pagination.setRows(rows == 0 ? Integer.MAX_VALUE : rows);
+		pagination.setOrderBy(criteriaResultMapped.getOrderBy());
+		pagination.setDirection(criteriaResultMapped.getDirection());
+		pagination.setScroll(criteriaResultMapped.isScroll());
 
 		PreparedStatement pstmt = null;
 		try {
@@ -1071,7 +1072,7 @@ public class DaoImpl implements Dao {
 
 			if (rs != null) {
 
-				List<String> resultKeyList = criteriaResultMapped.getResultList();
+				List<String> resultKeyList = criteriaResultMapped.getResultKeyList();
 				if (resultKeyList.isEmpty()) {
 					resultKeyList = criteriaResultMapped.listAllResultKey();
 				}
@@ -1085,6 +1086,17 @@ public class DaoImpl implements Dao {
 						Object obj = this.dialect.mappedResult(property,mapper,rs);
 						mapR.put(property, obj);
 					}
+				}
+
+				long count = 0;
+				if (!criteriaResultMapped.isScroll()) {
+					int size = pagination.getList().size();
+					if (page == 0){
+						count = size;
+					}else if (size > 0){
+						count = getCount(sqlCount, valueList);
+					}
+					pagination.setTotalRows(count);
 				}
 
 				String resultKey0 = resultKeyList.get(0);
@@ -1146,7 +1158,7 @@ public class DaoImpl implements Dao {
 
 			if (rs != null) {
 
-				List<String> resultKeyList = resultMapped.getResultList();
+				List<String> resultKeyList = resultMapped.getResultKeyList();
 				if (resultKeyList.isEmpty()) {
 					resultKeyList = resultMapped.listAllResultKey();// FIXME ALLWAYS BUG
 				}

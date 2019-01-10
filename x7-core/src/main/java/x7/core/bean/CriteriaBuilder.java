@@ -22,7 +22,7 @@ import x7.core.repository.Mapped;
 import x7.core.util.*;
 import x7.core.web.Fetched;
 import x7.core.web.Paged;
-import x7.core.web.ResultMapping;
+import x7.core.web.MapResult;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -489,7 +489,7 @@ public class CriteriaBuilder {
         return builder;
     }
 
-    public static ResultMappedBuilder buildResultMapped(Class<?> clz, ResultMapping ro) {
+    public static ResultMappedBuilder buildResultMapped(Class<?> clz, MapResult ro) {
         CriteriaBuilder b = new CriteriaBuilder();
         ResultMappedBuilder builder = b.new ResultMappedBuilder(clz);
 
@@ -673,6 +673,7 @@ public class CriteriaBuilder {
 
     public class ResultMappedBuilder extends CriteriaBuilder {
 
+
         @Override
         public Criteria.ResultMapped get() {
             return (ResultMapped) super.get();
@@ -700,7 +701,7 @@ public class CriteriaBuilder {
 
         private void xAddResultKey(List<String> xExpressionList) {
             for (String xExpression : xExpressionList) {
-                get().getResultList().add(xExpression);
+                get().getResultKeyList().add(xExpression);
             }
         }
 
@@ -714,7 +715,7 @@ public class CriteriaBuilder {
             xAddResultKey(xExpressionList);
         }
 
-        private  void xAddResultKey(ResultMapping mappedKey) {
+        private  void xAddResultKey(MapResult mappedKey) {
             if (mappedKey == null)
                 return;
             String[] arr = mappedKey.getResultKeys();
@@ -722,6 +723,11 @@ public class CriteriaBuilder {
                 return;
             List<String> list = Arrays.asList(arr);
             xAddResultKey(list);
+        }
+
+        public ResultMappedBuilder addResultKey(String resultKey){
+            get().getResultKeyList().add(resultKey);
+            return this;
         }
 
         @Override

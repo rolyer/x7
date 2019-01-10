@@ -194,7 +194,7 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 
 	public class ResultMapped extends Criteria {
 
-		private List<String> resultList = new ArrayList<String>();
+		private List<String> resultKeyList = new ArrayList<String>();
 		private String sourceScript;
 		private Distinct distinct;
 		private String groupBy;
@@ -234,13 +234,13 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 		}
 
 		public String getResultScript() {
-			if (resultList.isEmpty()){
+			if (resultKeyList.isEmpty()){
 				return SqlScript.STAR;
 			}else{
 				StringBuilder sb = new StringBuilder();
 				int i = 0;
-				int size = resultList.size() - 1;
-				for (String str : resultList){
+				int size = resultKeyList.size() - 1;
+				for (String str : resultKeyList){
 					String mapper = getMapMapper().mapper(str);
 					sb.append(mapper);
 					if (i < size){
@@ -257,12 +257,12 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 		}
 		
 
-		public List<String> getResultList() {
-			return resultList;
+		public List<String> getResultKeyList() {
+			return resultKeyList;
 		}
 
-		public void setResultList(List<String> columnList) {
-			this.resultList = columnList;
+		public void setResultKeyList(List<String> columnList) {
+			this.resultKeyList = columnList;
 		}
 
 
@@ -283,12 +283,12 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 			}else {
 				int size = 0;
 				String column = "";
-				if (resultList.isEmpty()) {
+				if (resultKeyList.isEmpty()) {
 					column += (SqlScript.SPACE + SqlScript.STAR + SqlScript.SPACE);
 				} else {
-					size = resultList.size();
+					size = resultKeyList.size();
 					for (int i = 0; i < size; i++) {
-						column = column + SqlScript.SPACE + resultList.get(i);
+						column = column + SqlScript.SPACE + resultKeyList.get(i);
 						if (i < size - 1) {
 							column += SqlScript.COMMA;
 						}
@@ -312,7 +312,7 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 		@Override
 		public String toString() {
 			return "ResultMapped{" +
-					"resultList=" + resultList +
+					"resultKeyList=" + resultKeyList +
 					", sourceScript='" + sourceScript + '\'' +
 					", criteria='" + super.toString() + '\'' +
 					'}';
