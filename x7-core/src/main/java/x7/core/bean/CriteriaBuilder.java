@@ -20,6 +20,7 @@ import x7.core.bean.Criteria.ResultMapped;
 import x7.core.bean.Criteria.X;
 import x7.core.repository.Mapped;
 import x7.core.util.*;
+import x7.core.web.Direction;
 import x7.core.web.Fetched;
 import x7.core.web.Paged;
 import x7.core.web.MapResult;
@@ -37,13 +38,14 @@ public class CriteriaBuilder {
     private Criteria criteria;
     private CriteriaBuilder instance;
 
-    public CriteriaBuilder orderByFixed(List<? extends Object> inList) {
-        if (criteria.isFixedSort())
-            return instance;
-        if (Objects.nonNull(inList) && inList.size() > 0) {
-            this.criteria.setFixedSort(true);
-        }
-        return instance;
+
+    public PageBuilder paged(){
+        return this.pageBuilder;
+    }
+
+    public void paged(Paged paged) {
+        criteria.paged(paged);
+        DataPermission.Chain.onBuild(criteria, paged);
     }
 
     public ConditionBuilder and() {
@@ -120,6 +122,47 @@ public class CriteriaBuilder {
         return instance;
     }
 
+    private PageBuilder pageBuilder = new PageBuilder() {
+
+        @Override
+        public PageBuilder scroll(boolean isScroll) {
+            criteria.setScroll(isScroll);
+            return this;
+        }
+
+        @Override
+        public PageBuilder rows(int rows) {
+            criteria.setRows(rows);
+            return this;
+        }
+
+        @Override
+        public PageBuilder page(int page) {
+            criteria.setPage(page);
+            return this;
+        }
+
+        @Override
+        public PageBuilder orderByFixed(List<?> inList) {
+            if (criteria.isFixedSort())
+                return this;
+            if (Objects.nonNull(inList) && inList.size() > 0) {
+                criteria.setFixedSort(true);
+            }
+            return this;
+        }
+
+        @Override
+        public PageBuilder orderBy(String property) {
+            criteria.setOrderBy(property);
+            return this;
+        }
+
+        @Override
+        public void on(Direction direction) {
+            criteria.setDirection(direction);
+        }
+    };
 
     private ConditionBuilder conditionBuilder = new ConditionBuilder() {
 
@@ -513,10 +556,6 @@ public class CriteriaBuilder {
         return builder;
     }
 
-    public void paged(Paged paged) {
-        criteria.paged(paged);
-        DataPermission.Chain.onBuild(criteria, paged);
-    }
 
     public Class<?> getClz() {
         return this.criteria.getClz();
@@ -657,6 +696,16 @@ public class CriteriaBuilder {
 
         ConditionBuilder beginSub();
 
+    }
+
+    public interface  PageBuilder {
+
+        PageBuilder scroll(boolean isScroll);
+        PageBuilder rows(int rows);
+        PageBuilder page(int page);
+        PageBuilder orderByFixed(List<? extends Object> inList);
+        PageBuilder orderBy(String property);
+        void on(Direction direction);
     }
 
     public Criteria get() {

@@ -13,6 +13,7 @@ import x7.core.bean.CriteriaBuilder;
 import x7.core.bean.SpringHelper;
 import x7.core.bean.condition.InCondition;
 import x7.core.bean.condition.RefreshCondition;
+import x7.core.web.Direction;
 import x7.core.web.Pagination;
 import x7.core.web.ViewEntity;
 
@@ -135,7 +136,7 @@ public class XxxController {
 		CriteriaBuilder.ResultMappedBuilder builder = CriteriaBuilder.buildResultMapped(CatTest.class,ro);
 //		builder.distinct("catTest.id").reduce(Criteria.ReduceType.COUNT,"catTest.id").groupBy("catTest.id");
 		builder.and().in("catTest.catFriendName", inList);
-		builder.orderByFixed(inList);
+		builder.paged().orderByFixed(inList).rows(100);
 
 
 //		builder.or().beginSub().eq("dogTest.userName","yyy")
@@ -187,7 +188,7 @@ public class XxxController {
 		CriteriaBuilder.ResultMappedBuilder builder = CriteriaBuilder.buildResultMapped(Cat.class,ro);
 //		builder.distinct("id").reduce(Criteria.ReduceType.COUNT,"dogId").groupBy("id");
 		builder.and().in("type", inList);
-//		builder.orderByFixed(inList);
+		builder.paged().orderByFixed(inList);
 
 
 //		builder.or().beginSub().eq("dogTest.userName","yyy")
