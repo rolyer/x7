@@ -18,12 +18,14 @@ package x7.core.bean;
 
 import x7.core.bean.Criteria.ResultMapped;
 import x7.core.bean.Criteria.X;
-import x7.core.repository.Mapped;
-import x7.core.util.*;
+import x7.core.util.BeanMapUtil;
+import x7.core.util.BeanUtilX;
+import x7.core.util.NumberUtil;
+import x7.core.util.StringUtil;
 import x7.core.web.Direction;
 import x7.core.web.Fetched;
-import x7.core.web.Paged;
 import x7.core.web.MapResult;
+import x7.core.web.Paged;
 
 import java.util.*;
 import java.util.Map.Entry;
