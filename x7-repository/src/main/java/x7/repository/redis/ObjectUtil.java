@@ -17,7 +17,7 @@
 package x7.repository.redis;
 
 import x7.core.util.JsonX;
-import x7.core.web.Pagination;
+import x7.core.web.Page;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -78,12 +78,12 @@ public class ObjectUtil {
 		return null;
 	}
 
-	public static <T> Pagination<T> toPagination(byte[] bytes, Class<T> clz) {
+	public static <T> Page<T> toPagination(byte[] bytes, Class<T> clz) {
 		if (bytes == null)
 			return null;
 		try {
 			String str = new String(bytes, "UTF-8");
-			Pagination<T> pagination = JsonX.toObject(str, Pagination.class);
+			Page<T> pagination = JsonX.toObject(str, Page.class);
 			List tempList = pagination.getList();
 			if (!tempList.isEmpty()) {
 				if (!JsonX.isJsonable(clz))

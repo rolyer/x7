@@ -19,9 +19,9 @@ package x7.core.web;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PaginationUtil {
+public class PageUtil {
 
-	public static Map<String,Object> toMap(Pagination po){
+	public static Map<String,Object> toMap(Page po){
 		Map<String,Object> map = new HashMap<String,Object>();
 		map.put("page", po.getPage());
 		map.put("rows", po.getRows());

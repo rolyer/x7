@@ -17,13 +17,12 @@
 package x7.repository.api;
 
 import x7.core.bean.Criteria;
-import x7.core.bean.CriteriaCondition;
 import x7.core.bean.IQuantity;
 import x7.core.bean.condition.InCondition;
 import x7.core.bean.condition.ReduceCondition;
 import x7.core.bean.condition.RefreshCondition;
 import x7.core.web.Direction;
-import x7.core.web.Pagination;
+import x7.core.web.Page;
 
 import java.util.List;
 import java.util.Map;
@@ -35,16 +34,6 @@ import java.util.Map;
  * @param <T>
  */
 public interface X7Repository<T> {
-
-	void set(byte[] key, byte[] value);
-
-	byte[] get(byte[] key);
-
-	void set(String key, String value, int seconds);
-
-	void set(String key, String value);
-
-	String get(String key);
 
 	long createId();
 
@@ -113,14 +102,14 @@ public interface X7Repository<T> {
 	 * @param criteria
 	 * 
 	 */
-	Pagination<T> find(Criteria criteria);
+	Page<T> find(Criteria criteria);
 
 	/**
 	 * Standard query pageable API, FETCH supported
 	 * 
 	 * @param criteria
 	 */
-	Pagination<Map<String, Object>> find(Criteria.ResultMapped criteria);
+	Page<Map<String, Object>> find(Criteria.ResultMapped criteria);
 
 	/**
 	 *  SUM | COUNT | AVG | MIN | MAX

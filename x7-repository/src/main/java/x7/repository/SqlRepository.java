@@ -26,7 +26,7 @@ import x7.core.repository.Repository;
 import x7.core.repository.X;
 import x7.core.util.JsonX;
 import x7.core.web.Direction;
-import x7.core.web.Pagination;
+import x7.core.web.Page;
 import x7.repository.dao.Dao;
 import x7.repository.exception.PersistenceException;
 import x7.repository.exception.ShardingException;
@@ -371,7 +371,7 @@ public class SqlRepository implements Repository {
 	}
 
 	@Override
-	public <T> Pagination<T> find(Criteria criteria) {
+	public <T> Page<T> find(Criteria criteria) {
 		testAvailable();
 		Class clz = criteria.getClz();
 		Parsed parsed = Parser.get(clz);
@@ -379,12 +379,11 @@ public class SqlRepository implements Repository {
 
 		if (cacheResolver == null) {
 			return syncDao.find(criteria);
-
 		}
 
 		List<T> list = null;
 
-		Pagination<T> p = cacheResolver.getResultKeyListPaginated(clz, criteria);// FIXME
+		Page<T> p = cacheResolver.getResultKeyListPaginated(clz, criteria);// FIXME
 
 		if (p == null) {
 			syncDao.find(criteria);
@@ -429,6 +428,48 @@ public class SqlRepository implements Repository {
 		p.reSetList(sortedList);
 
 		return p;
+	}
+
+	@Override
+	public <T> List<T> list(Criteria criteria) {
+		testAvailable();
+		Class clz = criteria.getClz();
+		Parsed parsed = Parser.get(clz);
+
+		if (cacheResolver == null) {
+			return syncDao.list(criteria);
+		}
+
+		List<T> list = null;
+
+		List<String> keyList = cacheResolver.getResultKeyList(clz, criteria);
+
+		if (keyList == null || keyList.isEmpty()) {
+			list = syncDao.list(criteria);
+
+			keyList = new ArrayList<>();
+
+			for (T t : list) {
+				String key = getCacheKey(t, parsed);
+				keyList.add(key);
+			}
+
+			cacheResolver.setResultKeyList(clz, criteria, keyList);
+
+			return list;
+		}
+
+		list = cacheResolver.list(clz, keyList);
+
+		if (keyList.size() == list.size())
+			return list;
+
+		replenishAndRefreshCache(keyList, list, clz, parsed);
+
+		List<T> sortedList = sort(keyList, list, parsed);
+
+		return sortedList;
+
 	}
 
 	@Override
@@ -568,7 +609,7 @@ public class SqlRepository implements Repository {
 	}
 
 	@Override
-	public Pagination<Map<String, Object>> find(Criteria.ResultMapped resultMapped) {
+	public Page<Map<String, Object>> find(Criteria.ResultMapped resultMapped) {
 		testAvailable();
 		Class clz = resultMapped.getClz();
 		Parsed parsed = Parser.get(clz);

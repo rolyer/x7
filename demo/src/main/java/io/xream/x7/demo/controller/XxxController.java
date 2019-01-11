@@ -14,7 +14,7 @@ import x7.core.bean.SpringHelper;
 import x7.core.bean.condition.InCondition;
 import x7.core.bean.condition.RefreshCondition;
 import x7.core.web.Direction;
-import x7.core.web.Pagination;
+import x7.core.web.Page;
 import x7.core.web.ViewEntity;
 
 import javax.annotation.Resource;
@@ -151,7 +151,7 @@ public class XxxController {
 		Criteria.ResultMapped resultMapped = builder.get();
 		resultMapped.setSourceScript(sourceScript);
 
-		Pagination<Map<String,Object>> pagination = repository.find(resultMapped);
+		Page<Map<String,Object>> pagination = repository.find(resultMapped);
 
 		Cat cat = this.catRepository.get(110);
 
@@ -204,7 +204,7 @@ public class XxxController {
 
 		Criteria.ResultMapped resultMapped = builder.get();
 
-		Pagination<Map<String,Object>> pagination = repository.find(resultMapped);
+		Page<Map<String,Object>> pagination = repository.find(resultMapped);
 
 
 		return ViewEntity.ok(pagination);
@@ -222,7 +222,7 @@ public class XxxController {
 
 		Criteria.ResultMapped criteria = builder.get();
 
-		Pagination p = catRepository.find(criteria);
+		Page p = catRepository.find(criteria);
 
 		return ViewEntity.ok(p);
 	}

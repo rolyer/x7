@@ -21,7 +21,7 @@ import x7.core.repository.CacheException;
 import x7.core.repository.CacheResolver;
 import x7.core.util.JsonX;
 import x7.core.util.VerifyUtil;
-import x7.core.web.Pagination;
+import x7.core.web.Page;
 import x7.repository.exception.PersistenceException;
 
 import java.util.ArrayList;
@@ -192,14 +192,14 @@ public class LevelTwoCacheResolver implements CacheResolver {
 	
 	@SuppressWarnings("rawtypes")
 	@Override
-	public <T> void setResultKeyListPaginated(Class<T> clz, Object condition, Pagination<T> pagination) {
+	public <T> void setResultKeyListPaginated(Class<T> clz, Object condition, Page<T> pagination) {
 		
 		int validSecond = Configs.getIntValue("x7.cache.second");
 		setResultKeyListPaginated(clz, condition, pagination, validSecond);
 	}
 	
 	@Override
-	public <T> void setResultKeyListPaginated(Class<T> clz, Object condition, Pagination<T> pagination, int second) {
+	public <T> void setResultKeyListPaginated(Class<T> clz, Object condition, Page<T> pagination, int second) {
 		
 		String key = getKey(clz, condition);
 		try{
@@ -226,7 +226,7 @@ public class LevelTwoCacheResolver implements CacheResolver {
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	public Pagination<String> getResultKeyListPaginated(Class clz, Object condition) {
+	public Page<String> getResultKeyListPaginated(Class clz, Object condition) {
 		String key = getKey(clz, condition);
 		System.out.println("get key: " + key);
 		byte[] bytes = JedisConnector_Cache.getInstance().get(key.getBytes());

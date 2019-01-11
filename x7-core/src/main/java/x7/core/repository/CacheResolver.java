@@ -17,7 +17,7 @@
 package x7.core.repository;
 
 import x7.core.util.JsonX;
-import x7.core.web.Pagination;
+import x7.core.web.Page;
 
 import java.util.List;
 import java.util.Map;
@@ -74,7 +74,7 @@ public interface CacheResolver {
 	 * @param conditionObj
 	 * @param pagination
 	 */
-	<T> void setResultKeyListPaginated(Class<T> clz, Object conditionObj, Pagination<T> pagination);
+	<T> void setResultKeyListPaginated(Class<T> clz, Object conditionObj, Page<T> pagination);
 
 	/**
 	 * 
@@ -82,7 +82,7 @@ public interface CacheResolver {
 	 * @param conditionObj
 	 * @param pagination
 	 */
-	<T> void setResultKeyListPaginated(Class<T> clz, Object conditionObj, Pagination<T> pagination, int second);
+	<T> void setResultKeyListPaginated(Class<T> clz, Object conditionObj, Page<T> pagination, int second);
 	
 	/**
 	 * 高效的获取缓存对象Key列表<br>
@@ -102,7 +102,7 @@ public interface CacheResolver {
 	 * @param conditionObj
 	 * @return obj
 	 */
-	<T> Pagination<T> getResultKeyListPaginated(Class<T> clz, Object conditionObj);
+	<T> Page<T> getResultKeyListPaginated(Class<T> clz, Object conditionObj);
 	/**
 	 * 高效从缓存中查出符合条件的所以对象
 	 * @param clz

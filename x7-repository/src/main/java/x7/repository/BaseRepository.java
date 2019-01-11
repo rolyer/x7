@@ -26,7 +26,7 @@ import x7.core.bean.condition.RefreshCondition;
 import x7.core.repository.X;
 import x7.core.util.StringUtil;
 import x7.core.web.Direction;
-import x7.core.web.Pagination;
+import x7.core.web.Page;
 import x7.repository.api.X7Repository;
 import x7.repository.exception.PersistenceException;
 import x7.repository.mapper.Mapper;
@@ -74,76 +74,6 @@ public abstract class BaseRepository<T> implements X7Repository<T> {
         HealthChecker.repositoryList.add(this);
     }
 
-    /**
-     * FIXME
-     * @param methodName
-     * @param s
-     * @return
-     */
-    protected Object find(String methodName, Object... s) {
-
-//        boolean isOne = methodName.startsWith("get");
-//
-//        String sql = map.get(methodName);
-//        if (StringUtil.isNullOrEmpty(sql)) {
-//
-//
-//            Parsed parsed = Parser.get(this.clz);
-//
-//            String[] arr = methodName.split("By");
-//
-//            String conditionSql = arr[1];
-//
-//            String defaultKeyword = "eq";
-//            String[] keywordArr = {"And", "Or", "NotIn", "In", "Like", "IsNotNull", "IsNull", "Ne", "Eq", "Gte", "Gt", "Lte", "Lt"};
-//            String space = " ";
-//
-//            for (String keyword : keywordArr) {
-//                String target = space + keyword + space;
-//                conditionSql = conditionSql.replace(keyword, target);
-//            }
-//
-//        }
-//
-//        List<Object> conditionList = Arrays.asList(s);
-//        List<T> list = (List<T>) ManuRepository.list(clz, sql, conditionList);
-//
-//        if (isOne) {
-//            if (list.isEmpty())
-//                return null;
-//            return list.get(0);
-//        }
-//
-//        return list;
-
-        return null;
-
-    }
-
-    @Override
-    public void set(byte[] key, byte[] value) {
-        JedisConnector_Persistence.getInstance().set(key, value);
-    }
-
-    @Override
-    public byte[] get(byte[] key) {
-        return JedisConnector_Persistence.getInstance().get(key);
-    }
-
-    @Override
-    public void set(String key, String value, int seconds) {
-        JedisConnector_Persistence.getInstance().set(key, value, seconds);
-    }
-
-    @Override
-    public void set(String key, String value) {
-        JedisConnector_Persistence.getInstance().set(key, value);
-    }
-
-    @Override
-    public String get(String key) {
-        return JedisConnector_Persistence.getInstance().get(key);
-    }
 
     @Override
     public long createId() {
@@ -324,7 +254,7 @@ public abstract class BaseRepository<T> implements X7Repository<T> {
     }
 
     @Override
-    public Pagination<Map<String, Object>> find(Criteria.ResultMapped criteria) {
+    public Page<Map<String, Object>> find(Criteria.ResultMapped criteria) {
 
         return SqlRepository.getInstance().find(criteria);
     }
@@ -365,7 +295,7 @@ public abstract class BaseRepository<T> implements X7Repository<T> {
     }
 
     @Override
-    public Pagination<T> find(Criteria criteria) {
+    public Page<T> find(Criteria criteria) {
 
         if (criteria instanceof Criteria.ResultMapped)
             throw new RuntimeException("Codeing Exception: maybe {Criteria.ResultMapped criteria = builder.get();} instead of {Criteria criteria = builder.get();}");

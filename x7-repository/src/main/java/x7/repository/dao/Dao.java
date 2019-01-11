@@ -21,7 +21,7 @@ import x7.core.bean.condition.InCondition;
 import x7.core.bean.condition.ReduceCondition;
 import x7.core.bean.condition.RefreshCondition;
 import x7.core.web.Direction;
-import x7.core.web.Pagination;
+import x7.core.web.Page;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -66,11 +66,13 @@ public interface Dao {
 	
 	<T> List<T> in(InCondition inCondition);
 	
-	Pagination<Map<String, Object>> find(Criteria.ResultMapped resultMapped);
-	
+	Page<Map<String, Object>> find(Criteria.ResultMapped resultMapped);
+
 	List<Map<String,Object>> list(Criteria.ResultMapped resultMapped);
-	
-	<T> Pagination<T> find(Criteria criteria);
+
+	<T> Page<T> find(Criteria criteria);
+
+	<T> List<T> list(Criteria criteria);
 
 	Object reduce(ReduceCondition reduceCondition);
 

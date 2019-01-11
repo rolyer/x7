@@ -21,7 +21,7 @@ import x7.core.bean.condition.InCondition;
 import x7.core.bean.condition.ReduceCondition;
 import x7.core.bean.condition.RefreshCondition;
 import x7.core.web.Direction;
-import x7.core.web.Pagination;
+import x7.core.web.Page;
 
 import java.util.List;
 import java.util.Map;
@@ -57,7 +57,7 @@ public interface Repository {
 	/**
 	 * 带条件支持局部更新
 	 * @param refreshCondition
-	 * @return
+	 * @return true | false
 	 */
 	<T> boolean refresh(RefreshCondition<T> refreshCondition);
 
@@ -88,7 +88,7 @@ public interface Repository {
 	/**
 	 * 
 	 * @param conditionObj
-	 * @return
+	 * @return T
 	 */
 	<T> T getOne(T conditionObj);
 	/**
@@ -104,9 +104,9 @@ public interface Repository {
 	 * 根据对象内容查询<br>
 	 *
 	 *            可以拼接的条件
-	 * 
+	 *  @param criteria
 	 */
-	<T> Pagination<T> find(Criteria criteria);
+	<T> Page<T> find(Criteria criteria);
 
 	/**
 	 * loadAll
@@ -136,7 +136,7 @@ public interface Repository {
 	 * @param resultMapped
 	 * 
 	 */
-	Pagination<Map<String,Object>> find(Criteria.ResultMapped resultMapped);
+	Page<Map<String,Object>> find(Criteria.ResultMapped resultMapped);
 	
 	/**
 	 * 
@@ -145,6 +145,8 @@ public interface Repository {
 	 * 
 	 */
 	List<Map<String,Object>> list(Criteria.ResultMapped resultMapped);
+
+	<T> List<T> list(Criteria criteria);
 
 	boolean createBatch(List<? extends Object> objList);
 }
