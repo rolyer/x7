@@ -18,6 +18,7 @@ package x7.core.bean;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import x7.core.util.BeanUtil;
+import x7.core.util.StringUtil;
 import x7.core.web.Direction;
 import x7.core.web.Paged;
 
@@ -39,7 +40,7 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 	private boolean isScroll = true;
 	private int page;
 	private int rows;
-	private String orderBy;
+	private List<String> orderByList = new ArrayList<>();
 	private Direction direction = Direction.DESC;
 	private boolean isFixedSort;
 
@@ -110,13 +111,21 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 	public String getOrderBy() {
 		if (isFixedSort)
 			return null;
-		return orderBy;
+		StringBuilder sb = new StringBuilder();
+		for (String s : orderByList){
+			sb.append(s);
+		}
+		return sb.toString();
 	}
 
-	public void setOrderBy(String orderBy) {
-		this.orderBy = orderBy;
+	public List<String> getOrderByList() {
+		return orderByList;
 	}
-	
+
+	public void setOrderByList(List<String> orderByList) {
+		this.orderByList = orderByList;
+	}
+
 	public boolean isScroll() {
 		return isScroll;
 	}
@@ -167,7 +176,13 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 	}
 
 	public void paged(Paged paged) {
-		this.orderBy = paged.getOrderBy();
+		String orderBy = paged.getOrderBy();
+		if (StringUtil.isNotNull(orderBy)){
+			String[] arr = orderBy.split(",");
+			for (String s : arr){
+				this.orderByList.add(s.trim());
+			}
+		}
 		this.direction = paged.getDirection();
 		this.isScroll = paged.isScroll();
 		this.page = paged.getPage();
@@ -180,7 +195,7 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 				"isScroll=" + isScroll +
 				", page=" + page +
 				", rows=" + rows +
-				", orderBy='" + orderBy + '\'' +
+				", orderByList='" + orderByList + '\'' +
 				", direction=" + direction +
 				", valueList=" + valueList +
 				", listX=" + listX +

@@ -136,7 +136,7 @@ public class XxxController {
 		CriteriaBuilder.ResultMappedBuilder builder = CriteriaBuilder.buildResultMapped(CatTest.class,ro);
 //		builder.distinct("catTest.id").reduce(Criteria.ReduceType.COUNT,"catTest.id").groupBy("catTest.id");
 		builder.and().in("catTest.catFriendName", inList);
-		builder.paged().orderByFixed(inList).rows(100);
+		builder.paged().orderIn(inList).rows(100);
 
 
 //		builder.or().beginSub().eq("dogTest.userName","yyy")
@@ -179,6 +179,8 @@ public class XxxController {
 				"id",
 		};
 
+//		ro.setOrderBy("cat.dogId");
+
 //		ro.setResultKeys(resultKeys);
 
 		List<Object> inList = new ArrayList<>();
@@ -186,9 +188,9 @@ public class XxxController {
 		inList.add("NL");
 
 		CriteriaBuilder.ResultMappedBuilder builder = CriteriaBuilder.buildResultMapped(Cat.class,ro);
-//		builder.distinct("id").reduce(Criteria.ReduceType.COUNT,"dogId").groupBy("id");
+		builder.distinct("id").reduce(Criteria.ReduceType.COUNT,"dogId").groupBy("id");
 		builder.and().in("type", inList);
-		builder.paged().orderByFixed(inList);
+		builder.paged().orderBy("cat.dogId").on(Direction.DESC.ASC);
 
 
 //		builder.or().beginSub().eq("dogTest.userName","yyy")
@@ -215,10 +217,10 @@ public class XxxController {
 		CriteriaBuilder.ResultMappedBuilder builder = CriteriaBuilder.buildResultMapped(Cat.class);
 //		CriteriaBuilder builder = CriteriaBuilder.build(Cat.class);
 
-		builder.addResultKey("id").addResultKey("type");
+		builder.resultKey("id").resultKey("type");
 		builder.and().eq("type","NL");
 
-		Criteria criteria = builder.get();
+		Criteria.ResultMapped criteria = builder.get();
 
 		Pagination p = catRepository.find(criteria);
 

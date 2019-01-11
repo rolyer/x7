@@ -10,6 +10,7 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.context.annotation.Configuration;
 import x7.core.bean.DataPermission;
 import x7.core.bean.SpringHelper;
+import x7.core.util.ExceptionUtil;
 import x7.core.util.TimeUtil;
 import x7.core.web.Tokened;
 import x7.core.web.ViewEntity;
@@ -96,13 +97,7 @@ public class WebAop {
 //					return ViewEntity.toast("服务繁忙, 请稍后");
 //				}
 
-				String msg = "";
-				StackTraceElement[] eleArr = e.getStackTrace();
-				if (eleArr != null && eleArr.length > 0){
-					msg = eleArr[0].toString();
-				}
-				msg += "\n";
-				msg += e.getMessage();
+				String msg = ExceptionUtil.getMessage(e);
 
 				System.out.println("_______GOT EXCEIPTION ....by request: " + mapping + "  ....:" + msg);
 				System.out.println("_______ROLL BACKED ....by request: " + mapping);

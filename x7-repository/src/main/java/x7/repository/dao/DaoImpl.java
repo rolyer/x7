@@ -159,10 +159,9 @@ public class DaoImpl implements Dao {
 			pstmt.executeBatch();
 
 		} catch (Exception e) {
-			System.out.println("Exception occured, while create: " + obj);
 			e.printStackTrace();
 
-			throw new RollbackException("RollbackException: " + e.getMessage() + ", while create: " + obj);
+			throw new RollbackException("RollbackException: " + ExceptionUtil.getMessage(e) + ", while create: " + obj);
 
 		} finally {
 			DataSourceUtil.releaseConnection(conn);
@@ -282,7 +281,7 @@ public class DaoImpl implements Dao {
 			System.out.println("Exception occured, while create: " + obj);
 			e.printStackTrace();
 
-			throw new RollbackException("RollbackException: " + e.getMessage());
+			throw new RollbackException("RollbackException occoured: " + ExceptionUtil.getMessage(e) + ", while create " + obj);
 
 		} finally {
 
@@ -412,7 +411,7 @@ public class DaoImpl implements Dao {
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RollbackException(
-					"Exception occured by class = " + clz.getName()  + ", message: " + e.getMessage());
+					"Exception occured by class = " + clz.getName()  + ", message: " + ExceptionUtil.getMessage(e));
 
 		} finally {
 			close(pstmt);
@@ -521,7 +520,7 @@ public class DaoImpl implements Dao {
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RollbackException(
-					"Exception occured by class = " + clz.getName()  + ", message: " + e.getMessage());
+					"Exception occured by class = " + clz.getName()  + ", message: " + ExceptionUtil.getMessage(e));
 		} finally {
 			close(pstmt);
 			close(conn);
@@ -567,7 +566,7 @@ public class DaoImpl implements Dao {
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RollbackException(
-					"Exception occured by class = " + clz.getName()  + ", message: " + e.getMessage());
+					"Exception occured by class = " + clz.getName()  + ", message: " + ExceptionUtil.getMessage(e));
 		} finally {
 			close(pstmt);
 			close(conn);
@@ -649,7 +648,7 @@ public class DaoImpl implements Dao {
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RollbackException(
-					"Exception occured by class = " + clz.getName()  + ", message: " + e.getMessage());
+					"Exception occured by class = " + clz.getName()  + ", message: " + ExceptionUtil.getMessage(e));
 		} finally {
 			close(pstmt);
 			close(conn);
@@ -816,7 +815,7 @@ public class DaoImpl implements Dao {
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RollbackException(
-					"Exception occured by class = " + clz.getName()  + ", message: " + e.getMessage());
+					"Exception occured by class = " + clz.getName()  + ", message: " + ExceptionUtil.getMessage(e));
 		} finally {
 			close(pstmt);
 			close(conn);
@@ -903,7 +902,7 @@ public class DaoImpl implements Dao {
 			flag = false;
 			e.printStackTrace();
 			throw new RollbackException(
-						"Exception occured by class = " + clz.getName()  + ", message: " + e.getMessage());
+						"Exception occured by class = " + clz.getName()  + ", message: " + ExceptionUtil.getMessage(e));
 
 		} finally {
 			DataSourceUtil.releaseConnection(conn);
@@ -1014,7 +1013,7 @@ public class DaoImpl implements Dao {
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RollbackException(
-					"Exception occured by class = " + clz.getName()  + ", message: " + e.getMessage());
+					"Exception occured by class = " + clz.getName()  + ", message: " + ExceptionUtil.getMessage(e));
 		} finally {
 			close(pstmt);
 			close(conn);

@@ -21,6 +21,7 @@ import x7.core.bean.*;
 import x7.core.util.BeanUtil;
 import x7.core.util.BeanUtilX;
 import x7.core.util.StringUtil;
+import x7.core.web.Direction;
 import x7.repository.CriteriaParser;
 import x7.repository.mapper.Mapper;
 
@@ -307,19 +308,8 @@ public class SqlCriteriaParser implements CriteriaParser {
         if (criteria.isFixedSort())
             return;
 
-        if (StringUtil.isNotNull(criteria.getOrderBy())) {
-            String orderBy = criteria.getOrderBy();
-            List<String> orderByList = new ArrayList<>();
-            if (orderBy.contains(SqlScript.COMMA)) {
-                String[] arr = orderBy.split(SqlScript.COMMA);
-                for (String ob : arr) {
-                    if (!orderByList.contains(ob))
-                        orderByList.add(ob);
-                }
-            } else {
-                if (!orderByList.contains(orderBy))
-                    orderByList.add(orderBy);
-            }
+        List<String> orderByList = criteria.getOrderByList();
+        if (!orderByList.isEmpty()) {
 
             sb.append(Conjunction.ORDER_BY.sql());
             int size = orderByList.size();
@@ -332,7 +322,12 @@ public class SqlCriteriaParser implements CriteriaParser {
                     sb.append(SqlScript.COMMA).append(SqlScript.SPACE);
                 }
             }
-            sb.append(criteria.getDirection());
+            Direction direction = criteria.getDirection();
+            if (direction == null) {
+                sb.append(Direction.DESC);
+            }else{
+                sb.append(direction);
+            }
         }
 
     }

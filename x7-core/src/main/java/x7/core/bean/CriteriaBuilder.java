@@ -145,7 +145,7 @@ public class CriteriaBuilder {
         }
 
         @Override
-        public PageBuilder orderByFixed(List<?> inList) {
+        public PageBuilder orderIn(List<?> inList) {
             if (criteria.isFixedSort())
                 return this;
             if (Objects.nonNull(inList) && inList.size() > 0) {
@@ -156,7 +156,7 @@ public class CriteriaBuilder {
 
         @Override
         public PageBuilder orderBy(String property) {
-            criteria.setOrderBy(property);
+            criteria.getOrderByList().add(property);
             return this;
         }
 
@@ -705,7 +705,7 @@ public class CriteriaBuilder {
         PageBuilder scroll(boolean isScroll);
         PageBuilder rows(int rows);
         PageBuilder page(int page);
-        PageBuilder orderByFixed(List<? extends Object> inList);
+        PageBuilder orderIn(List<? extends Object> inList);
         PageBuilder orderBy(String property);
         void on(Direction direction);
     }
@@ -776,7 +776,7 @@ public class CriteriaBuilder {
             xAddResultKey(list);
         }
 
-        public ResultMappedBuilder addResultKey(String resultKey){
+        public ResultMappedBuilder resultKey(String resultKey){
             get().getResultKeyList().add(resultKey);
             return this;
         }
