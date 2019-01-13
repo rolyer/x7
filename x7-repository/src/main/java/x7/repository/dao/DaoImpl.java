@@ -27,11 +27,12 @@ import x7.core.util.*;
 import x7.core.web.Direction;
 import x7.core.web.Page;
 import x7.repository.CriteriaParser;
-import x7.repository.ResultSetUtil;
+import x7.repository.util.ResultSetUtil;
 import x7.repository.exception.PersistenceException;
 import x7.repository.exception.RollbackException;
 import x7.repository.mapper.Mapper;
 import x7.repository.mapper.MapperFactory;
+import x7.repository.util.ResultSortUtil;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -41,1255 +42,1263 @@ import java.sql.*;
 import java.util.*;
 
 /**
- * 
  * @author Sim
  */
 public class DaoImpl implements Dao {
 
-	private static DaoImpl instance;
-
-	public static DaoImpl getInstance() {
-		if (instance == null) {
-			instance = new DaoImpl();
-		}
-		return instance;
-	}
-
-	private DaoImpl() {
-		this.criteriaParser = new SqlCriteriaParser();
-	}
-
-	private CriteriaParser criteriaParser;
-
-	@Autowired
-	private Mapper.Dialect dialect;
-	public void setDialect(Mapper.Dialect dialect){
-		this.dialect = dialect;
-		this.criteriaParser.setDialect(dialect);
-	}
-
-
-
-	/**
-	 * 放回连接池,<br>
-	 * 连接池已经重写了关闭连接的方法
-	 */
-	private static void close(Connection conn) {
-		RcDataSourceUtil.releaseConnection(conn);
-	}
-
-	private static void close(PreparedStatement pstmt) {
-		if (pstmt != null) {
-			try {
-				pstmt.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-	}
+    private static DaoImpl instance;
+
+    public static DaoImpl getInstance() {
+        if (instance == null) {
+            instance = new DaoImpl();
+        }
+        return instance;
+    }
+
+    private DaoImpl() {
+        this.criteriaParser = new SqlCriteriaParser();
+    }
+
+    private CriteriaParser criteriaParser;
+
+    @Autowired
+    private Mapper.Dialect dialect;
+
+    public void setDialect(Mapper.Dialect dialect) {
+        this.dialect = dialect;
+        this.criteriaParser.setDialect(dialect);
+    }
+
+
+    /**
+     * 放回连接池,<br>
+     * 连接池已经重写了关闭连接的方法
+     */
+    private static void close(Connection conn) {
+        RcDataSourceUtil.releaseConnection(conn);
+    }
+
+    private static void close(PreparedStatement pstmt) {
+        if (pstmt != null) {
+            try {
+                pstmt.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
-	@Override
-	public boolean createBatch(List<? extends Object> objList) {
+    @Override
+    public boolean createBatch(List<? extends Object> objList) {
 
-		if (objList.isEmpty())
-			return false;
-		Object obj = objList.get(0);
-		Class clz = obj.getClass();
+        if (objList.isEmpty())
+            return false;
+        Object obj = objList.get(0);
+        Class clz = obj.getClass();
 
-		String sql = MapperFactory.getSql(clz, Mapper.CREATE);
+        String sql = MapperFactory.getSql(clz, Mapper.CREATE);
 
-		List<BeanElement> eles = MapperFactory.getElementList(clz);
+        List<BeanElement> eles = MapperFactory.getElementList(clz);
 
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		try {
-			Parsed parsed = Parser.get(clz);
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        try {
+            Parsed parsed = Parser.get(clz);
 
-			Long keyOneValue = 0L;
-			Field keyOneField = parsed.getKeyField(X.KEY_ONE);
-			if (Objects.isNull(keyOneField))
-				throw new PersistenceException("No setting of PrimaryKey by @X.Key");
-			Class keyOneType = keyOneField.getType();
-			if (keyOneType != String.class) {
-				keyOneValue = keyOneField.getLong(obj);
-			}
+            Long keyOneValue = 0L;
+            Field keyOneField = parsed.getKeyField(X.KEY_ONE);
+            if (Objects.isNull(keyOneField))
+                throw new PersistenceException("No setting of PrimaryKey by @X.Key");
+            Class keyOneType = keyOneField.getType();
+            if (keyOneType != String.class) {
+                keyOneValue = keyOneField.getLong(obj);
+            }
 
-			conn = DataSourceUtil.getConnection();
+            conn = DataSourceUtil.getConnection();
 
-			if (keyOneType != String.class && (keyOneValue == null || keyOneValue == 0)) {
-				pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-			} else {
-				pstmt = conn.prepareStatement(sql);
-			}
+            if (keyOneType != String.class && (keyOneValue == null || keyOneValue == 0)) {
+                pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            } else {
+                pstmt = conn.prepareStatement(sql);
+            }
 
-			for (Object o : objList) {
+            for (Object o : objList) {
 
-				int i = 1;
-				for (BeanElement ele : eles) {
+                int i = 1;
+                for (BeanElement ele : eles) {
 
-					Object value = ele.getMethod.invoke(o);
-					if (value == null) {
-						if (ele.clz.isEnum())
-							throw new PersistenceException(
-									"ENUM CAN NOT NULL, property:" + clz.getName() + SqlScript.POINT + ele.getProperty());
-						if (ele.clz == Boolean.class || ele.clz == Integer.class || ele.clz == Long.class
-								|| ele.clz == Double.class || ele.clz == Float.class || ele.clz == BigDecimal.class
-								|| ele.clz == Byte.class || ele.clz == Short.class)
-							value = 0;
-						pstmt.setObject(i++, value);
-					} else {
-						if (ele.isJson) {
-							String str = JsonX.toJson(value);
-							this.dialect.setJSON(i++,str,pstmt);
-						}else if (ele.clz.isEnum()) {
-							String str = value.toString();
-							pstmt.setObject(i++, str);
-						} else {
-							value = this.dialect.filterValue(value);
-							pstmt.setObject(i++, value);
-						}
-					}
+                    Object value = ele.getMethod.invoke(o);
+                    if (value == null) {
+                        if (ele.clz.isEnum())
+                            throw new PersistenceException(
+                                    "ENUM CAN NOT NULL, property:" + clz.getName() + SqlScript.POINT + ele.getProperty());
+                        if (ele.clz == Boolean.class || ele.clz == Integer.class || ele.clz == Long.class
+                                || ele.clz == Double.class || ele.clz == Float.class || ele.clz == BigDecimal.class
+                                || ele.clz == Byte.class || ele.clz == Short.class)
+                            value = 0;
+                        pstmt.setObject(i++, value);
+                    } else {
+                        if (ele.isJson) {
+                            String str = JsonX.toJson(value);
+                            this.dialect.setJSON(i++, str, pstmt);
+                        } else if (ele.clz.isEnum()) {
+                            String str = value.toString();
+                            pstmt.setObject(i++, str);
+                        } else {
+                            value = this.dialect.filterValue(value);
+                            pstmt.setObject(i++, value);
+                        }
+                    }
 
-				}
+                }
 
-				pstmt.addBatch();
+                pstmt.addBatch();
 
-			}
+            }
 
-			pstmt.executeBatch();
+            pstmt.executeBatch();
 
-		} catch (Exception e) {
-			e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
 
-			throw new RollbackException("RollbackException: " + ExceptionUtil.getMessage(e) + ", while create: " + obj);
+            throw new RollbackException("RollbackException: " + ExceptionUtil.getMessage(e) + ", while create: " + obj);
 
-		} finally {
-			DataSourceUtil.releaseConnection(conn);
-		}
+        } finally {
+            DataSourceUtil.releaseConnection(conn);
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	protected boolean remove(Object obj, Connection conn) {
+    protected boolean remove(Object obj, Connection conn) {
 
-		Class clz = obj.getClass();
+        Class clz = obj.getClass();
 
-		String sql = MapperFactory.getSql(clz, Mapper.REMOVE);
+        String sql = MapperFactory.getSql(clz, Mapper.REMOVE);
 
-		boolean flag = false;
+        boolean flag = false;
 
-		PreparedStatement pstmt = null;
-		try {
+        PreparedStatement pstmt = null;
+        try {
 
-			pstmt = conn.prepareStatement(sql);
+            pstmt = conn.prepareStatement(sql);
 
-			Parsed parsed = Parser.get(clz);
+            Parsed parsed = Parser.get(clz);
 
-			int i = 1;
+            int i = 1;
 
-			Field keyOneField = parsed.getKeyField(X.KEY_ONE);
-			if (Objects.isNull(keyOneField))
-				throw new PersistenceException("No setting of PrimaryKey by @X.Key");
-			SqlUtil.adpterSqlKey(pstmt, keyOneField, obj, i);
+            Field keyOneField = parsed.getKeyField(X.KEY_ONE);
+            if (Objects.isNull(keyOneField))
+                throw new PersistenceException("No setting of PrimaryKey by @X.Key");
+            SqlUtil.adpterSqlKey(pstmt, keyOneField, obj, i);
 
-			flag = pstmt.executeUpdate() == 0 ? false : true;
+            flag = pstmt.executeUpdate() == 0 ? false : true;
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new RollbackException("RollbackException: " + e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RollbackException("RollbackException: " + e.getMessage());
 
-		} finally {
-			DataSourceUtil.releaseConnection(conn);
-		}
+        } finally {
+            DataSourceUtil.releaseConnection(conn);
+        }
 
-		return flag;
-	}
+        return flag;
+    }
 
-	protected long create(Object obj, Connection conn) {
+    protected long create(Object obj, Connection conn) {
 
-		Class clz = obj.getClass();
+        Class clz = obj.getClass();
 
-		String sql = MapperFactory.getSql(clz, Mapper.CREATE);
+        String sql = MapperFactory.getSql(clz, Mapper.CREATE);
 
-		List<BeanElement> eles = MapperFactory.getElementList(clz);
+        List<BeanElement> eles = MapperFactory.getElementList(clz);
 
-		long id = -1;
-		PreparedStatement pstmt = null;
-		try {
-			Parsed parsed = Parser.get(clz);
-			Long keyOneValue = 0L;
-			Field keyOneField = parsed.getKeyField(X.KEY_ONE);
-			if (Objects.isNull(keyOneField))
-				throw new PersistenceException("No setting of PrimaryKey by @X.Key");
-			Class keyOneType = keyOneField.getType();
-			if (keyOneType != String.class) {
-				keyOneValue = keyOneField.getLong(obj);
-			}
+        long id = -1;
+        PreparedStatement pstmt = null;
+        try {
+            Parsed parsed = Parser.get(clz);
+            Long keyOneValue = 0L;
+            Field keyOneField = parsed.getKeyField(X.KEY_ONE);
+            if (Objects.isNull(keyOneField))
+                throw new PersistenceException("No setting of PrimaryKey by @X.Key");
+            Class keyOneType = keyOneField.getType();
+            if (keyOneType != String.class) {
+                keyOneValue = keyOneField.getLong(obj);
+            }
 
-			/*
-			 * 返回自增键
-			 */
+            /*
+             * 返回自增键
+             */
 
-			if (keyOneType != String.class && (keyOneValue == null || keyOneValue == 0)) {
-				pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-			} else {
-				pstmt = conn.prepareStatement(sql);
-			}
+            if (keyOneType != String.class && (keyOneValue == null || keyOneValue == 0)) {
+                pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            } else {
+                pstmt = conn.prepareStatement(sql);
+            }
 
-			int i = 1;
-			for (BeanElement ele : eles) {
+            int i = 1;
+            for (BeanElement ele : eles) {
 
-				Object value = ele.getMethod.invoke(obj);
-				if (value == null) {
-					if (ele.clz.isEnum())
-						throw new PersistenceException(
-								"ENUM CAN NOT NULL, property:" + clz.getName() + SqlScript.POINT + ele.getProperty());
-					if (ele.clz == Boolean.class || ele.clz == Integer.class || ele.clz == Long.class
-							|| ele.clz == Double.class || ele.clz == Float.class || ele.clz == BigDecimal.class
-							|| ele.clz == Byte.class || ele.clz == Short.class)
-						value = 0;
-					pstmt.setObject(i++, value);
-				} else {
-					if (ele.isJson) {
-						String str = JsonX.toJson(value);
-						this.dialect.setJSON(i++,str,pstmt);
-					}else if (ele.clz.isEnum()) {
-						String str = value.toString();
-						pstmt.setObject(i++, str);
-					} else {
-						value = this.dialect.filterValue(value);
-						pstmt.setObject(i++, value);
-					}
+                Object value = ele.getMethod.invoke(obj);
+                if (value == null) {
+                    if (ele.clz.isEnum())
+                        throw new PersistenceException(
+                                "ENUM CAN NOT NULL, property:" + clz.getName() + SqlScript.POINT + ele.getProperty());
+                    if (ele.clz == Boolean.class || ele.clz == Integer.class || ele.clz == Long.class
+                            || ele.clz == Double.class || ele.clz == Float.class || ele.clz == BigDecimal.class
+                            || ele.clz == Byte.class || ele.clz == Short.class)
+                        value = 0;
+                    pstmt.setObject(i++, value);
+                } else {
+                    if (ele.isJson) {
+                        String str = JsonX.toJson(value);
+                        this.dialect.setJSON(i++, str, pstmt);
+                    } else if (ele.clz.isEnum()) {
+                        String str = value.toString();
+                        pstmt.setObject(i++, str);
+                    } else {
+                        value = this.dialect.filterValue(value);
+                        pstmt.setObject(i++, value);
+                    }
 
-				}
+                }
 
-			}
+            }
 
-			pstmt.execute();
+            pstmt.execute();
 
-			if (keyOneType != String.class && (keyOneValue == null || keyOneValue == 0)) {
-				ResultSet rs = pstmt.getGeneratedKeys();
-				if (rs.next()) {
-					id = rs.getLong(1);
-				}
+            if (keyOneType != String.class && (keyOneValue == null || keyOneValue == 0)) {
+                ResultSet rs = pstmt.getGeneratedKeys();
+                if (rs.next()) {
+                    id = rs.getLong(1);
+                }
 
-			} else {
-				id = keyOneValue;
-			}
+            } else {
+                id = keyOneValue;
+            }
 
-		} catch (Exception e) {
-			System.out.println("Exception occured, while create: " + obj);
-			e.printStackTrace();
+        } catch (Exception e) {
+            System.out.println("Exception occured, while create: " + obj);
+            e.printStackTrace();
 
-			throw new RollbackException("RollbackException occoured: " + ExceptionUtil.getMessage(e) + ", while create " + obj);
+            throw new RollbackException("RollbackException occoured: " + ExceptionUtil.getMessage(e) + ", while create " + obj);
 
-		} finally {
+        } finally {
 
-			DataSourceUtil.releaseConnection(conn);
-		}
+            DataSourceUtil.releaseConnection(conn);
+        }
 
-		return id;
-	}
+        return id;
+    }
 
-	protected boolean refresh(Object obj, Connection conn) {
+    protected boolean refresh(Object obj, Connection conn) {
 
-		@SuppressWarnings("rawtypes")
-		Class clz = obj.getClass();
-		Parsed parsed = Parser.get(clz);
+        @SuppressWarnings("rawtypes")
+        Class clz = obj.getClass();
+        Parsed parsed = Parser.get(clz);
 
-		String tableName = parsed.getTableName();
+        String tableName = parsed.getTableName();
 
-		StringBuilder sb = new StringBuilder();
-		sb.append(SqlScript.UPDATE).append(SqlScript.SPACE).append(tableName).append(SqlScript.SPACE);
+        StringBuilder sb = new StringBuilder();
+        sb.append(SqlScript.UPDATE).append(SqlScript.SPACE).append(tableName).append(SqlScript.SPACE);
 
-		Map<String, Object> refreshMap = BeanUtilX.getRefreshMap(parsed, obj);
+        Map<String, Object> refreshMap = BeanUtilX.getRefreshMap(parsed, obj);
 
-		String sql = SqlUtil.concatRefresh(sb, parsed, refreshMap);
+        String sql = SqlUtil.concatRefresh(sb, parsed, refreshMap);
 
-		System.out.println("refresh normally: " + sql);
+        System.out.println("refresh normally: " + sql);
 
-		if (sql.contains("SET  WHERE"))
-			return false;
+        if (sql.contains("SET  WHERE"))
+            return false;
 
-		boolean flag = false;
+        boolean flag = false;
 
-		PreparedStatement pstmt = null;
-		try {
+        PreparedStatement pstmt = null;
+        try {
 
-			pstmt = conn.prepareStatement(sql);
+            pstmt = conn.prepareStatement(sql);
 
-			int i = 1;
-			for (Object value : refreshMap.values()) {
-				value = this.dialect.filterValue(value);
-				this.dialect.setObject(i++,value,pstmt);
-			}
+            int i = 1;
+            for (Object value : refreshMap.values()) {
+                value = this.dialect.filterValue(value);
+                this.dialect.setObject(i++, value, pstmt);
+            }
 
-			/*
-			 * 处理KEY
-			 */
-			Field keyOneField = parsed.getKeyField(X.KEY_ONE);
-			if (Objects.isNull(keyOneField))
-				throw new PersistenceException("No setting of PrimaryKey by @X.Key");
-			SqlUtil.adpterSqlKey(pstmt, keyOneField, obj, i);
+            /*
+             * 处理KEY
+             */
+            Field keyOneField = parsed.getKeyField(X.KEY_ONE);
+            if (Objects.isNull(keyOneField))
+                throw new PersistenceException("No setting of PrimaryKey by @X.Key");
+            SqlUtil.adpterSqlKey(pstmt, keyOneField, obj, i);
 
-			flag = pstmt.executeUpdate() == 0 ? false : true;
+            flag = pstmt.executeUpdate() == 0 ? false : true;
 
-		} catch (Exception e) {
-			e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
 
-			throw new RollbackException("RollbackException: " + e.getMessage());
+            throw new RollbackException("RollbackException: " + e.getMessage());
 
-		} finally {
-			DataSourceUtil.releaseConnection(conn);
-		}
+        } finally {
+            DataSourceUtil.releaseConnection(conn);
+        }
 
-		return flag;
-	}
+        return flag;
+    }
 
-	@Override
-	public long create(Object obj) {
+    @Override
+    public long create(Object obj) {
 
-		Connection conn = null;
-		try {
-			conn = DataSourceUtil.getConnection();
-		} catch (Exception e) {
-			throw new RuntimeException("NO CONNECTION");
-		}
-		return create(obj, conn);
-	}
+        Connection conn = null;
+        try {
+            conn = DataSourceUtil.getConnection();
+        } catch (Exception e) {
+            throw new RuntimeException("NO CONNECTION");
+        }
+        return create(obj, conn);
+    }
 
-	@Override
-	public boolean refresh(Object obj) {
+    @Override
+    public boolean refresh(Object obj) {
 
-		Connection conn = null;
-		try {
-			conn = DataSourceUtil.getConnection();
-		} catch (Exception e) {
-			throw new RuntimeException("NO CONNECTION");
-		}
-		return refresh(obj, conn);
-	}
+        Connection conn = null;
+        try {
+            conn = DataSourceUtil.getConnection();
+        } catch (Exception e) {
+            throw new RuntimeException("NO CONNECTION");
+        }
+        return refresh(obj, conn);
+    }
 
-	@Override
-	public boolean remove(Object obj) {
-		Connection conn = null;
-		try {
-			conn = DataSourceUtil.getConnection();
-		} catch (Exception e) {
-			throw new RuntimeException("NO CONNECTION");
-		}
-		return remove(obj, conn);
-	}
+    @Override
+    public boolean remove(Object obj) {
+        Connection conn = null;
+        try {
+            conn = DataSourceUtil.getConnection();
+        } catch (Exception e) {
+            throw new RuntimeException("NO CONNECTION");
+        }
+        return remove(obj, conn);
+    }
 
-	protected <T> T get(Class<T> clz, long idOne, Connection conn) {
+    protected <T> T get(Class<T> clz, long idOne, Connection conn) {
 
-		List<T> list = new ArrayList<T>();
+        List<T> list = new ArrayList<T>();
 
-		String sql = MapperFactory.getSql(clz, Mapper.QUERY);
-		List<BeanElement> eles = MapperFactory.getElementList(clz);
+        String sql = MapperFactory.getSql(clz, Mapper.QUERY);
+        List<BeanElement> eles = MapperFactory.getElementList(clz);
 
-		PreparedStatement pstmt = null;
-		BeanElement tempEle = null;
-		try {
-			conn.setAutoCommit(true);
-			pstmt = conn.prepareStatement(sql);
+        PreparedStatement pstmt = null;
+        BeanElement tempEle = null;
+        try {
+            conn.setAutoCommit(true);
+            pstmt = conn.prepareStatement(sql);
 
-			int i = 1;
+            int i = 1;
 
-			pstmt.setObject(i++, idOne);
+            pstmt.setObject(i++, idOne);
 
-			ResultSet rs = pstmt.executeQuery();
+            ResultSet rs = pstmt.executeQuery();
 
-			if (rs != null) {
-				while (rs.next()) {
-					T obj = clz.newInstance();
-					list.add(obj);
-					initObj(obj, rs, tempEle, eles);
-				}
-			}
+            if (rs != null) {
+                while (rs.next()) {
+                    T obj = clz.newInstance();
+                    list.add(obj);
+                    initObj(obj, rs, tempEle, eles);
+                }
+            }
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new RollbackException(
-					"Exception occured by class = " + clz.getName()  + ", message: " + ExceptionUtil.getMessage(e));
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RollbackException(
+                    "Exception occured by class = " + clz.getName() + ", message: " + ExceptionUtil.getMessage(e));
 
-		} finally {
-			close(pstmt);
-			close(conn);
-		}
+        } finally {
+            close(pstmt);
+            close(conn);
+        }
 
-		if (list.isEmpty())
-			return null;
-		return list.get(0);
-	}
+        if (list.isEmpty())
+            return null;
+        return list.get(0);
+    }
 
-	@Override
-	public <T> T get(Class<T> clz, long idOne) {
-		Connection conn = RcDataSourceUtil.getConnection();
+    @Override
+    public <T> T get(Class<T> clz, long idOne) {
+        Connection conn = RcDataSourceUtil.getConnection();
 
-		return get(clz, idOne, conn);
-	}
+        return get(clz, idOne, conn);
+    }
 
-	protected List<Map<String, Object>> list(Class clz, String sql, List<Object> conditionList, Connection conn) {
+    protected List<Map<String, Object>> list(Class clz, String sql, List<Object> conditionList, Connection conn) {
 
-		sql = sql.replace("drop", SqlScript.SPACE).replace("delete", SqlScript.SPACE).replace("insert", SqlScript.SPACE).replace(";", SqlScript.SPACE); // 手动拼接SQL,
-																										// 必须考虑应用代码的漏
-		Parsed parsed = Parser.get(clz);
+        sql = sql.replace("drop", SqlScript.SPACE).replace("delete", SqlScript.SPACE).replace("insert", SqlScript.SPACE).replace(";", SqlScript.SPACE); // 手动拼接SQL,
+        // 必须考虑应用代码的漏
+        Parsed parsed = Parser.get(clz);
 
-		sql = BeanUtilX.mapper(sql, parsed);//FIXME 解析之后, 替换,拼接
-		sql = BeanUtilX.mapperForManu(sql, parsed);//FIXME 解析之后, 替换,拼接
+        sql = BeanUtilX.mapper(sql, parsed);//FIXME 解析之后, 替换,拼接
+        sql = BeanUtilX.mapperForManu(sql, parsed);//FIXME 解析之后, 替换,拼接
 
-		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+        List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 
-		PreparedStatement pstmt = null;
+        PreparedStatement pstmt = null;
 
-		try {
-			conn.setAutoCommit(true);
-			pstmt = conn.prepareStatement(sql);
+        try {
+            conn.setAutoCommit(true);
+            pstmt = conn.prepareStatement(sql);
 
-			int i = 1;
-			if (conditionList != null) {
-				for (Object obj : conditionList) {
-					pstmt.setObject(i++, obj);
-				}
-			}
+            int i = 1;
+            if (conditionList != null) {
+                for (Object obj : conditionList) {
+                    pstmt.setObject(i++, obj);
+                }
+            }
 
-			ResultSet rs = pstmt.executeQuery();
+            ResultSet rs = pstmt.executeQuery();
 
-			if (rs != null) {
-				while (rs.next()) {
-					Map<String, Object> mapR = new HashMap<String, Object>();
-					list.add(mapR);
-					ResultSetMetaData rsmd = rs.getMetaData();
-					int count = rsmd.getColumnCount();
-					for (i = 1; i <= count; i++) {
-						String key = rsmd.getColumnLabel(i);
-						String value = rs.getString(i);
-						String property = parsed.getProperty(key);
-						if (StringUtil.isNullOrEmpty(property)) {
-							property = key;
-						}
-						mapR.put(property, value);
-					}
+            if (rs != null) {
+                while (rs.next()) {
+                    Map<String, Object> mapR = new HashMap<String, Object>();
+                    list.add(mapR);
+                    ResultSetMetaData rsmd = rs.getMetaData();
+                    int count = rsmd.getColumnCount();
+                    for (i = 1; i <= count; i++) {
+                        String key = rsmd.getColumnLabel(i);
+                        String value = rs.getString(i);
+                        String property = parsed.getProperty(key);
+                        if (StringUtil.isNullOrEmpty(property)) {
+                            property = key;
+                        }
+                        mapR.put(property, value);
+                    }
 
-				}
-			}
+                }
+            }
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			close(pstmt);
-			close(conn);
-		}
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            close(pstmt);
+            close(conn);
+        }
 
-		return list;
-	}
+        return list;
+    }
 
-	public List<Map<String, Object>> list(Class clz, String sql, List<Object> conditionList) {
-		Connection conn = RcDataSourceUtil.getConnection();
+    public List<Map<String, Object>> list(Class clz, String sql, List<Object> conditionList) {
+        Connection conn = RcDataSourceUtil.getConnection();
 
-		return list(clz, sql, conditionList, conn);
-	}
+        return list(clz, sql, conditionList, conn);
+    }
 
-	@Override
-	public <T> List<T> list(Class<T> clz) {
+    @Override
+    public <T> List<T> list(Class<T> clz) {
 
-		List<T> list = new ArrayList<T>();
+        List<T> list = new ArrayList<T>();
 
-		String sql = MapperFactory.getSql(clz, Mapper.LOAD);
-		List<BeanElement> eles = MapperFactory.getElementList(clz);
+        String sql = MapperFactory.getSql(clz, Mapper.LOAD);
+        List<BeanElement> eles = MapperFactory.getElementList(clz);
 
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		BeanElement tempEle = null;
-		try {
-			conn = RcDataSourceUtil.getConnection();
-			conn.setAutoCommit(true);
-			pstmt = conn.prepareStatement(sql);
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        BeanElement tempEle = null;
+        try {
+            conn = RcDataSourceUtil.getConnection();
+            conn.setAutoCommit(true);
+            pstmt = conn.prepareStatement(sql);
 
-			ResultSet rs = pstmt.executeQuery();
+            ResultSet rs = pstmt.executeQuery();
 
-			if (rs != null) {
-				while (rs.next()) {
-					T obj = clz.newInstance();
-					list.add(obj);
-					initObj(obj, rs, tempEle, eles);
-				}
-			}
+            if (rs != null) {
+                while (rs.next()) {
+                    T obj = clz.newInstance();
+                    list.add(obj);
+                    initObj(obj, rs, tempEle, eles);
+                }
+            }
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new RollbackException(
-					"Exception occured by class = " + clz.getName()  + ", message: " + ExceptionUtil.getMessage(e));
-		} finally {
-			close(pstmt);
-			close(conn);
-		}
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RollbackException(
+                    "Exception occured by class = " + clz.getName() + ", message: " + ExceptionUtil.getMessage(e));
+        } finally {
+            close(pstmt);
+            close(conn);
+        }
 
-		return list;
-	}
+        return list;
+    }
 
-	protected <T> List<T> list(Object conditionObj, Connection conn) {
+    protected <T> List<T> list(Object conditionObj, Connection conn) {
 
-		Class clz = conditionObj.getClass();
+        Class clz = conditionObj.getClass();
 
-		String sql = MapperFactory.getSql(clz, Mapper.LOAD);
+        String sql = MapperFactory.getSql(clz, Mapper.LOAD);
 
-		Parsed parsed = Parser.get(clz);
+        Parsed parsed = Parser.get(clz);
 
-		Map<String, Object> queryMap = BeanUtilX.getQueryMap(parsed, conditionObj);
-		sql = SqlUtil.concat(parsed, sql, queryMap);
+        Map<String, Object> queryMap = BeanUtilX.getQueryMap(parsed, conditionObj);
+        sql = SqlUtil.concat(parsed, sql, queryMap);
 
-		List<T> list = new ArrayList<T>();
+        List<T> list = new ArrayList<T>();
 
-		PreparedStatement pstmt = null;
-		BeanElement tempEle = null;
-		try {
-			conn.setAutoCommit(true);
-			pstmt = conn.prepareStatement(sql);
+        PreparedStatement pstmt = null;
+        BeanElement tempEle = null;
+        try {
+            conn.setAutoCommit(true);
+            pstmt = conn.prepareStatement(sql);
 
-			int i = 1;
-			for (Object o : queryMap.values()) {
-				pstmt.setObject(i++, o);
-			}
+            int i = 1;
+            for (Object o : queryMap.values()) {
+                pstmt.setObject(i++, o);
+            }
 
-			List<BeanElement> eles = parsed.getBeanElementList();
-			ResultSet rs = pstmt.executeQuery();
-			if (rs != null) {
-				while (rs.next()) {
-					T obj = (T) clz.newInstance();
-					list.add(obj);
-					initObj(obj, rs, tempEle, eles);
-				}
-			}
+            List<BeanElement> eles = parsed.getBeanElementList();
+            ResultSet rs = pstmt.executeQuery();
+            if (rs != null) {
+                while (rs.next()) {
+                    T obj = (T) clz.newInstance();
+                    list.add(obj);
+                    initObj(obj, rs, tempEle, eles);
+                }
+            }
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new RollbackException(
-					"Exception occured by class = " + clz.getName()  + ", message: " + ExceptionUtil.getMessage(e));
-		} finally {
-			close(pstmt);
-			close(conn);
-		}
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RollbackException(
+                    "Exception occured by class = " + clz.getName() + ", message: " + ExceptionUtil.getMessage(e));
+        } finally {
+            close(pstmt);
+            close(conn);
+        }
 
-		return list;
-	}
+        return list;
+    }
 
-	@Override
-	public <T> List<T> list(Object conditionObj) {
-		Connection conn = RcDataSourceUtil.getConnection();
+    @Override
+    public <T> List<T> list(Object conditionObj) {
+        Connection conn = RcDataSourceUtil.getConnection();
 
-		return list(conditionObj, conn);
-	}
+        return list(conditionObj, conn);
+    }
 
-	protected <T> List<T> list(Criteria criteria, Connection conn) {
-		Class clz = criteria.getClz();
+    protected <T> List<T> list(Criteria criteria, Connection conn) {
+        Class clz = criteria.getClz();
 
-		List<Object> valueList = criteria.getValueList();
+        List<Object> valueList = criteria.getValueList();
 
-		String[] sqlArr = this.criteriaParser.parse(criteria);
+        String[] sqlArr = this.criteriaParser.parse(criteria);
 
-		String sql = sqlArr[1];
+        String sql = sqlArr[1];
 
-		int page = criteria.getPage();
-		int rows = criteria.getRows();
+        int page = criteria.getPage();
+        int rows = criteria.getRows();
 
-		int start = (page - 1) * rows;
+        int start = (page - 1) * rows;
 
-		sql = dialect.match(sql, start, rows);
+        sql = dialect.match(sql, start, rows);
 
-		List<T> list = new ArrayList<>();
+        List<T> list = new ArrayList<>();
 
-		PreparedStatement pstmt = null;
-		BeanElement tempEle = null;
-		try {
-			conn.setAutoCommit(true);
-			pstmt = conn.prepareStatement(sql);
+        PreparedStatement pstmt = null;
+        BeanElement tempEle = null;
+        try {
+            conn.setAutoCommit(true);
+            pstmt = conn.prepareStatement(sql);
 
-			int i = 1;
-			for (Object obj : valueList) {
-				pstmt.setObject(i++, obj);
-			}
+            int i = 1;
+            for (Object obj : valueList) {
+                pstmt.setObject(i++, obj);
+            }
 
-			ResultSet rs = pstmt.executeQuery();
+            ResultSet rs = pstmt.executeQuery();
 
-			if (rs != null) {
+            if (rs != null) {
 
-				List<BeanElement> eles = MapperFactory.getElementList(clz);
+                List<BeanElement> eles = MapperFactory.getElementList(clz);
 
-				while (rs.next()) {
+                while (rs.next()) {
 
-					T obj = (T) clz.newInstance();
-					list.add(obj);
-					initObj(obj, rs, tempEle, eles);
+                    T obj = (T) clz.newInstance();
+                    list.add(obj);
+                    initObj(obj, rs, tempEle, eles);
 
-				}
+                }
 
-			}
+            }
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new RollbackException(
-					"Exception occured by class = " + clz.getName()  + ", message: " + ExceptionUtil.getMessage(e));
-		} finally {
-			close(pstmt);
-			close(conn);
-		}
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RollbackException(
+                    "Exception occured by class = " + clz.getName() + ", message: " + ExceptionUtil.getMessage(e));
+        } finally {
+            close(pstmt);
+            close(conn);
+        }
 
-		return list;
-	}
+        return list;
+    }
 
-	protected <T> Page<T> find(Criteria criteria, Connection conn) {
-		Class clz = criteria.getClz();
+    protected <T> Page<T> find(Criteria criteria, Connection conn) {
+        Class clz = criteria.getClz();
 
-		List<Object> valueList = criteria.getValueList();
+        List<Object> valueList = criteria.getValueList();
 
-		String[] sqlArr = this.criteriaParser.parse(criteria);
+        String[] sqlArr = this.criteriaParser.parse(criteria);
 
-		String sql = sqlArr[1];
+        String sql = sqlArr[1];
 
-		int page = criteria.getPage();
-		int rows = criteria.getRows();
+        int page = criteria.getPage();
+        int rows = criteria.getRows();
 
-		int start = (page - 1) * rows;
+        int start = (page - 1) * rows;
 
-		sql = dialect.match(sql, start, rows);
+        sql = dialect.match(sql, start, rows);
 
-		Page<T> pagination = new Page<T>();
-		pagination.setClz(clz);
-		pagination.setPage(page == 0 ? 1 : page);
-		pagination.setRows(rows == 0 ? Integer.MAX_VALUE : rows);
-		pagination.setOrderBy(criteria.getOrderBy());
-		pagination.setDirection(criteria.getDirection());
-		pagination.setScroll(criteria.isScroll());
+        Page<T> pagination = new Page<T>();
+        pagination.setClz(clz);
+        pagination.setPage(page == 0 ? 1 : page);
+        pagination.setRows(rows == 0 ? Integer.MAX_VALUE : rows);
+        pagination.setOrderBy(criteria.getOrderBy());
+        pagination.setDirection(criteria.getDirection());
+        pagination.setScroll(criteria.isScroll());
 
-		PreparedStatement pstmt = null;
-		BeanElement tempEle = null;
-		try {
-			conn.setAutoCommit(true);
-			pstmt = conn.prepareStatement(sql);
+        List<T> list = pagination.getList();
 
-			int i = 1;
-			for (Object obj : valueList) {
-				pstmt.setObject(i++, obj);
-			}
+        PreparedStatement pstmt = null;
+        BeanElement tempEle = null;
+        try {
+            conn.setAutoCommit(true);
+            pstmt = conn.prepareStatement(sql);
 
-			ResultSet rs = pstmt.executeQuery();
+            int i = 1;
+            for (Object obj : valueList) {
+                pstmt.setObject(i++, obj);
+            }
 
-			if (rs != null) {
+            ResultSet rs = pstmt.executeQuery();
 
-				List<BeanElement> eles = MapperFactory.getElementList(clz);
+            if (rs != null) {
 
-				while (rs.next()) {
+                List<BeanElement> eles = MapperFactory.getElementList(clz);
 
-					T obj = (T) clz.newInstance();
-					pagination.getList().add(obj);
-					initObj(obj, rs, tempEle, eles);
 
-				}
+                while (rs.next()) {
 
-				long count = 0;
-				if (!criteria.isScroll()) {
-					int size = pagination.getList().size();
-					if (page == 0){
-						count = size;
-					}else if (size > 0){
-						String sqlCount = sqlArr[0];
-						count = getCount(sqlCount, valueList);
-					}
-					pagination.setTotalRows(count);
-				}
+                    T obj = (T) clz.newInstance();
+                    list.add(obj);
+                    initObj(obj, rs, tempEle, eles);
 
-			}
+                }
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new RollbackException(
-					"Exception occured by class = " + clz.getName()  + ", message: " + ExceptionUtil.getMessage(e));
-		} finally {
-			close(pstmt);
-			close(conn);
-		}
+                Parsed parsed = Parser.get(clz);
+                ResultSortUtil.sort(list,criteria,parsed);
 
-		return pagination;
-	}
+                long count = 0;
+                if (!criteria.isScroll()) {
+                    int size = list.size();
+                    if (page == 0) {
+                        count = size;
+                    } else if (size > 0) {
+                        String sqlCount = sqlArr[0];
+                        count = getCount(sqlCount, valueList);
+                    }
+                    pagination.setTotalRows(count);
+                }
 
-	@Override
-	public <T> Page<T> find(Criteria criteria) {
+            }
 
-		Connection conn = RcDataSourceUtil.getConnection();
-		return find(criteria, conn);
-	}
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RollbackException(
+                    "Exception occured by class = " + clz.getName() + ", message: " + ExceptionUtil.getMessage(e));
+        } finally {
+            close(pstmt);
+            close(conn);
+        }
 
-	@Override
-	public <T> List<T> list(Criteria criteria) {
+        return pagination;
+    }
 
-		Connection conn = RcDataSourceUtil.getConnection();
-		return list(criteria, conn);
-	}
+    @Override
+    public <T> Page<T> find(Criteria criteria) {
 
-	@Override
-	public Object reduce(ReduceCondition reduceCondition) {
+        Connection conn = RcDataSourceUtil.getConnection();
+        return find(criteria, conn);
+    }
 
-		Connection conn = RcDataSourceUtil.getConnection();
-		return reduce(reduceCondition, conn);
-	}
+    @Override
+    public <T> List<T> list(Criteria criteria) {
 
-	protected Object reduce(ReduceCondition reduceCondition, Connection conn) {
+        Connection conn = RcDataSourceUtil.getConnection();
+        return list(criteria, conn);
+    }
 
-		Class<?> clz = reduceCondition.getClz();
-		Parsed parsed = Parser.get(clz);
+    @Override
+    public Object reduce(ReduceCondition reduceCondition) {
 
-		String conditionSql = this.criteriaParser.parseCondition(reduceCondition.getCondition());
+        Connection conn = RcDataSourceUtil.getConnection();
+        return reduce(reduceCondition, conn);
+    }
 
-		String type = reduceCondition.getType().toString();
-		String returnStr = type.toLowerCase();
-		String property = reduceCondition.getReduceProperty();
-		if (StringUtil.isNotNull(property)) {
-			property = parsed.getMapper(property);
-		}
-		if (Objects.isNull(property)){
-			property = SqlScript.STAR;
-		}
-		String script = type + SqlScript.LEFT_PARENTTHESIS+property+SqlScript.RIGHT_PARENTTHESIS + SqlScript.SPACE+ returnStr;
+    protected Object reduce(ReduceCondition reduceCondition, Connection conn) {
 
-		String sql = MapperFactory.getSql(clz, Mapper.LOAD);
+        Class<?> clz = reduceCondition.getClz();
+        Parsed parsed = Parser.get(clz);
 
-		sql = sql.replace(SqlScript.STAR,script);
-		sql += conditionSql;
+        String conditionSql = this.criteriaParser.parseCondition(reduceCondition.getCondition());
 
-		sql = BeanUtilX.mapper(sql, parsed);
+        String type = reduceCondition.getType().toString();
+        String returnStr = type.toLowerCase();
+        String property = reduceCondition.getReduceProperty();
+        if (StringUtil.isNotNull(property)) {
+            property = parsed.getMapper(property);
+        }
+        if (Objects.isNull(property)) {
+            property = SqlScript.STAR;
+        }
+        String script = type + SqlScript.LEFT_PARENTTHESIS + property + SqlScript.RIGHT_PARENTTHESIS + SqlScript.SPACE + returnStr;
 
-		System.out.println(sql);
+        String sql = MapperFactory.getSql(clz, Mapper.LOAD);
 
-		Object result = null;
+        sql = sql.replace(SqlScript.STAR, script);
+        sql += conditionSql;
 
-		PreparedStatement pstmt = null;
-		try {
-			conn = RcDataSourceUtil.getConnection();
-			conn.setAutoCommit(true);
-			pstmt = conn.prepareStatement(sql);
+        sql = BeanUtilX.mapper(sql, parsed);
 
-			int i = 1;
+        System.out.println(sql);
 
-			List<Object> valueList = reduceCondition.getCondition().getValueList();
-			for (Object o : valueList) {
-				pstmt.setObject(i++, o);
-			}
+        Object result = null;
 
-			ResultSet rs = pstmt.executeQuery();
+        PreparedStatement pstmt = null;
+        try {
+            conn = RcDataSourceUtil.getConnection();
+            conn.setAutoCommit(true);
+            pstmt = conn.prepareStatement(sql);
 
-			if (rs.next()) {
-				result = rs.getObject(returnStr);
-			}
+            int i = 1;
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			close(pstmt);
-			close(conn);
-		}
+            List<Object> valueList = reduceCondition.getCondition().getValueList();
+            for (Object o : valueList) {
+                pstmt.setObject(i++, o);
+            }
 
-		return result;
-	}
+            ResultSet rs = pstmt.executeQuery();
 
-	/**
-	 *  getCount
-	 * 
-	 * @param sql
-	 * @param set
-	 * @return
-	 */
-	private long getCount(String sql, Collection<Object> set) {
+            if (rs.next()) {
+                result = rs.getObject(returnStr);
+            }
 
-		long count = 0;
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		try {
-			conn = RcDataSourceUtil.getConnection();
-			conn.setAutoCommit(true);
-			pstmt = conn.prepareStatement(sql);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            close(pstmt);
+            close(conn);
+        }
 
-			int i = 1;
-			for (Object obj : set) {
-				pstmt.setObject(i++, obj);
-			}
+        return result;
+    }
 
-			ResultSet rs = pstmt.executeQuery();
+    /**
+     * getCount
+     *
+     * @param sql
+     * @param set
+     * @return
+     */
+    private long getCount(String sql, Collection<Object> set) {
 
-			if (rs.next()) {
-				count = rs.getLong("count");
-			}
+        long count = 0;
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        try {
+            conn = RcDataSourceUtil.getConnection();
+            conn.setAutoCommit(true);
+            pstmt = conn.prepareStatement(sql);
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			close(pstmt);
-			close(conn);
-		}
+            int i = 1;
+            for (Object obj : set) {
+                pstmt.setObject(i++, obj);
+            }
 
-		return count;
-	}
+            ResultSet rs = pstmt.executeQuery();
 
+            if (rs.next()) {
+                count = rs.getLong("count");
+            }
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@Override
-	public <T> T getOne(T conditionObj, String orderBy, Direction sc) {
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            close(pstmt);
+            close(conn);
+        }
 
-		Class clz = conditionObj.getClass();
+        return count;
+    }
 
-		String sql = MapperFactory.getSql(clz, Mapper.LOAD);
 
-		Parsed parsed = Parser.get(clz);
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    @Override
+    public <T> T getOne(T conditionObj, String orderBy, Direction sc) {
 
-		Map<String, Object> queryMap = BeanUtilX.getQueryMap(parsed, conditionObj);
-		sql = SqlUtil.concat(parsed, sql, queryMap);
+        Class clz = conditionObj.getClass();
 
-		String mapper = BeanUtilX.getMapper(orderBy);
-		StringBuilder sb = new StringBuilder();
-		sb.append(Conjunction.ORDER_BY.sql()).append(mapper).append(" ").append(sc.toString()).append(SqlScript.LIMIT).append("1");
+        String sql = MapperFactory.getSql(clz, Mapper.LOAD);
 
-		sql += sb.toString();
+        Parsed parsed = Parser.get(clz);
 
-		List<Object> list = new ArrayList<Object>();
+        Map<String, Object> queryMap = BeanUtilX.getQueryMap(parsed, conditionObj);
+        sql = SqlUtil.concat(parsed, sql, queryMap);
 
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		BeanElement tempEle = null;
-		try {
-			conn = RcDataSourceUtil.getConnection();
-			conn.setAutoCommit(true);
-			pstmt = conn.prepareStatement(sql);
+        String mapper = BeanUtilX.getMapper(orderBy);
+        StringBuilder sb = new StringBuilder();
+        sb.append(Conjunction.ORDER_BY.sql()).append(mapper).append(" ").append(sc.toString()).append(SqlScript.LIMIT).append("1");
 
-			int i = 1;
-			for (Object o : queryMap.values()) {
-				pstmt.setObject(i++, o);
-			}
+        sql += sb.toString();
 
-			List<BeanElement> eles = parsed.getBeanElementList();
-			ResultSet rs = pstmt.executeQuery();
-			if (rs != null) {
-				while (rs.next()) {
-					Object obj = clz.newInstance();
-					list.add(obj);
-					initObj(obj, rs, tempEle, eles);
-				}
-			}
+        List<Object> list = new ArrayList<Object>();
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new RollbackException(
-					"Exception occured by class = " + clz.getName()  + ", message: " + ExceptionUtil.getMessage(e));
-		} finally {
-			close(pstmt);
-			close(conn);
-		}
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        BeanElement tempEle = null;
+        try {
+            conn = RcDataSourceUtil.getConnection();
+            conn.setAutoCommit(true);
+            pstmt = conn.prepareStatement(sql);
 
-		if (list.isEmpty())
-			return null;
+            int i = 1;
+            for (Object o : queryMap.values()) {
+                pstmt.setObject(i++, o);
+            }
 
-		return (T) list.get(0);
-	}
+            List<BeanElement> eles = parsed.getBeanElementList();
+            ResultSet rs = pstmt.executeQuery();
+            if (rs != null) {
+                while (rs.next()) {
+                    Object obj = clz.newInstance();
+                    list.add(obj);
+                    initObj(obj, rs, tempEle, eles);
+                }
+            }
 
-	/**
-	 * 没有特殊需求，请不要调用此代码
-	 *
-	 * @param obj
-	 * @param sql
-	 */
-	@Deprecated
-	@Override
-	public boolean execute(Object obj, String sql) {
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RollbackException(
+                    "Exception occured by class = " + clz.getName() + ", message: " + ExceptionUtil.getMessage(e));
+        } finally {
+            close(pstmt);
+            close(conn);
+        }
 
-		Parsed parsed = Parser.get(obj.getClass());
+        if (list.isEmpty())
+            return null;
 
-		sql = sql.replace(" drop ", SqlScript.SPACE).replace(" delete ", SqlScript.SPACE).replace(" insert ", SqlScript.SPACE).replace(";", SqlScript.SPACE); // 手动拼接SQL,
-																										// 必须考虑应用代码的漏洞
-		sql = BeanUtilX.mapper(sql, parsed);
-		boolean b = false;
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		try {
+        return (T) list.get(0);
+    }
 
-			conn = DataSourceUtil.getConnection();
-			pstmt = conn.prepareStatement(sql);
+    /**
+     * 没有特殊需求，请不要调用此代码
+     *
+     * @param obj
+     * @param sql
+     */
+    @Deprecated
+    @Override
+    public boolean execute(Object obj, String sql) {
 
-			b = pstmt.executeUpdate() == 0 ? false : true;
+        Parsed parsed = Parser.get(obj.getClass());
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new RuntimeException(e.getMessage());
-		} finally {
-			DataSourceUtil.releaseConnection(conn);
-		}
+        sql = sql.replace(" drop ", SqlScript.SPACE).replace(" delete ", SqlScript.SPACE).replace(" insert ", SqlScript.SPACE).replace(";", SqlScript.SPACE); // 手动拼接SQL,
+        // 必须考虑应用代码的漏洞
+        sql = BeanUtilX.mapper(sql, parsed);
+        boolean b = false;
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        try {
 
-		return b;
-	}
+            conn = DataSourceUtil.getConnection();
+            pstmt = conn.prepareStatement(sql);
 
-	protected boolean refreshByCondition(RefreshCondition refreshCondition, Connection conn) {
+            b = pstmt.executeUpdate() == 0 ? false : true;
 
-		@SuppressWarnings("rawtypes")
-		Class clz = refreshCondition.getClz();
-		Object obj = refreshCondition.getObj();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e.getMessage());
+        } finally {
+            DataSourceUtil.releaseConnection(conn);
+        }
 
-		Parsed parsed = Parser.get(clz);
+        return b;
+    }
 
-		Map<String, Object> refreshMap = BeanUtilX.getRefreshMap(parsed, obj);
+    protected boolean refreshByCondition(RefreshCondition refreshCondition, Connection conn) {
 
-		String tableName = parsed.getTableName();
-		StringBuilder sb = new StringBuilder();
-		sb.append(SqlScript.UPDATE).append(SqlScript.SPACE).append(tableName).append(SqlScript.SPACE);
-		String sql = SqlUtil.concatRefresh(sb, parsed, refreshMap, refreshCondition,this.criteriaParser);
+        @SuppressWarnings("rawtypes")
+        Class clz = refreshCondition.getClz();
+        Object obj = refreshCondition.getObj();
 
-		System.out.println("________SQL: refreshByCondition: " + sql);
+        Parsed parsed = Parser.get(clz);
 
-		if (sql.contains("SET  WHERE"))
-			return false;
+        Map<String, Object> refreshMap = BeanUtilX.getRefreshMap(parsed, obj);
 
-		boolean flag = false;
+        String tableName = parsed.getTableName();
+        StringBuilder sb = new StringBuilder();
+        sb.append(SqlScript.UPDATE).append(SqlScript.SPACE).append(tableName).append(SqlScript.SPACE);
+        String sql = SqlUtil.concatRefresh(sb, parsed, refreshMap, refreshCondition, this.criteriaParser);
 
-		PreparedStatement pstmt = null;
-		try {
-			pstmt = conn.prepareStatement(sql);
+        System.out.println("________SQL: refreshByCondition: " + sql);
 
-			int i = 1;
-			for (Object value : refreshMap.values()) {
-				value = this.dialect.filterValue(value);
-				this.dialect.setObject(i++,value,pstmt);
-			}
+        if (sql.contains("SET  WHERE"))
+            return false;
 
-			SqlUtil.adpterRefreshCondition(pstmt, i, refreshCondition.getCondition());
+        boolean flag = false;
 
-			flag = pstmt.executeUpdate() == 0 ? false : true;
+        PreparedStatement pstmt = null;
+        try {
+            pstmt = conn.prepareStatement(sql);
 
-		} catch (Exception e) {
-			flag = false;
-			e.printStackTrace();
-			throw new RollbackException(
-						"Exception occured by class = " + clz.getName()  + ", message: " + ExceptionUtil.getMessage(e));
+            int i = 1;
+            for (Object value : refreshMap.values()) {
+                value = this.dialect.filterValue(value);
+                this.dialect.setObject(i++, value, pstmt);
+            }
 
-		} finally {
-			DataSourceUtil.releaseConnection(conn);
-		}
+            SqlUtil.adpterRefreshCondition(pstmt, i, refreshCondition.getCondition());
 
-		return flag;
-	}
+            flag = pstmt.executeUpdate() == 0 ? false : true;
 
+        } catch (Exception e) {
+            flag = false;
+            e.printStackTrace();
+            throw new RollbackException(
+                    "Exception occured by class = " + clz.getName() + ", message: " + ExceptionUtil.getMessage(e));
 
-	@Override
-	public <T> boolean refreshByCondition(RefreshCondition<T> refreshCondition)  {
+        } finally {
+            DataSourceUtil.releaseConnection(conn);
+        }
 
-		Connection conn = null;
-		try {
-			conn = DataSourceUtil.getConnection();
-		} catch (Exception e) {
-			throw new RuntimeException("NO CONNECTION");
-		}
+        return flag;
+    }
 
-		return refreshByCondition(refreshCondition, conn);
-	}
 
-	@Override
-	public <T> List<T> in(InCondition inCondition) {
+    @Override
+    public <T> boolean refreshByCondition(RefreshCondition<T> refreshCondition) {
 
-		Class<T> clz = inCondition.getClz();
-		String inProperty = inCondition.getProperty();
-		List<? extends Object> inList = inCondition.getInList();
+        Connection conn = null;
+        try {
+            conn = DataSourceUtil.getConnection();
+        } catch (Exception e) {
+            throw new RuntimeException("NO CONNECTION");
+        }
 
-		Parsed parsed = Parser.get(clz);
+        return refreshByCondition(refreshCondition, conn);
+    }
 
-		if (StringUtil.isNullOrEmpty(inProperty)) {
-			inProperty = parsed.getKey(X.KEY_ONE);
-			if (Objects.isNull(inProperty))
-				throw new PersistenceException("No setting of PrimaryKey by @X.Key");
-		}
+    @Override
+    public <T> List<T> in(InCondition inCondition) {
 
-		BeanElement be = parsed.getElement(inProperty);
-		if (be == null)
-			throw new RuntimeException(
-					"Exception in method: <T> List<T> in(inCondition), no property: "
-							+ inProperty);
+        Class<T> clz = inCondition.getClz();
+        String inProperty = inCondition.getProperty();
+        List<? extends Object> inList = inCondition.getInList();
 
+        Parsed parsed = Parser.get(clz);
 
-		String sql = MapperFactory.getSql(clz, Mapper.LOAD);
-		List<BeanElement> eles = MapperFactory.getElementList(clz);
+        if (StringUtil.isNullOrEmpty(inProperty)) {
+            inProperty = parsed.getKey(X.KEY_ONE);
+            if (Objects.isNull(inProperty))
+                throw new PersistenceException("No setting of PrimaryKey by @X.Key");
+        }
 
-		String mapper = parsed.getMapper(inProperty);
+        BeanElement be = parsed.getElement(inProperty);
+        if (be == null)
+            throw new RuntimeException(
+                    "Exception in method: <T> List<T> in(inCondition), no property: "
+                            + inProperty);
 
-		StringBuilder sb = new StringBuilder();
 
-		sb.append(sql).append(SqlScript.WHERE).append(mapper);
-		sb.append(SqlScript.IN).append(SqlScript.LEFT_PARENTTHESIS);//" IN ("
+        String sql = MapperFactory.getSql(clz, Mapper.LOAD);
+        List<BeanElement> eles = MapperFactory.getElementList(clz);
 
-		Class<?> keyType = be.getMethod.getReturnType();
-		boolean isNumber = (keyType == long.class || keyType == int.class || keyType == Long.class
-				|| keyType == Integer.class);
-		
-		int size = inList.size();
-		if (isNumber) {
-			for (int i = 0; i < size; i++) {
-				Object id = inList.get(i);
-				if (id == null)
-					continue;
-				sb.append(id);
-				if (i < size - 1) {
-					sb.append(SqlScript.COMMA);
-				}
-			}
-		} else {
-			for (int i = 0; i < size; i++) {
-				Object id = inList.get(i);
-				if (id == null || StringUtil.isNullOrEmpty(id.toString()))
-					continue;
-				sb.append(SqlScript.SINGLE_QUOTES).append(id).append(SqlScript.SINGLE_QUOTES);
-				if (i < size - 1) {
-					sb.append(SqlScript.COMMA);
-				}
-			}
-		}
+        String mapper = parsed.getMapper(inProperty);
 
-		sb.append(SqlScript.RIGHT_PARENTTHESIS);
+        StringBuilder sb = new StringBuilder();
 
-		sql = sb.toString();
+        sb.append(sql).append(SqlScript.WHERE).append(mapper);
+        sb.append(SqlScript.IN).append(SqlScript.LEFT_PARENTTHESIS);//" IN ("
 
-		System.out.println(sql);
+        Class<?> keyType = be.getMethod.getReturnType();
+        boolean isNumber = (keyType == long.class || keyType == int.class || keyType == Long.class
+                || keyType == Integer.class);
 
-		List<T> list = new ArrayList<T>();// return list
+        int size = inList.size();
+        if (isNumber) {
+            for (int i = 0; i < size; i++) {
+                Object id = inList.get(i);
+                if (id == null)
+                    continue;
+                sb.append(id);
+                if (i < size - 1) {
+                    sb.append(SqlScript.COMMA);
+                }
+            }
+        } else {
+            for (int i = 0; i < size; i++) {
+                Object id = inList.get(i);
+                if (id == null || StringUtil.isNullOrEmpty(id.toString()))
+                    continue;
+                sb.append(SqlScript.SINGLE_QUOTES).append(id).append(SqlScript.SINGLE_QUOTES);
+                if (i < size - 1) {
+                    sb.append(SqlScript.COMMA);
+                }
+            }
+        }
 
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		BeanElement tempEle = null;
-		try {
-			conn = RcDataSourceUtil.getConnection();
-			conn.setAutoCommit(true);
-			pstmt = conn.prepareStatement(sql);
+        sb.append(SqlScript.RIGHT_PARENTTHESIS);
 
-			ResultSet rs = pstmt.executeQuery();
+        sql = sb.toString();
 
-			if (rs != null) {
-				while (rs.next()) {
-					T obj = clz.newInstance();
-					list.add(obj);
-					initObj(obj, rs, tempEle, eles);
-				}
-			}
+        System.out.println(sql);
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new RollbackException(
-					"Exception occured by class = " + clz.getName()  + ", message: " + ExceptionUtil.getMessage(e));
-		} finally {
-			close(pstmt);
-			close(conn);
-		}
+        List<T> list = new ArrayList<T>();// return list
 
-		return list;
-	}
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        BeanElement tempEle = null;
+        try {
+            conn = RcDataSourceUtil.getConnection();
+            conn.setAutoCommit(true);
+            pstmt = conn.prepareStatement(sql);
 
-	@Override
-	public Page<Map<String, Object>> find(Criteria.ResultMapped criteriaResultMapped) {
+            ResultSet rs = pstmt.executeQuery();
 
-		Connection conn = RcDataSourceUtil.getConnection();
+            if (rs != null) {
+                while (rs.next()) {
+                    T obj = clz.newInstance();
+                    list.add(obj);
+                    initObj(obj, rs, tempEle, eles);
+                }
+            }
 
-		return this.find(criteriaResultMapped, conn);
-	}
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RollbackException(
+                    "Exception occured by class = " + clz.getName() + ", message: " + ExceptionUtil.getMessage(e));
+        } finally {
+            close(pstmt);
+            close(conn);
+        }
 
-	protected Page<Map<String, Object>> find(Criteria.ResultMapped criteriaResultMapped, Connection conn) {
+        return list;
+    }
 
-		List<Object> valueList = criteriaResultMapped.getValueList();
+    @Override
+    public Page<Map<String, Object>> find(Criteria.ResultMapped criteriaResultMapped) {
 
-		String[] sqlArr = this.criteriaParser.parse(criteriaResultMapped);
+        Connection conn = RcDataSourceUtil.getConnection();
 
-		String sqlCount = sqlArr[0];
-		String sql = sqlArr[1];
+        return this.find(criteriaResultMapped, conn);
+    }
 
-		int page = criteriaResultMapped.getPage();
-		int rows = criteriaResultMapped.getRows();
+    protected Page<Map<String, Object>> find(Criteria.ResultMapped criteriaResultMapped, Connection conn) {
 
-		int start = (page - 1) * rows;
+        List<Object> valueList = criteriaResultMapped.getValueList();
 
-		sql = dialect.match(sql, start, rows);
+        String[] sqlArr = this.criteriaParser.parse(criteriaResultMapped);
 
-		System.out.println(sql);
+        String sqlCount = sqlArr[0];
+        String sql = sqlArr[1];
 
-		Page<Map<String, Object>> pagination = new Page<Map<String, Object>>();
-		pagination.setClz(Map.class);
-		pagination.setPage(page == 0 ? 1 : page);
-		pagination.setRows(rows == 0 ? Integer.MAX_VALUE : rows);
-		pagination.setOrderBy(criteriaResultMapped.getOrderBy());
-		pagination.setDirection(criteriaResultMapped.getDirection());
-		pagination.setScroll(criteriaResultMapped.isScroll());
+        int page = criteriaResultMapped.getPage();
+        int rows = criteriaResultMapped.getRows();
 
-		PreparedStatement pstmt = null;
-		try {
-			conn.setAutoCommit(true);
-			pstmt = conn.prepareStatement(sql);
+        int start = (page - 1) * rows;
 
-			int i = 1;
-			for (Object obj : valueList) {
-				pstmt.setObject(i++, obj);
-			}
+        sql = dialect.match(sql, start, rows);
 
+        System.out.println(sql);
 
-			ResultSet rs = pstmt.executeQuery();
+        Page<Map<String, Object>> pagination = new Page<Map<String, Object>>();
+        pagination.setClz(Map.class);
+        pagination.setPage(page == 0 ? 1 : page);
+        pagination.setRows(rows == 0 ? Integer.MAX_VALUE : rows);
+        pagination.setOrderBy(criteriaResultMapped.getOrderBy());
+        pagination.setDirection(criteriaResultMapped.getDirection());
+        pagination.setScroll(criteriaResultMapped.isScroll());
 
-			if (rs != null) {
+        List<Map<String,Object>> list = pagination.getList();
 
-				List<String> resultKeyList = criteriaResultMapped.getResultKeyList();
-				if (resultKeyList.isEmpty()) {
-					resultKeyList = criteriaResultMapped.listAllResultKey();
-				}
+        PreparedStatement pstmt = null;
+        try {
+            conn.setAutoCommit(true);
+            pstmt = conn.prepareStatement(sql);
 
-				while (rs.next()) {
-					Map<String, Object> mapR = new HashMap<String, Object>();
-					pagination.getList().add(mapR);
+            int i = 1;
+            for (Object obj : valueList) {
+                pstmt.setObject(i++, obj);
+            }
 
-					for (String property : resultKeyList) {
-						String mapper = criteriaResultMapped.getMapMapper().mapper(property);
-						Object obj = this.dialect.mappedResult(property,mapper,rs);
-						mapR.put(property, obj);
-					}
-				}
 
-				long count = 0;
-				if (!criteriaResultMapped.isScroll()) {
-					int size = pagination.getList().size();
-					if (page == 0){
-						count = size;
-					}else if (size > 0){
-						count = getCount(sqlCount, valueList);
-					}
-					pagination.setTotalRows(count);
-				}
+            ResultSet rs = pstmt.executeQuery();
 
-				String resultKey0 = resultKeyList.get(0);
-				if (!resultKey0.contains("."))
-					return pagination;
-			}
+            if (rs != null) {
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			close(pstmt);
-			close(conn);
-		}
+                List<String> resultKeyList = criteriaResultMapped.getResultKeyList();
+                if (resultKeyList.isEmpty()) {
+                    resultKeyList = criteriaResultMapped.listAllResultKey();
+                }
 
+                while (rs.next()) {
+                    Map<String, Object> mapR = new HashMap<String, Object>();
+                    list.add(mapR);
 
+                    for (String property : resultKeyList) {
+                        String mapper = criteriaResultMapped.getMapMapper().mapper(property);
+                        Object obj = this.dialect.mappedResult(property, mapper, rs);
+                        mapR.put(property, obj);
+                    }
+                }
 
-		List<Map<String, Object>> stringKeyMapList = pagination.getList();
-		if (!stringKeyMapList.isEmpty()) {
-			List<Map<String, Object>> jsonableMapList = BeanMapUtil.toJsonableMapList(stringKeyMapList);
-			pagination.reSetList(jsonableMapList);
-		}
+                ResultSortUtil.sort(list,criteriaResultMapped);
 
-		return pagination;
-	}
+                long count = 0;
+                if (!criteriaResultMapped.isScroll()) {
+                    int size = pagination.getList().size();
+                    if (page == 0) {
+                        count = size;
+                    } else if (size > 0) {
+                        count = getCount(sqlCount, valueList);
+                    }
+                    pagination.setTotalRows(count);
+                }
 
-	@Override
-	public List<Map<String, Object>> list(Criteria.ResultMapped resultMapped) {
+                String resultKey0 = resultKeyList.get(0);
+                if (!resultKey0.contains("."))
+                    return pagination;
+            }
 
-		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            close(pstmt);
+            close(conn);
+        }
 
-		List<Object> valueList = resultMapped.getValueList();
 
-		String[] sqlArr = this.criteriaParser.parse(resultMapped);
+        List<Map<String, Object>> stringKeyMapList = pagination.getList();
+        if (!stringKeyMapList.isEmpty()) {
+            List<Map<String, Object>> jsonableMapList = BeanMapUtil.toJsonableMapList(stringKeyMapList);
+            pagination.reSetList(jsonableMapList);
+        }
 
-		String sql = sqlArr[1];
+        return pagination;
+    }
 
-		int page = resultMapped.getPage();
-		int rows = resultMapped.getRows();
-		int start = (page - 1) * rows;
+    @Override
+    public List<Map<String, Object>> list(Criteria.ResultMapped resultMapped) {
 
+        List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 
-		sql = dialect.match(sql, start, rows);
+        List<Object> valueList = resultMapped.getValueList();
 
-		System.out.println(sql);
+        String[] sqlArr = this.criteriaParser.parse(resultMapped);
 
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		try {
-			conn = RcDataSourceUtil.getConnection();
-			conn.setAutoCommit(true);
-			pstmt = conn.prepareStatement(sql);
+        String sql = sqlArr[1];
 
-			int i = 1;
-			for (Object obj : valueList) {
-				pstmt.setObject(i++, obj);
-			}
+        int page = resultMapped.getPage();
+        int rows = resultMapped.getRows();
+        int start = (page - 1) * rows;
 
-			ResultSet rs = pstmt.executeQuery();
 
-			if (rs != null) {
+        sql = dialect.match(sql, start, rows);
 
-				List<String> resultKeyList = resultMapped.getResultKeyList();
-				if (resultKeyList.isEmpty()) {
-					resultKeyList = resultMapped.listAllResultKey();// FIXME ALLWAYS BUG
-				}
+        System.out.println(sql);
 
-				while (rs.next()) {
-					Map<String, Object> mapR = new HashMap<String, Object>();
-					list.add(mapR);
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        try {
+            conn = RcDataSourceUtil.getConnection();
+            conn.setAutoCommit(true);
+            pstmt = conn.prepareStatement(sql);
 
-					for (String property : resultKeyList) {
-						String mapper = resultMapped.getMapMapper().mapper(property);
-						Object obj = this.dialect.mappedResult(property,mapper,rs);
-						mapR.put(property, obj);
-					}
+            int i = 1;
+            for (Object obj : valueList) {
+                pstmt.setObject(i++, obj);
+            }
 
-				}
+            ResultSet rs = pstmt.executeQuery();
 
-				String resultKey0 = resultKeyList.get(0);
-				if (!resultKey0.contains("."))
-					return list;
-			}
+            if (rs != null) {
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			close(pstmt);
-			close(conn);
-		}
+                List<String> resultKeyList = resultMapped.getResultKeyList();
+                if (resultKeyList.isEmpty()) {
+                    resultKeyList = resultMapped.listAllResultKey();// FIXME ALLWAYS BUG
+                }
 
-		if (!list.isEmpty()) {
-			List<Map<String, Object>> mapList = BeanMapUtil.toJsonableMapList(list);
-			return mapList;
-		}
+                while (rs.next()) {
+                    Map<String, Object> mapR = new HashMap<String, Object>();
+                    list.add(mapR);
 
-		return list;
-	}
+                    for (String property : resultKeyList) {
+                        String mapper = resultMapped.getMapMapper().mapper(property);
+                        Object obj = this.dialect.mappedResult(property, mapper, rs);
+                        mapR.put(property, obj);
+                    }
 
-	private <T> void initObj(T obj, ResultSet rs, BeanElement tempEle, List<BeanElement> eles)
-			throws IllegalArgumentException, SecurityException, SQLException, IOException, IllegalAccessException, InvocationTargetException {
+                }
 
-		ResultSetUtil.initObj(obj, rs, tempEle, eles);
-	}
+                String resultKey0 = resultKeyList.get(0);
+                if (!resultKey0.contains("."))
+                    return list;
+            }
 
-	protected <T> T getOne(T conditionObj, Connection conn) {
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            close(pstmt);
+            close(conn);
+        }
 
-		List<T> list = list(conditionObj, conn);
+        if (!list.isEmpty()) {
+            List<Map<String, Object>> mapList = BeanMapUtil.toJsonableMapList(list);
+            return mapList;
+        }
 
-		if (list.isEmpty())
-			return null;
-		return list.get(0);
-	}
+        return list;
+    }
 
-	public class Monitor {
+    private <T> void initObj(T obj, ResultSet rs, BeanElement tempEle, List<BeanElement> eles)
+            throws IllegalArgumentException, SecurityException, SQLException, IOException, IllegalAccessException, InvocationTargetException {
 
-		public List<x7.repository.monitor.mysql.Process> showProcessList(boolean isRead) {
-			String sql = "SHOW PROCESSLIST";
+        ResultSetUtil.initObj(obj, rs, tempEle, eles);
+    }
 
-			List<Map<String, Object>> mapList = DaoImpl.getInstance().list(x7.repository.monitor.mysql.Process.class,
-					sql, null);
+    protected <T> T getOne(T conditionObj, Connection conn) {
 
-			List<x7.repository.monitor.mysql.Process> objList = new ArrayList<x7.repository.monitor.mysql.Process>();
+        List<T> list = list(conditionObj, conn);
 
-			for (Map<String, Object> map : mapList) {
-				x7.repository.monitor.mysql.Process process = BeanMapUtil
-						.toObject(x7.repository.monitor.mysql.Process.class, map);
-				objList.add(process);
-			}
+        if (list.isEmpty())
+            return null;
+        return list.get(0);
+    }
 
-			return objList;
-		}
-	}
+    public class Monitor {
+
+        public List<x7.repository.monitor.mysql.Process> showProcessList(boolean isRead) {
+            String sql = "SHOW PROCESSLIST";
+
+            List<Map<String, Object>> mapList = DaoImpl.getInstance().list(x7.repository.monitor.mysql.Process.class,
+                    sql, null);
+
+            List<x7.repository.monitor.mysql.Process> objList = new ArrayList<x7.repository.monitor.mysql.Process>();
+
+            for (Map<String, Object> map : mapList) {
+                x7.repository.monitor.mysql.Process process = BeanMapUtil
+                        .toObject(x7.repository.monitor.mysql.Process.class, map);
+                objList.add(process);
+            }
+
+            return objList;
+        }
+    }
 }

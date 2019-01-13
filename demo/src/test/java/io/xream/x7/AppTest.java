@@ -24,7 +24,7 @@ public class AppTest {
     public void testAll(){
 
 
-        xxxTest.testOne();
+        xxxTest.testNonPaged();
 
     }
 

@@ -42,7 +42,7 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 	private int rows;
 	private List<String> orderByList = new ArrayList<>();
 	private Direction direction = Direction.DESC;
-	private boolean isFixedSort;
+	private List<KV> fixedSortList = new ArrayList();
 
 	private List<Object> valueList = new ArrayList<Object>();
 	
@@ -109,7 +109,7 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 	}
 
 	public String getOrderBy() {
-		if (isFixedSort)
+		if (isFixedSort())
 			return null;
 		StringBuilder sb = new StringBuilder();
 		for (String s : orderByList){
@@ -124,6 +124,14 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 
 	public void setOrderByList(List<String> orderByList) {
 		this.orderByList = orderByList;
+	}
+
+	public List<KV> getFixedSortList() {
+		return fixedSortList;
+	}
+
+	public void setFixedSortList(List<KV> fixedSortList) {
+		this.fixedSortList = fixedSortList;
 	}
 
 	public boolean isScroll() {
@@ -168,11 +176,7 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 	}
 
 	public boolean isFixedSort() {
-		return isFixedSort;
-	}
-
-	public void setFixedSort(boolean inConditionSort) {
-		this.isFixedSort = inConditionSort;
+		return !this.fixedSortList.isEmpty();
 	}
 
 	public void paged(Paged paged) {

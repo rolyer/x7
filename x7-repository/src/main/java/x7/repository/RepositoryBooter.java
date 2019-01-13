@@ -27,6 +27,7 @@ import x7.repository.mapper.MySqlDialect;
 import x7.repository.mapper.OracleDialect;
 import x7.repository.redis.JedisConnector_Persistence;
 import x7.repository.redis.LevelTwoCacheResolver;
+import x7.repository.util.ResultSetUtil;
 
 import javax.sql.DataSource;
 import java.util.List;

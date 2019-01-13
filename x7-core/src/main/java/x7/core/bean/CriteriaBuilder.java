@@ -145,11 +145,10 @@ public class CriteriaBuilder {
         }
 
         @Override
-        public PageBuilder orderIn(List<?> inList) {
-            if (criteria.isFixedSort())
-                return this;
+        public PageBuilder orderIn(String porperty, List<? extends Object> inList) {
             if (Objects.nonNull(inList) && inList.size() > 0) {
-                criteria.setFixedSort(true);
+                KV kv = new KV(porperty,inList);
+                criteria.getFixedSortList().add(kv);
             }
             return this;
         }
@@ -705,7 +704,7 @@ public class CriteriaBuilder {
         PageBuilder scroll(boolean isScroll);
         PageBuilder rows(int rows);
         PageBuilder page(int page);
-        PageBuilder orderIn(List<? extends Object> inList);
+        PageBuilder orderIn(String property, List<? extends Object> inList);
         PageBuilder orderBy(String property);
         void on(Direction direction);
     }

@@ -120,6 +120,7 @@ public class XxxController {
 
 		String[] resultKeys = {
 				"catTest.id",
+				"catTest.catFriendName",
 //				"dogTest.number",
 				"dogTest.userName"
 		};
@@ -130,13 +131,13 @@ public class XxxController {
 //		ro.setResultKeyMap();
 
 		List<Object> inList = new ArrayList<>();
-		inList.add("xxxxx");
 		inList.add("gggg");
+		inList.add("xxxxx");
 
 		CriteriaBuilder.ResultMappedBuilder builder = CriteriaBuilder.buildResultMapped(CatTest.class,ro);
 //		builder.distinct("catTest.id").reduce(Criteria.ReduceType.COUNT,"catTest.id").groupBy("catTest.id");
 		builder.and().in("catTest.catFriendName", inList);
-		builder.paged().orderIn(inList).rows(100);
+		builder.paged().orderIn("catTest.catFriendName",inList);
 
 
 //		builder.or().beginSub().eq("dogTest.userName","yyy")
@@ -153,17 +154,17 @@ public class XxxController {
 
 		Page<Map<String,Object>> pagination = repository.find(resultMapped);
 
-		Cat cat = this.catRepository.get(110);
+//		Cat cat = this.catRepository.get(110);
+//
+//		System.out.println("____cat: " + cat);
+//
+//		List<Long> idList = new ArrayList<>();
+//		idList.add(109L);
+//		idList.add(110L);
+//		InCondition inCondition = new InCondition("id",idList);
+//		List<Cat> catList = this.catRepository.in(inCondition);
 
-		System.out.println("____cat: " + cat);
-
-		List<Long> idList = new ArrayList<>();
-		idList.add(109L);
-		idList.add(110L);
-		InCondition inCondition = new InCondition("id",idList);
-		List<Cat> catList = this.catRepository.in(inCondition);
-
-		System.out.println("____catList: " + catList);
+//		System.out.println("____catList: " + catList);
 
 		return ViewEntity.ok(pagination);
 
@@ -177,20 +178,21 @@ public class XxxController {
 
 		String[] resultKeys = {
 				"id",
+				"type"
 		};
 
 //		ro.setOrderBy("cat.dogId");
 
-//		ro.setResultKeys(resultKeys);
+		ro.setResultKeys(resultKeys);
 
 		List<Object> inList = new ArrayList<>();
-		inList.add("BL");
 		inList.add("NL");
+		inList.add("BL");
 
 		CriteriaBuilder.ResultMappedBuilder builder = CriteriaBuilder.buildResultMapped(Cat.class,ro);
-		builder.distinct("id").reduce(Criteria.ReduceType.COUNT,"dogId").groupBy("id");
+//		builder.distinct("id").reduce(Criteria.ReduceType.COUNT,"dogId").groupBy("id");
 		builder.and().in("type", inList);
-		builder.paged().orderBy("cat.dogId").on(Direction.DESC.ASC);
+		builder.paged().orderIn("type",inList);
 
 
 //		builder.or().beginSub().eq("dogTest.userName","yyy")
@@ -214,14 +216,18 @@ public class XxxController {
 
 	public ViewEntity nonPaged(@RequestBody CatRO ro) {
 
-		CriteriaBuilder.ResultMappedBuilder builder = CriteriaBuilder.buildResultMapped(Cat.class);
-//		CriteriaBuilder builder = CriteriaBuilder.build(Cat.class);
+//		CriteriaBuilder.ResultMappedBuilder builder = CriteriaBuilder.buildResultMapped(Cat.class);
+		CriteriaBuilder builder = CriteriaBuilder.build(Cat.class);
 
-		builder.resultKey("id").resultKey("type");
-		builder.and().eq("type","NL");
+//		builder.resultKey("id").resultKey("type");
+		List<Object> inList = new ArrayList<>();
+		inList.add("NL");
+		inList.add("BL");
+		builder.and().in("type",inList);
+		builder.paged().orderIn("type",inList);
 
-		Criteria.ResultMapped criteria = builder.get();
-
+//		Criteria.ResultMapped criteria = builder.get();
+		Criteria criteria = builder.get();
 		Page p = catRepository.find(criteria);
 
 		return ViewEntity.ok(p);
