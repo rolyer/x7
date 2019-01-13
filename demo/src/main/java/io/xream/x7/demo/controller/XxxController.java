@@ -221,8 +221,8 @@ public class XxxController {
 
 //		builder.resultKey("id").resultKey("type");
 		List<Object> inList = new ArrayList<>();
-		inList.add("NL");
 		inList.add("BL");
+		inList.add("NL");
 		builder.and().in("type",inList);
 		builder.paged().orderIn("type",inList);
 

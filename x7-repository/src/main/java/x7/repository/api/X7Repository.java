@@ -117,4 +117,8 @@ public interface X7Repository<T> {
 	 * @return Object
 	 */
 	Object reduce(ReduceCondition condition);
+
+	List<Map<String,Object>> list(Criteria.ResultMapped resultMapped);
+
+	<T> List<T> list(Criteria criteria);
 }

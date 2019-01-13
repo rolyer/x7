@@ -557,6 +557,9 @@ public class SqlRepository implements Repository {
 			}
 		}
 
+		if (inList.isEmpty())
+			return new ArrayList<T>();
+
 		inCondition.setInList(inList);
 
 		Class clz = inCondition.getClz();

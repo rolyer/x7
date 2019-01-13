@@ -254,12 +254,6 @@ public abstract class BaseRepository<T> implements X7Repository<T> {
     }
 
     @Override
-    public Page<Map<String, Object>> find(Criteria.ResultMapped criteria) {
-
-        return SqlRepository.getInstance().find(criteria);
-    }
-
-    @Override
     public T getOne(T conditionObj, String orderBy, Direction sc) {
 
         return SqlRepository.getInstance().getOne(conditionObj, orderBy, sc);
@@ -301,6 +295,31 @@ public abstract class BaseRepository<T> implements X7Repository<T> {
             throw new RuntimeException("Codeing Exception: maybe {Criteria.ResultMapped criteria = builder.get();} instead of {Criteria criteria = builder.get();}");
         return SqlRepository.getInstance().find(criteria);
     }
+
+
+    @Override
+    public Page<Map<String, Object>> find(Criteria.ResultMapped criteria) {
+
+        return SqlRepository.getInstance().find(criteria);
+    }
+
+
+    @Override
+    public List<Map<String, Object>> list(Criteria.ResultMapped resultMapped) {
+        return SqlRepository.getInstance().list(resultMapped);
+    }
+
+    @Override
+    public <T> List<T> list(Criteria criteria) {
+
+        if (criteria instanceof Criteria.ResultMapped)
+            throw new RuntimeException("Codeing Exception: maybe {Criteria.ResultMapped criteria = builder.get();} instead of {Criteria criteria = builder.get();}");
+
+        return SqlRepository.getInstance().list(criteria);
+    }
+
+
+
 
     public static class HealthChecker {
 
@@ -369,103 +388,5 @@ public abstract class BaseRepository<T> implements X7Repository<T> {
         }
     }
 
-    public enum SimpleX {
-
-        //"And", "Or", "NotIn", "In", "Like", "IsNotNull", "IsNull", "Ne", "Eq", "Gte", "Gt", "Lte", "Lt"
-        AND {
-            public Criteria.X x() {
-                Criteria.X x = new Criteria.X();
-                x.setConjunction(Conjunction.AND);
-                return x;
-            }
-
-        },
-        OR {
-            public Criteria.X x() {
-                Criteria.X x = new Criteria.X();
-                x.setConjunction(Conjunction.OR);
-                return x;
-            }
-        },
-        NOTIN {
-            public Criteria.X x() {
-                Criteria.X x = new Criteria.X();
-                x.setPredicate(Predicate.NOT_IN);
-                return x;
-            }
-        },
-        IN {
-            public Criteria.X x() {
-                Criteria.X x = new Criteria.X();
-                x.setPredicate(Predicate.IN);
-                return x;
-            }
-        },
-        LIKE {
-            public Criteria.X x() {
-                Criteria.X x = new Criteria.X();
-                x.setPredicate(Predicate.LIKE);
-                return x;
-            }
-        },
-        ISNOTNULL {
-            public Criteria.X x() {
-                Criteria.X x = new Criteria.X();
-                x.setPredicate(Predicate.IS_NOT_NULL);
-                return x;
-            }
-        },
-        ISNULL {
-            public Criteria.X x() {
-                Criteria.X x = new Criteria.X();
-                x.setPredicate(Predicate.IS_NULL);
-                return x;
-            }
-        },
-        NE {
-            public Criteria.X x() {
-                Criteria.X x = new Criteria.X();
-                x.setPredicate(Predicate.NE);
-                return x;
-            }
-        },
-        EQ {
-            public Criteria.X x() {
-                Criteria.X x = new Criteria.X();
-                x.setPredicate(Predicate.EQ);
-                return x;
-            }
-        },
-        GTE {
-            public Criteria.X x() {
-                Criteria.X x = new Criteria.X();
-                x.setPredicate(Predicate.GTE);
-                return x;
-            }
-        },
-        GT {
-            public Criteria.X x() {
-                Criteria.X x = new Criteria.X();
-                x.setPredicate(Predicate.GT);
-                return x;
-            }
-        },
-        LTE {
-            public Criteria.X x() {
-                Criteria.X x = new Criteria.X();
-                x.setPredicate(Predicate.LTE);
-                return x;
-            }
-        },
-        LT {
-            public Criteria.X x() {
-                Criteria.X x = new Criteria.X();
-                x.setPredicate(Predicate.LT);
-                return x;
-            }
-        };
-
-        public abstract Criteria.X x();
-    }
 
 }
