@@ -1,11 +1,14 @@
 package io.xream.x7.demo;
 
+import org.apache.commons.collections.MapUtils;
 import x7.core.repository.X;
+import x7.core.web.IdView;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
-public class Cat implements Serializable {
+public class Cat implements Serializable, IdView {
 
 	private static final long serialVersionUID = 5708147778966785698L;
 
@@ -17,6 +20,16 @@ public class Cat implements Serializable {
 	private long dogId;
 	private long test;
 	private List<Long> list;
+
+	private transient Map<Object,Object> viewMap;
+	@Override
+	public void render(Map<Object,Object> viewMap) {
+		this.viewMap = viewMap;
+	}
+
+	public String getName(){
+		return MapUtils.getString(viewMap,""+id);
+	}
 
 	public long getId() {
 		return id;

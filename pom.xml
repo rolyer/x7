@@ -8,7 +8,7 @@
     <packaging>pom</packaging>
     <name>x7-parent</name>
     <description>x7 base on spring boot</description>
-    <url>http://xream.io</url>
+    <url>http://x7.xream.io</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -16,13 +16,14 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.compilerVersion>1.8</maven.compiler.compilerVersion>
         <maven.test.skip>true</maven.test.skip>
+        <x7.version>1.6.0.RELEASE</x7.version>
     </properties>
 
     <scm>
         <connection>scm:git:https://github.com/x-ream/x7</connection>
         <developerConnection>scm:git:https://github.com/x-ream/x7</developerConnection>
         <url>scm:git:https://github.com/x-ream/x7</url>
-        <tag>1.1.0.RELEASE</tag>
+        <tag>1.6.0.RELEASE</tag>
     </scm>
 
     <licenses>

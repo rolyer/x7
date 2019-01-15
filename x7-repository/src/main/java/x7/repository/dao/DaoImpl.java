@@ -449,8 +449,9 @@ public class DaoImpl implements Dao {
 
             int i = 1;
             if (conditionList != null) {
-                for (Object obj : conditionList) {
-                    pstmt.setObject(i++, obj);
+                for (Object value : conditionList) {
+                    value = this.dialect.filterValue(value);
+                    this.dialect.setObject(i++, value, pstmt);
                 }
             }
 
@@ -549,8 +550,9 @@ public class DaoImpl implements Dao {
             pstmt = conn.prepareStatement(sql);
 
             int i = 1;
-            for (Object o : queryMap.values()) {
-                pstmt.setObject(i++, o);
+            for (Object value : queryMap.values()) {
+                value = this.dialect.filterValue(value);
+                this.dialect.setObject(i++, value, pstmt);
             }
 
             List<BeanElement> eles = parsed.getBeanElementList();
@@ -607,8 +609,9 @@ public class DaoImpl implements Dao {
             pstmt = conn.prepareStatement(sql);
 
             int i = 1;
-            for (Object obj : valueList) {
-                pstmt.setObject(i++, obj);
+            for (Object value : valueList) {
+                value = this.dialect.filterValue(value);
+                this.dialect.setObject(i++, value, pstmt);
             }
 
             ResultSet rs = pstmt.executeQuery();
@@ -672,8 +675,9 @@ public class DaoImpl implements Dao {
             pstmt = conn.prepareStatement(sql);
 
             int i = 1;
-            for (Object obj : valueList) {
-                pstmt.setObject(i++, obj);
+            for (Object value : valueList) {
+                value = this.dialect.filterValue(value);
+                this.dialect.setObject(i++, value, pstmt);
             }
 
             ResultSet rs = pstmt.executeQuery();
@@ -779,8 +783,9 @@ public class DaoImpl implements Dao {
             int i = 1;
 
             List<Object> valueList = reduceCondition.getCondition().getValueList();
-            for (Object o : valueList) {
-                pstmt.setObject(i++, o);
+            for (Object value : valueList) {
+                value = this.dialect.filterValue(value);
+                this.dialect.setObject(i++, value, pstmt);
             }
 
             ResultSet rs = pstmt.executeQuery();
@@ -817,8 +822,9 @@ public class DaoImpl implements Dao {
             pstmt = conn.prepareStatement(sql);
 
             int i = 1;
-            for (Object obj : set) {
-                pstmt.setObject(i++, obj);
+            for (Object value : set) {
+                value = this.dialect.filterValue(value);
+                this.dialect.setObject(i++, value, pstmt);
             }
 
             ResultSet rs = pstmt.executeQuery();
@@ -868,8 +874,9 @@ public class DaoImpl implements Dao {
             pstmt = conn.prepareStatement(sql);
 
             int i = 1;
-            for (Object o : queryMap.values()) {
-                pstmt.setObject(i++, o);
+            for (Object value : queryMap.values()) {
+                value = this.dialect.filterValue(value);
+                this.dialect.setObject(i++, value, pstmt);
             }
 
             List<BeanElement> eles = parsed.getBeanElementList();
@@ -1134,8 +1141,9 @@ public class DaoImpl implements Dao {
             pstmt = conn.prepareStatement(sql);
 
             int i = 1;
-            for (Object obj : valueList) {
-                pstmt.setObject(i++, obj);
+            for (Object value : valueList) {
+                value = this.dialect.filterValue(value);
+                this.dialect.setObject(i++, value, pstmt);
             }
 
 
@@ -1222,8 +1230,9 @@ public class DaoImpl implements Dao {
             pstmt = conn.prepareStatement(sql);
 
             int i = 1;
-            for (Object obj : valueList) {
-                pstmt.setObject(i++, obj);
+            for (Object value : valueList) {
+                value = this.dialect.filterValue(value);
+                this.dialect.setObject(i++, value, pstmt);
             }
 
             ResultSet rs = pstmt.executeQuery();
