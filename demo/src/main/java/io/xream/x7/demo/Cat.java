@@ -29,6 +29,7 @@ public class Cat implements Serializable, IdView {
 
 	public String getName(){
 		return MapUtils.getString(viewMap,""+id);
+
 	}
 
 	public long getId() {
