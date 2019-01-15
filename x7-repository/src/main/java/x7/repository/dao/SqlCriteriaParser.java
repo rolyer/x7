@@ -25,7 +25,6 @@ import x7.core.web.Direction;
 import x7.repository.CriteriaParser;
 import x7.repository.mapper.Mapper;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 

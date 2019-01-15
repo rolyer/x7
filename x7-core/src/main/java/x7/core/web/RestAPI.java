@@ -35,7 +35,7 @@ public interface RestAPI {
 		String getId();
 	}
 	
-	public static class SignException extends RuntimeException{
+	class SignException extends RuntimeException{
 		
 		private String message;
 		public SignException(String message){
@@ -48,7 +48,7 @@ public interface RestAPI {
 		}
 	}
 	
-	public class RequestMessage<T> {
+	class RequestMessage<T> {
 		
 		private T body;
 		private String id;
@@ -91,7 +91,7 @@ public interface RestAPI {
 		}
 	}
 	
-	public static class Callback {
+	class Callback {
 		
 		public static Message parse (String responseStr, Signed signed){
 			
@@ -107,7 +107,7 @@ public interface RestAPI {
 		
 	}
 	
-	public static class SendMessage {
+	class SendMessage {
 		public static Message toast(String str) {
 			Message message = new Message();
 			message.setStatus(ViewStatus.FAIL);
@@ -128,7 +128,7 @@ public interface RestAPI {
 		}
 	}
 
-	public static class Message<T> {
+	class Message<T> {
 
 		private ViewStatus status;
 		private T body;

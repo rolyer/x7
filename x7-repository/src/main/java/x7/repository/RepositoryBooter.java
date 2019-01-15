@@ -23,8 +23,6 @@ import x7.repository.BaseRepository.HealthChecker;
 import x7.repository.dao.DaoImpl;
 import x7.repository.mapper.Mapper;
 import x7.repository.mapper.MapperFactory;
-import x7.repository.mapper.MySqlDialect;
-import x7.repository.mapper.OracleDialect;
 import x7.repository.redis.JedisConnector_Persistence;
 import x7.repository.redis.LevelTwoCacheResolver;
 import x7.repository.util.ResultSetUtil;
@@ -126,12 +124,19 @@ public class RepositoryBooter {
 
         driver = driver.toLowerCase();
 
-        if (driver.contains(DbType.MYSQL)) {
-            DbType.value = DbType.MYSQL;
-            initDialect(new MySqlDialect());
-        } else if (driver.contains(DbType.ORACLE)) {
-            DbType.value = DbType.ORACLE;
-            initDialect(new OracleDialect());
+        try {
+            Mapper.Dialect dialect = null;
+            if (driver.contains(DbType.MYSQL)) {
+                DbType.value = DbType.MYSQL;
+                dialect = (Mapper.Dialect) Class.forName("x7.repository.dialect.MySqlDialect").newInstance();
+                initDialect(dialect);
+            } else if (driver.contains(DbType.ORACLE)) {
+                DbType.value = DbType.ORACLE;
+                dialect = (Mapper.Dialect) Class.forName("x7.repository.dialect.OracleDialect").newInstance();
+                initDialect(dialect);
+            }
+        }catch (Exception e){
+
         }
     }
 

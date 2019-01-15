@@ -14,17 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package x7.repository.mapper;
+package x7.repository.dialect;
 
-import x7.core.bean.*;
+import x7.core.bean.BeanElement;
+import x7.core.bean.Parsed;
+import x7.core.bean.Parser;
+import x7.core.bean.SqlScript;
 import x7.core.util.JsonX;
 import x7.core.util.StringUtil;
-import x7.repository.DbType;
-import x7.repository.exception.SqlTypeException;
+import x7.repository.mapper.Mapper;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;

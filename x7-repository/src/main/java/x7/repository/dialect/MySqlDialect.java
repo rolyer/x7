@@ -14,28 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package x7.repository.mapper;
+package x7.repository.dialect;
 
 import x7.core.bean.BeanElement;
 import x7.core.bean.Parsed;
 import x7.core.bean.Parser;
 import x7.core.bean.SqlScript;
 import x7.core.util.JsonX;
-import x7.core.util.StringUtil;
-import x7.repository.DbType;
-import x7.repository.exception.SqlTypeException;
+import x7.repository.mapper.Mapper;
 
 import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MySqlDialect implements Mapper.Dialect {
 

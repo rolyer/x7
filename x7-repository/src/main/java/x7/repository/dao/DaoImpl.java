@@ -16,7 +16,6 @@
  */
 package x7.repository.dao;
 
-import com.mysql.jdbc.Statement;
 import org.springframework.beans.factory.annotation.Autowired;
 import x7.core.bean.*;
 import x7.core.bean.condition.InCondition;
