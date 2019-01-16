@@ -18,10 +18,8 @@ package x7.repository.dao;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import x7.core.async.AsyncService;
 import x7.core.async.HeartBeator;
-import x7.core.async.IAsyncTask;
-import x7.core.async.IHeartBeat;
+import x7.core.async.HeartBeat;
 import x7.core.bean.BeanElement;
 import x7.core.bean.Parsed;
 import x7.core.bean.Parser;
@@ -50,7 +48,7 @@ import java.util.concurrent.Executors;
  * 
  */
 @Component
-public class AsyncDaoImpl extends AsyncService implements IHeartBeat, AsyncDao {
+public class AsyncDaoImpl implements HeartBeat, AsyncDao {
 
 	/**
 	 * 批处理最多条数
@@ -61,6 +59,8 @@ public class AsyncDaoImpl extends AsyncService implements IHeartBeat, AsyncDao {
 	 */
 	private final static int HEARTBEAT_DELAY = (int) TimeUtil.ONE_MINUTE;
 	private long heartBeatTime = 0; // 降低心跳的实时性来提高性能
+
+	private final ExecutorService mainExecutor = Executors.newSingleThreadExecutor();
 
 	private final ExecutorService inner = Executors.newSingleThreadExecutor();
 
@@ -116,16 +116,16 @@ public class AsyncDaoImpl extends AsyncService implements IHeartBeat, AsyncDao {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see com.sevenx.db.IAsyncDao#create(java.lang.Object)
+	/*
+	 *
 	 */
 	@Override
 	public void create(final Object obj) {
-		this.accept(new IAsyncTask() {
+		mainExecutor.submit(new Runnable() {
 
 			@SuppressWarnings("rawtypes")
 			@Override
-			public void execute() throws Exception {
+			public void run()  {
 
 				/*
 				 * 加入需要持久化的的对象MAP
@@ -151,16 +151,16 @@ public class AsyncDaoImpl extends AsyncService implements IHeartBeat, AsyncDao {
 
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.sevenx.db.IAsyncDao#refresh(java.lang.Object)
+	/*
+	 *
 	 */
 	@Override
 	public void refresh(final Object obj) {
-		this.accept(new IAsyncTask() {
+		mainExecutor.submit(new Runnable() {
 
 			@SuppressWarnings("rawtypes")
 			@Override
-			public void execute() throws Exception {
+			public void run()  {
 				/*
 				 * 加入需要持久化的的对象MAP
 				 */
@@ -185,16 +185,16 @@ public class AsyncDaoImpl extends AsyncService implements IHeartBeat, AsyncDao {
 
 	}
 
-	/* (non-Javadoc)
-	 * @see com.sevenx.db.IAsyncDao#remove(java.lang.Object)
+	/*
+	 *
 	 */
 	@Override
 	public void remove(final Object obj) {
-		this.accept(new IAsyncTask() {
+		mainExecutor.submit(new Runnable() {
 
 			@SuppressWarnings("rawtypes")
 			@Override
-			public void execute() throws Exception {
+			public void run()  {
 
 				/*
 				 * 加入需要持久化的的对象MAP
@@ -608,10 +608,11 @@ public class AsyncDaoImpl extends AsyncService implements IHeartBeat, AsyncDao {
 	 * 定时处理
 	 */
 	private void onHeartBeat(final long now) {
-		this.accept(new IAsyncTask() {
+		mainExecutor.submit(new Runnable() {
 
+			@SuppressWarnings("rawtypes")
 			@Override
-			public void execute() throws Exception {
+			public void run()  {
 				if (heartBeatTime == 0){
 					heartBeatTime = now;
 					return;
@@ -621,7 +622,11 @@ public class AsyncDaoImpl extends AsyncService implements IHeartBeat, AsyncDao {
 					/*
 					 * 定时批处理
 					 */
-					batch();
+					try {
+						batch();
+					}catch (Exception e){
+						e.printStackTrace();
+					}
 				}
 			}
 		});
@@ -638,12 +643,16 @@ public class AsyncDaoImpl extends AsyncService implements IHeartBeat, AsyncDao {
 	 * <br>
 	 */
 	public void doImmediately() {
-		this.accept(new IAsyncTask() {
+		mainExecutor.submit(new Runnable() {
 
+			@SuppressWarnings("rawtypes")
 			@Override
-			public void execute() throws Exception {
-
-				batch();
+			public void run()  {
+				try {
+					batch();
+				}catch (Exception e){
+					e.printStackTrace();
+				}
 			}
 		});
 	}

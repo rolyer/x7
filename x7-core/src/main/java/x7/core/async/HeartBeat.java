@@ -14,11 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package x7.core.type;
+package x7.core.async;
 
-public enum DataEventType {
-
-	CREATE,
-	REFRESH,
-	REMOVE
+/**
+ * <li>心跳接口</li>
+ * 必需异步实现tick方法，实现此接口的service，需要在构造或初始化时：<br>
+ * HeartBeator.add(this);
+ * @author wyan
+ *
+ */
+public interface HeartBeat {
+	/**
+	 * 处理心跳循环的业务逻辑方法
+	 * @param now
+	 */
+	void tick(long now);
+	
 }

@@ -27,11 +27,9 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
-import x7.core.async.ScheduledTaskService;
 import x7.core.bean.KV;
 import x7.core.template.ITemplateable;
 import x7.core.template.Templates;
-import x7.core.util.TimeUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -62,28 +60,7 @@ public class ExcelParser {
 		return instance;
 	}
 
-	private void schedule() {
 
-		ScheduledTaskService.getInstance().schedule(new Runnable() {
-
-			@Override
-			public void run() {
-
-				try {
-					init();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-
-				try {
-					parse();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-
-			}
-		}, TimeUtil.now() + TimeUtil.ONE_MINUTE * 1, TimeUtil.ONE_MINUTE / 2);
-	}
 
 	public void load() {
 		try {
@@ -97,7 +74,7 @@ public class ExcelParser {
 	}
 
 	private ExcelParser() {
-		schedule();
+//		schedule(); //FIXME
 	}
 
 	/**

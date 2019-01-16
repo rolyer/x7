@@ -27,11 +27,11 @@ public class PetVo implements IdView {
         this.catList = catList;
     }
 
-    public void render(Map<Object,Object> viewMap){
-        cat.render(viewMap);
+    public void transform(Map<Object,Object> viewMap){
+        cat.transform(viewMap);
         if (catList != null){
             for (Cat c : catList) {
-                c.render(viewMap);
+                c.transform(viewMap);
             }
         }
     }

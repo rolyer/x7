@@ -36,7 +36,7 @@ public class HeartBeator {
 	private final static ScheduledExecutorService service = Executors
 			.newScheduledThreadPool(1);
 
-	private final static CopyOnWriteArrayList<IHeartBeat> tasks = new CopyOnWriteArrayList<IHeartBeat>();
+	private final static CopyOnWriteArrayList<HeartBeat> tasks = new CopyOnWriteArrayList<HeartBeat>();
 
 	private static HeartBeator instance;
 	public static void newInstance(){
@@ -74,7 +74,7 @@ public class HeartBeator {
 
 	private static void tick() {
 		long now = System.currentTimeMillis();
-		for (IHeartBeat task : tasks){
+		for (HeartBeat task : tasks){
 			try{
 				task.tick(now);
 			}catch(Exception e){
@@ -88,7 +88,7 @@ public class HeartBeator {
 	 * 
 	 * @param task
 	 */
-	public static void add(IHeartBeat task) {
+	public static void add(HeartBeat task) {
 		tasks.add(task);
 	}
 
@@ -97,7 +97,7 @@ public class HeartBeator {
 	 * 
 	 * @param task
 	 */
-	public static void remove(IHeartBeat task) {
+	public static void remove(HeartBeat task) {
 		tasks.remove(task);
 	}
 }

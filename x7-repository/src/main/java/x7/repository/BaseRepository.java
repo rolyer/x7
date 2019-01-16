@@ -112,21 +112,6 @@ public abstract class BaseRepository<T> implements X7Repository<T> {
     }
 
     @Override
-    public int reduce(IQuantity obj, int reduced) {
-        if (reduced < 0) {
-            throw new RuntimeException("reduced quantity must > 0");
-        }
-
-        String mapKey = obj.getClass().getName();
-
-        int quantity = (int) JedisConnector_Persistence.getInstance().hincrBy(mapKey, obj.getKey(), -reduced);
-
-        obj.setQuantity(quantity);
-
-        return quantity;
-    }
-
-    @Override
     public boolean createBatch(List<T> objList) {
         return SqlRepository.getInstance().createBatch(objList);
     }

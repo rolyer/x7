@@ -17,7 +17,6 @@
 package x7.repository.api;
 
 import x7.core.bean.Criteria;
-import x7.core.bean.IQuantity;
 import x7.core.bean.condition.InCondition;
 import x7.core.bean.condition.ReduceCondition;
 import x7.core.bean.condition.RefreshCondition;
@@ -36,13 +35,6 @@ import java.util.Map;
 public interface X7Repository<T> {
 
 	long createId();
-
-	/**
-	 * @param obj
-	 * @param reduced
-	 * @return currentQuantity
-	 */
-	int reduce(IQuantity obj, int reduced);
 
 	boolean createBatch(List<T> objList);
 

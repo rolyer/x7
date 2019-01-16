@@ -23,7 +23,7 @@ public class Cat implements Serializable, IdView {
 
 	private transient Map<Object,Object> viewMap;
 	@Override
-	public void render(Map<Object,Object> viewMap) {
+	public void transform(Map<Object,Object> viewMap) {
 		this.viewMap = viewMap;
 	}
 

@@ -34,7 +34,7 @@ public class CatTest {
         PetVo vo = new PetVo();
         vo.setCat(cat);
         vo.setCatList(catList);
-        vo.render(map);
+        vo.transform(map);
 
         String str = JsonX.toJson(vo);
         System.out.println(str);
