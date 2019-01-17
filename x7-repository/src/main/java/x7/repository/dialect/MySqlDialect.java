@@ -16,10 +16,7 @@
  */
 package x7.repository.dialect;
 
-import x7.core.bean.BeanElement;
-import x7.core.bean.Parsed;
-import x7.core.bean.Parser;
-import x7.core.bean.SqlScript;
+import x7.core.bean.*;
 import x7.core.util.JsonX;
 import x7.repository.mapper.Mapper;
 
@@ -113,7 +110,7 @@ public class MySqlDialect implements Mapper.Dialect {
     }
 
     @Override
-    public Object mappedResult(String property, String mapper, ResultSet rs) throws SQLException, IOException {
+    public Object mappedResult(String property, String mapper, Map<String,String> aliaMap, ResultSet rs) throws SQLException, IOException {
 
         if (mapper == null)
             throw new RuntimeException("Result key is empty?");
@@ -189,7 +186,7 @@ public class MySqlDialect implements Mapper.Dialect {
 
 
     @Override
-    public String filterResultKey(String key) {
-        return key;
+    public String filterResultKey(String mapper, Criteria.ResultMapped criteria) {
+        return mapper;
     }
 }

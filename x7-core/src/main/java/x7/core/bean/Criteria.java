@@ -35,22 +35,25 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 	private static final long serialVersionUID = 7088698915888081349L;
 
 	private Class<?> clz;
-	@JsonIgnore
-	private transient Parsed parsed;
 	private boolean isScroll = true;
 	private int page;
 	private int rows;
-	private List<String> orderByList = new ArrayList<>();
 	private Direction direction = Direction.DESC;
+	private List<String> orderByList = new ArrayList<>();
 	private List<KV> fixedSortList = new ArrayList();
-
-	private List<Object> valueList = new ArrayList<Object>();
-	
 	private List<X> listX = new ArrayList<X>();
+	private DataPermission dataPermission;//String,Or List<String>   LikeRight | In
 
-	private transient DataPermission dataPermission;//String,Or List<String>   LikeRight | In
-
+	@JsonIgnore
+	private transient Parsed parsed;
+	@JsonIgnore
 	public transient boolean isWhere = true;
+	@JsonIgnore
+	private transient List<Object> valueList = new ArrayList<Object>();
+	@JsonIgnore
+	private transient String countDistinct = "COUNT(*) count";
+	@JsonIgnore
+	private transient String customedResultKey = SqlScript.STAR;
 
 	public Criteria(){}
 
@@ -91,7 +94,6 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 		return BeanUtil.getByFirstLower(getClz().getSimpleName());
 	}
 
-	private transient String countDistinct = "COUNT(*) count";
 	public void setCountDistinct(String str){
 		this.countDistinct = str;
 	}
@@ -99,7 +101,6 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 		return this.countDistinct;
 	}
 
-	private transient String customedResultKey = SqlScript.STAR;
 	public void setCustomedResultKey(String str){
 		this.customedResultKey = str;
 	}
@@ -218,7 +219,10 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 		private Distinct distinct;
 		private String groupBy;
 		private List<Reduce> reduceList = new ArrayList<>();
-		private MapMapper mapMapper;
+		@JsonIgnore
+		private transient MapMapper mapMapper;
+		@JsonIgnore
+		private transient Map<String,String> aliaMap = new HashMap<>();
 
 		public Distinct getDistinct() {
 			return distinct;
@@ -250,6 +254,14 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 
 		public void setMapMapper(MapMapper mapMapper) {
 			this.mapMapper = mapMapper;
+		}
+
+		public Map<String, String> getAliaMap() {
+			return aliaMap;
+		}
+
+		public void setAliaMap(Map<String, String> aliaMap) {
+			this.aliaMap = aliaMap;
 		}
 
 		public String getResultScript() {

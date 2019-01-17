@@ -16,10 +16,7 @@
  */
 package x7.repository.dialect;
 
-import x7.core.bean.BeanElement;
-import x7.core.bean.Parsed;
-import x7.core.bean.Parser;
-import x7.core.bean.SqlScript;
+import x7.core.bean.*;
 import x7.core.util.JsonX;
 import x7.core.util.StringUtil;
 import x7.repository.mapper.Mapper;
@@ -36,6 +33,8 @@ import java.sql.Timestamp;
 import java.util.*;
 
 public class OracleDialect implements Mapper.Dialect {
+
+    private final String ALIA_NAME = "AAA";
 
     private Map<String, String> map = new HashMap<String, String>() {
         {
@@ -175,7 +174,7 @@ public class OracleDialect implements Mapper.Dialect {
     }
 
     @Override
-    public Object mappedResult(String property, String mapper, ResultSet rs) throws SQLException, IOException {
+    public Object mappedResult(String property, String mapper, Map<String,String> aliaMap, ResultSet rs) throws SQLException, IOException {
 
         if (mapper == null)
             throw new RuntimeException("Result key is empty?");
@@ -191,9 +190,8 @@ public class OracleDialect implements Mapper.Dialect {
                 mapper = mapper.replace(SqlScript.KEY_SQL, SqlScript.NONE);
             }
 
-            if (mapper.contains(SqlScript.POINT)) {
-                mapper = mapper.replace(SqlScript.POINT, SqlScript.WELL_NO);
-            }
+            String m = aliaMap.get(mapper);
+            mapper = (m == null ? mapper : m);
 
             if (element == null) {
                 return rs.getObject(mapper);
@@ -228,8 +226,11 @@ public class OracleDialect implements Mapper.Dialect {
     }
 
     @Override
-    public String filterResultKey(String key) {
-        String target = key + SqlScript.AS + key.replace(SqlScript.POINT, SqlScript.WELL_NO);
+    public String filterResultKey(String mapper, Criteria.ResultMapped criteria) {
+        Map<String,String> aliaMap = criteria.getAliaMap();
+        String alian = ALIA_NAME + aliaMap.size();
+        aliaMap.put(mapper, alian);
+        String target = mapper + SqlScript.AS + alian;
         return target;
     }
 

@@ -239,13 +239,10 @@ public class SqlCriteriaParser implements CriteriaParser {
                 int size = resultList.size();
                 for (int i = 0; i < size; i++) {
                     String key = resultList.get(i);
-                    String value = mapping(key,criteria);
-
-                    mapMapper.put(key, value);
-
-                    value = this.dialect.filterResultKey(value);
-
-                    sb.append(SqlScript.SPACE ).append(value);
+                    String mapper = mapping(key,criteria);
+                    mapMapper.put(key, mapper);
+                    mapper = this.dialect.filterResultKey(mapper,resultMapped);
+                    sb.append(SqlScript.SPACE ).append(mapper);
                     if (i < size - 1) {
                         sb.append(SqlScript.COMMA );
                     }

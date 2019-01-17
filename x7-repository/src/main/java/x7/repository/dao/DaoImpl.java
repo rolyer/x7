@@ -221,7 +221,9 @@ public class DaoImpl implements Dao {
             if (Objects.isNull(keyOneField))
                 throw new PersistenceException("No setting of PrimaryKey by @X.Key");
             Class keyOneType = keyOneField.getType();
-            if (keyOneType != String.class) {
+            if (keyOneType == String.class) {
+                keyOneValue = 1L;
+            }else{
                 keyOneValue = keyOneField.getLong(obj);
             }
 
@@ -1099,24 +1101,24 @@ public class DaoImpl implements Dao {
     }
 
     @Override
-    public Page<Map<String, Object>> find(Criteria.ResultMapped criteriaResultMapped) {
+    public Page<Map<String, Object>> find(Criteria.ResultMapped resultMapped) {
 
         Connection conn = RcDataSourceUtil.getConnection();
 
-        return this.find(criteriaResultMapped, conn);
+        return this.find(resultMapped, conn);
     }
 
-    protected Page<Map<String, Object>> find(Criteria.ResultMapped criteriaResultMapped, Connection conn) {
+    protected Page<Map<String, Object>> find(Criteria.ResultMapped resultMapped, Connection conn) {
 
-        List<Object> valueList = criteriaResultMapped.getValueList();
+        List<Object> valueList = resultMapped.getValueList();
 
-        String[] sqlArr = this.criteriaParser.parse(criteriaResultMapped);
+        String[] sqlArr = this.criteriaParser.parse(resultMapped);
 
         String sqlCount = sqlArr[0];
         String sql = sqlArr[1];
 
-        int page = criteriaResultMapped.getPage();
-        int rows = criteriaResultMapped.getRows();
+        int page = resultMapped.getPage();
+        int rows = resultMapped.getRows();
 
         int start = (page - 1) * rows;
 
@@ -1128,9 +1130,9 @@ public class DaoImpl implements Dao {
         pagination.setClz(Map.class);
         pagination.setPage(page == 0 ? 1 : page);
         pagination.setRows(rows == 0 ? Integer.MAX_VALUE : rows);
-        pagination.setOrderBy(criteriaResultMapped.getOrderBy());
-        pagination.setDirection(criteriaResultMapped.getDirection());
-        pagination.setScroll(criteriaResultMapped.isScroll());
+        pagination.setOrderBy(resultMapped.getOrderBy());
+        pagination.setDirection(resultMapped.getDirection());
+        pagination.setScroll(resultMapped.isScroll());
 
         List<Map<String,Object>> list = pagination.getList();
 
@@ -1150,9 +1152,9 @@ public class DaoImpl implements Dao {
 
             if (rs != null) {
 
-                List<String> resultKeyList = criteriaResultMapped.getResultKeyList();
+                List<String> resultKeyList = resultMapped.getResultKeyList();
                 if (resultKeyList.isEmpty()) {
-                    resultKeyList = criteriaResultMapped.listAllResultKey();
+                    resultKeyList = resultMapped.listAllResultKey();
                 }
 
                 while (rs.next()) {
@@ -1160,16 +1162,16 @@ public class DaoImpl implements Dao {
                     list.add(mapR);
 
                     for (String property : resultKeyList) {
-                        String mapper = criteriaResultMapped.getMapMapper().mapper(property);
-                        Object obj = this.dialect.mappedResult(property, mapper, rs);
+                        String mapper = resultMapped.getMapMapper().mapper(property);
+                        Object obj = this.dialect.mappedResult(property, mapper, resultMapped.getAliaMap(),rs);
                         mapR.put(property, obj);
                     }
                 }
 
-                ResultSortUtil.sort(list,criteriaResultMapped);
+                ResultSortUtil.sort(list,resultMapped);
 
                 long count = 0;
-                if (!criteriaResultMapped.isScroll()) {
+                if (!resultMapped.isScroll()) {
                     int size = pagination.getList().size();
                     if (page == 0) {
                         count = size;
@@ -1249,7 +1251,7 @@ public class DaoImpl implements Dao {
 
                     for (String property : resultKeyList) {
                         String mapper = resultMapped.getMapMapper().mapper(property);
-                        Object obj = this.dialect.mappedResult(property, mapper, rs);
+                        Object obj = this.dialect.mappedResult(property, mapper, resultMapped.getAliaMap(),rs);
                         mapR.put(property, obj);
                     }
 

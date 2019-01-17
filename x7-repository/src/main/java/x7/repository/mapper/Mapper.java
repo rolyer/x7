@@ -17,6 +17,7 @@
 package x7.repository.mapper;
 
 import x7.core.bean.BeanElement;
+import x7.core.bean.Criteria;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -26,6 +27,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public interface Mapper {
 
@@ -108,10 +110,10 @@ public interface Mapper {
 
         void setJSON(int i, String str, PreparedStatement pstmt) throws SQLException, IOException ;
 
-        Object mappedResult(String property, String mapper, ResultSet rs) throws SQLException, IOException;
+        Object mappedResult(String property, String mapper, Map<String,String> aliaMap, ResultSet rs) throws SQLException, IOException;
 
         Object filterValue(Object value);
 
-        String filterResultKey(String key);
+        String filterResultKey(String mapper, Criteria.ResultMapped criteria);
     }
 }
