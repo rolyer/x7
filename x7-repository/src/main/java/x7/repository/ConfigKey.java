@@ -19,7 +19,6 @@ package x7.repository;
 public interface ConfigKey{
 	String IS_DEVELOPING = "x7.developing";
 	String IS_CACHEABLE = "x7.cache.serving";
-	String IS_ID_GENERATOR = "x7.db.id.generator";
 
 	String DB_NAMING_SPEC = "x7.db.naming.spec";
 	String DB_NAMING_PREFIX = "x7.db.naming.prefix";
