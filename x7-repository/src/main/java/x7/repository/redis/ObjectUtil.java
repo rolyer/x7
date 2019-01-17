@@ -17,6 +17,7 @@
 package x7.repository.redis;
 
 import x7.core.util.JsonX;
+import x7.core.util.StringUtil;
 import x7.core.web.Page;
 
 import java.io.UnsupportedEncodingException;
@@ -78,12 +79,12 @@ public class ObjectUtil {
 		return null;
 	}
 
-	public static <T> Page<T> toPagination(byte[] bytes, Class<T> clz) {
-		if (bytes == null)
+	public static <T> Page<T> toPagination(String json, Class<T> clz) {
+		if (StringUtil.isNullOrEmpty(json))
 			return null;
 		try {
-			String str = new String(bytes, "UTF-8");
-			Page<T> pagination = JsonX.toObject(str, Page.class);
+
+			Page<T> pagination = JsonX.toObject(json, Page.class);
 			List tempList = pagination.getList();
 			if (!tempList.isEmpty()) {
 				if (!JsonX.isJsonable(clz))
@@ -98,7 +99,7 @@ public class ObjectUtil {
 				pagination.getList().addAll(list);
 			}
 			return pagination;
-		} catch (UnsupportedEncodingException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 

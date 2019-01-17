@@ -63,6 +63,13 @@ public class JedisConnector_Cache {
 
 		return true;
 	}
+
+	public boolean set(String key, String value,int validSeconds){
+		if (key == null || key.equals("") )
+			return false;
+		this.stringRedisTemplate.opsForValue().set(key, value,validSeconds);
+		return true;
+	}
 	
 	public boolean set(byte[] key, byte[] value, int validSeconds){
 
@@ -78,14 +85,28 @@ public class JedisConnector_Cache {
 		return str.trim();
 	}
 	
-	public List<byte[]> mget(List<byte[]> keyList){
-		
+//	public List<byte[]> mget(List<byte[]> keyList){
+//
+//		if (keyList == null || keyList.isEmpty())
+//			return null;
+//
+//		Object obj = this.redisTemplate.opsForValue().multiGet(keyList);
+//		if (obj == null)
+//			return null;
+//		return (List<byte[]>) obj;
+//
+//	}
+
+	public List<String> mget(List<String> keyList){
+
 		if (keyList == null || keyList.isEmpty())
 			return null;
-		
-		List<byte[]> byteList = this.redisTemplate.opsForValue().multiGet(keyList);
-		
-		return byteList;
+
+		List<String> list = this.stringRedisTemplate.opsForValue().multiGet(keyList);
+		if (list == null)
+			return null;
+		return list;
+
 	}
 	
 	public byte[] get(byte[] key){
@@ -98,6 +119,12 @@ public class JedisConnector_Cache {
 	public boolean delete(byte[] key){
 
 		this.redisTemplate.delete(key);
+		return true;
+	}
+
+	public boolean delete(String key){
+
+		this.stringRedisTemplate.delete(key);
 		return true;
 	}
 

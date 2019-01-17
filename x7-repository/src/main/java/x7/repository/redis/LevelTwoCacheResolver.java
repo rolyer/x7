@@ -16,18 +16,17 @@
  */
 package x7.repository.redis;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import x7.core.config.Configs;
 import x7.core.repository.CacheException;
 import x7.core.repository.CacheResolver;
 import x7.core.util.JsonX;
+import x7.core.util.StringUtil;
 import x7.core.util.VerifyUtil;
 import x7.core.web.Page;
 import x7.repository.exception.PersistenceException;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -44,6 +43,7 @@ public class LevelTwoCacheResolver implements CacheResolver {
 	public static LevelTwoCacheResolver getInstance(){
 		if (instance == null){
 			instance = new LevelTwoCacheResolver();
+			System.out.println("\n_________L2 Cache started\n");
 		}
 		return instance;
 	}
@@ -57,7 +57,7 @@ public class LevelTwoCacheResolver implements CacheResolver {
 	public String markForRefresh(Class clz){
 		String key = getNSKey(clz);
 		String time = String.valueOf(System.nanoTime());
-		boolean flag = JedisConnector_Cache.getInstance().set(key.getBytes(), time.getBytes());
+		boolean flag = JedisConnector_Cache.getInstance().set(key, time);
 		if (!flag)
 			throw new CacheException("markForRefresh failed");
 		return time;
@@ -70,7 +70,7 @@ public class LevelTwoCacheResolver implements CacheResolver {
 	@SuppressWarnings("rawtypes")
 	public void remove(Class clz, String key){
 		key = getSimpleKey(clz, key);
-		boolean flag = JedisConnector_Cache.getInstance().delete(key.getBytes());
+		boolean flag = JedisConnector_Cache.getInstance().delete(key);
 		if (!flag)
 			throw new CacheException("remove failed");
 	}
@@ -82,7 +82,7 @@ public class LevelTwoCacheResolver implements CacheResolver {
 		Set<String> keySet = JedisConnector_Cache.getInstance().keys(key);
 
 		for (String k : keySet) {
-			boolean flag = JedisConnector_Cache.getInstance().delete(k.getBytes());
+			boolean flag = JedisConnector_Cache.getInstance().delete(k);
 			if (!flag)
 				throw new CacheException("remove failed");
 		}
@@ -100,24 +100,39 @@ public class LevelTwoCacheResolver implements CacheResolver {
 	}
 	
 	@SuppressWarnings("rawtypes")
-	private List<byte[]> getKeyList(Class clz, List<String> conditionList){
+	private List<String> getKeyList(Class clz, List<String> conditionList){
 		if (conditionList == null || conditionList.isEmpty())
 			return null;
-		List<byte[]> keyList = new ArrayList<byte[]>();
+		List<String> keyList = new ArrayList<>();
 		for (String condition : conditionList){
 			String key = getSimpleKey(clz, condition);
-			keyList.add(key.getBytes());
+			keyList.add(key);
 		}
 		if (keyList.isEmpty())
 			return null;
-		List<byte[]> arrList= new ArrayList<byte[]>();
-//		keyList.toArray(arrList);
-		int i = 0;
-		for (byte[] keyB : keyList){
-			arrList.add(keyB);
-		}
-		return arrList;
+
+		return keyList;
 	}
+
+//	@SuppressWarnings("rawtypes")
+//	private List<byte[]> getKeyList(Class clz, List<String> conditionList){
+//		if (conditionList == null || conditionList.isEmpty())
+//			return null;
+//		List<byte[]> keyList = new ArrayList<byte[]>();
+//		for (String condition : conditionList){
+//			String key = getSimpleKey(clz, condition);
+//			keyList.add(key.getBytes());
+//		}
+//		if (keyList.isEmpty())
+//			return null;
+//		List<byte[]> arrList= new ArrayList<byte[]>();
+//
+//		int i = 0;
+//		for (byte[] keyB : keyList){
+//			arrList.add(keyB);
+//		}
+//		return arrList;
+//	}
 	
 	/**
 	 * FIXME 有简单simpleKey的地方全改成字符串存储, value为bytes, new String(bytes)
@@ -154,12 +169,12 @@ public class LevelTwoCacheResolver implements CacheResolver {
 	@SuppressWarnings("rawtypes")
 	private String getPrefix(Class clz){
 		String key = getNSKey(clz);
-		byte[] nsArr = JedisConnector_Cache.getInstance().get(key.getBytes());
-		if (nsArr == null){
+		String nsStr = JedisConnector_Cache.getInstance().get(key);
+		if (nsStr == null){
 			String str = markForRefresh(clz);
 			return clz.getName() + str;
 		}
-		return clz.getName() + new String(nsArr);
+		return clz.getName() + nsStr;
 	}
 
 	/**
@@ -170,7 +185,7 @@ public class LevelTwoCacheResolver implements CacheResolver {
 	public void set(Class clz, String key, Object obj) {
 		key = getSimpleKey(clz, key);
 		int validSecond =  getValidSecondAdjusted();
-		JedisConnector_Cache.getInstance().set(key.getBytes(), PersistenceUtil.toBytes(obj), validSecond);
+		JedisConnector_Cache.getInstance().set(key, JsonX.toJson(obj), validSecond);
 	}
 
 	
@@ -184,7 +199,7 @@ public class LevelTwoCacheResolver implements CacheResolver {
 		String key = getKey(clz, condition);
 		int validSecond = Configs.getIntValue("x7.cache.second");
 		try{
-			JedisConnector_Cache.getInstance().set(key.getBytes(), ObjectUtil.toBytes(keyList), validSecond);
+			JedisConnector_Cache.getInstance().set(key, JsonX.toJson(keyList), validSecond);
 		}catch (Exception e) {
 			throw new PersistenceException(e.getMessage());
 		}
@@ -203,7 +218,7 @@ public class LevelTwoCacheResolver implements CacheResolver {
 		
 		String key = getKey(clz, condition);
 		try{
-			JedisConnector_Cache.getInstance().set(key.getBytes(), ObjectUtil.toBytes(pagination), second);
+			JedisConnector_Cache.getInstance().set(key, JsonX.toJson(pagination), second);
 		}catch (Exception e) {
 			throw new PersistenceException(e.getMessage());
 		}
@@ -215,13 +230,13 @@ public class LevelTwoCacheResolver implements CacheResolver {
 		String key = getKey(clz, condition);
 		System.out.println("get key: " + key);
 		long startTime = System.currentTimeMillis();
-		byte[] bytes = JedisConnector_Cache.getInstance().get(key.getBytes());
+		String str = JedisConnector_Cache.getInstance().get(key);
 		long endTime = System.currentTimeMillis();
 		System.out.println("time_getResultKeyList = "+(endTime - startTime));
-		if (bytes == null)
+		if (StringUtil.isNullOrEmpty(str))
 			return new ArrayList<String>();
 		
-		return ObjectUtil.toList(bytes, String.class);
+		return JsonX.toList(str, String.class);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -229,34 +244,32 @@ public class LevelTwoCacheResolver implements CacheResolver {
 	public Page<String> getResultKeyListPaginated(Class clz, Object condition) {
 		String key = getKey(clz, condition);
 		System.out.println("get key: " + key);
-		byte[] bytes = JedisConnector_Cache.getInstance().get(key.getBytes());
+		String json = JedisConnector_Cache.getInstance().get(key);
 		
-		if (bytes == null)
+		if (StringUtil.isNullOrEmpty(json))
 			return null;
 		
-		return ObjectUtil.toPagination(bytes, String.class);
+		return ObjectUtil.toPagination(json, String.class);
 	}
 
 	@Override
 	public <T> List<T> list(Class<T> clz, List<String> keyList) {
-		List<byte[]> keyArr = getKeyList(clz, keyList);//转换成缓存需要的keyList
+		List<String> keyArr = getKeyList(clz, keyList);//转换成缓存需要的keyList
 		
-		List<byte[]> bytesList = JedisConnector_Cache.getInstance().mget(keyArr);
+		List<String> jsonList = JedisConnector_Cache.getInstance().mget(keyArr);
 		
-		if (bytesList == null)
+		if (jsonList == null)
 			return new ArrayList<T>();
 		
-		List<T> objList = new ArrayList<T>();
-		for (byte[] bytes : bytesList){
-			if (bytes == null)
-				continue;
-			T t = PersistenceUtil.toObject(clz, bytes);
-			if (t == null)
-				continue;
-			objList.add(t);
+		List<T> list = new ArrayList<T>();
+		for (String json : jsonList){
+			if (StringUtil.isNotNull(json)) {
+				T t = JsonX.toObject(json,clz);
+				list.add(t);
+			}
 		}
 		
-		return objList;
+		return list;
 	}
 
 	/**
@@ -265,10 +278,10 @@ public class LevelTwoCacheResolver implements CacheResolver {
 	@Override
 	public <T> T get(Class<T> clz, String key) {
 		key = getSimpleKey(clz,key);
-		byte[] bytes = JedisConnector_Cache.getInstance().get(key.getBytes());
-		if (bytes == null)
+		String str = JedisConnector_Cache.getInstance().get(key);
+		if (StringUtil.isNullOrEmpty(str))
 			return null;
-		T obj = PersistenceUtil.toObject(clz, bytes);
+		T obj = JsonX.toObject(str,clz);
 		return obj;
 	}
 
@@ -277,17 +290,17 @@ public class LevelTwoCacheResolver implements CacheResolver {
 		key = getSimpleKey(clz, key);
 		int validSecond =  getValidSecondAdjusted();
 		
-		JedisConnector_Cache.getInstance().set(key.getBytes(), PersistenceUtil.toBytes(mapList), validSecond);
+		JedisConnector_Cache.getInstance().set(key, JsonX.toJson(mapList), validSecond);
 	}
 
 	@Override
 	public List<Map<String, Object>> getMapList(Class clz, String key) {
 		
 		key = getSimpleKey(clz,key);
-		byte[] bytes = JedisConnector_Cache.getInstance().get(key.getBytes());
-		if (bytes == null)
+		String str = JedisConnector_Cache.getInstance().get(key);
+		if (StringUtil.isNullOrEmpty(str))
 			return null;
-		List<Map<String, Object>> mapList = PersistenceUtil.toMapList(bytes);
+		List mapList = (List)JsonX.toList(str,Map.class);
 		return mapList;
 	}
 
