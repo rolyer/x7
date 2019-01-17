@@ -150,6 +150,11 @@ public class RepositoryBooter {
 
     }
 
+    /**
+     * TODO:
+     *      改成Map,可以动态获取方言
+     * @param dialect
+     */
     private static void initDialect(Mapper.Dialect dialect) {
         MapperFactory.Dialect = dialect;
         DaoImpl.getInstance().setDialect(dialect);
