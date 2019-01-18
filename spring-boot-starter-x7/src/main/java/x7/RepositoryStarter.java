@@ -34,23 +34,19 @@ import javax.sql.DataSource;
 import java.util.Objects;
 
 @EnableConfigurationProperties({
-		RepositoryProperties.class,
 		DataSourceProperties_R.class})
 public class RepositoryStarter {
 
-
-	@Autowired
-	private RepositoryProperties repositoryProperties;
 	@Autowired
 	private DataSourceProperties_R dataSourceProperties_r;
     @Autowired
     private Environment environment;
 	@Autowired
 	private DataSource dataSource;
-    @Autowired
-    private RedisTemplate redisTemplate;
-    @Autowired
-    private StringRedisTemplate stringRedisTemplate;
+//    @Autowired
+//    private RedisTemplate redisTemplate;
+//    @Autowired
+//    private StringRedisTemplate stringRedisTemplate;
 
     @Bean
     @Order(1)
