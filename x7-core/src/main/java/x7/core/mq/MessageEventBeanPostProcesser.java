@@ -21,7 +21,6 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 import x7.core.bean.KV;
 import x7.core.util.StringUtil;
