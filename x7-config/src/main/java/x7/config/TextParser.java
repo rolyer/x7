@@ -464,7 +464,9 @@ public class TextParser{
 							continue;
 						if (!name.contains("-")){
 							System.out.println("\n[" + name + "]");
-							readConfig(childFile.getPath());
+							if (!(name.contains("log4j")||name.contains("logback"))) {
+								readConfig(childFile.getPath());
+							}
 							continue;
 						}
 

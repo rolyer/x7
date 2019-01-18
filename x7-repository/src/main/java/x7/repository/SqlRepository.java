@@ -29,7 +29,6 @@ import x7.core.web.Direction;
 import x7.core.web.Page;
 import x7.repository.dao.Dao;
 import x7.repository.exception.PersistenceException;
-import x7.repository.exception.ShardingException;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -400,7 +399,7 @@ public class SqlRepository implements Repository {
 
 			p.reSetList(null);
 
-			cacheResolver.setResultKeyListPaginated(clz, criteria, p, 120);
+			cacheResolver.setResultKeyListPaginated(clz, criteria, p);
 
 			p.setKeyList(null);
 			p.reSetList(list);

@@ -16,8 +16,7 @@
  */
 package x7.repository.redis;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import x7.core.config.Configs;
+import org.apache.log4j.Logger;
 import x7.core.repository.CacheException;
 import x7.core.repository.CacheResolver;
 import x7.core.util.JsonX;
@@ -26,26 +25,40 @@ import x7.core.util.VerifyUtil;
 import x7.core.web.Page;
 import x7.repository.exception.PersistenceException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 /**
  * 
- * Level two Cache
+ * Level Two Cache
  * @author sim
  *
  */
 public class LevelTwoCacheResolver implements CacheResolver {
 
+	private final static Logger logger = Logger.getLogger(LevelTwoCacheResolver.class);
 	public final static String NANO_SECOND = ".N_S";
 	
 	private static LevelTwoCacheResolver instance = null;
 	public static LevelTwoCacheResolver getInstance(){
 		if (instance == null){
 			instance = new LevelTwoCacheResolver();
-			System.out.println("\n_________L2 Cache started\n");
 		}
 		return instance;
+	}
+
+	private int validSecond;
+	public void setValidSecond(int validSecond){
+		this.validSecond = validSecond;
+		System.out.println("\n");
+		logger.info("L2 Cache started, cache time = " + validSecond + "s");
+		System.out.println("\n");
+	}
+	private int getValidSecondAdjusted(){
+		return  this.validSecond;
 	}
 	
 	/**
@@ -188,37 +201,25 @@ public class LevelTwoCacheResolver implements CacheResolver {
 		JedisConnector_Cache.getInstance().set(key, JsonX.toJson(obj), validSecond);
 	}
 
-	
-	private int getValidSecondAdjusted(){
-		return  Configs.getIntValue("x7.cache.second") * 120;
-	}
 
 	@SuppressWarnings("rawtypes")
 	@Override
 	public void setResultKeyList(Class clz, Object condition, List<String> keyList) {
 		String key = getKey(clz, condition);
-		int validSecond = Configs.getIntValue("x7.cache.second");
 		try{
 			JedisConnector_Cache.getInstance().set(key, JsonX.toJson(keyList), validSecond);
 		}catch (Exception e) {
 			throw new PersistenceException(e.getMessage());
 		}
 	}
+
 	
-	@SuppressWarnings("rawtypes")
 	@Override
 	public <T> void setResultKeyListPaginated(Class<T> clz, Object condition, Page<T> pagination) {
 		
-		int validSecond = Configs.getIntValue("x7.cache.second");
-		setResultKeyListPaginated(clz, condition, pagination, validSecond);
-	}
-	
-	@Override
-	public <T> void setResultKeyListPaginated(Class<T> clz, Object condition, Page<T> pagination, int second) {
-		
 		String key = getKey(clz, condition);
 		try{
-			JedisConnector_Cache.getInstance().set(key, JsonX.toJson(pagination), second);
+			JedisConnector_Cache.getInstance().set(key, JsonX.toJson(pagination), validSecond);
 		}catch (Exception e) {
 			throw new PersistenceException(e.getMessage());
 		}

@@ -26,4 +26,5 @@ import java.lang.annotation.*;
 @Import({RepositoryStarter.class})
 public @interface EnableX7Repository {
 
+
 }

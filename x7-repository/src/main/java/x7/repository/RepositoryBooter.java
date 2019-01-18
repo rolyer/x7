@@ -60,7 +60,6 @@ public class RepositoryBooter {
         if (instance == null) {
             instance = new RepositoryBooter();
             setDataSource(ds_W, ds_R);
-            initCache();
             HealthChecker.onStarted();
             CasualWorker.accept(new IAsyncTask() {
                 @Override
@@ -104,14 +103,8 @@ public class RepositoryBooter {
     private static void init() {
         onDriver(null);
         setDataSource(null, null);
-        initCache();
     }
 
-    public static void initCache() {
-        if (Configs.isTrue(ConfigKey.IS_CACHEABLE)) {
-            SqlRepository.getInstance().setCacheResolver(LevelTwoCacheResolver.getInstance());
-        }
-    }
 
     public static void onDriver(String driverClassName) {
 

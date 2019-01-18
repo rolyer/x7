@@ -50,8 +50,6 @@ public abstract class BaseRepository<T> implements X7Repository<T> {
 
     public final static String ID_MAP_KEY = "ID_MAP_KEY";
 
-    public Map<String, String> map = new HashMap<String, String>();
-
     private Class<T> clz;
 
     protected Class<T> getClz() {
@@ -70,6 +68,7 @@ public abstract class BaseRepository<T> implements X7Repository<T> {
 
         this.clz = (Class) params[0];
 
+        EntityHolder.listAll().add(this.clz);
         logger.info("BaseRepository<T>, T: " + this.clz.getName());
         HealthChecker.repositoryList.add(this);
     }
@@ -304,7 +303,13 @@ public abstract class BaseRepository<T> implements X7Repository<T> {
     }
 
 
+    public static class EntityHolder {
+        private final static List<Class> list = new ArrayList<>();
 
+        public static List<Class> listAll() {
+            return list;
+        }
+    }
 
     public static class HealthChecker {
 

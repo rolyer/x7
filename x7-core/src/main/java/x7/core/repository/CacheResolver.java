@@ -76,13 +76,7 @@ public interface CacheResolver {
 	 */
 	<T> void setResultKeyListPaginated(Class<T> clz, Object conditionObj, Page<T> pagination);
 
-	/**
-	 * 
-	 * @param clz
-	 * @param conditionObj
-	 * @param pagination
-	 */
-	<T> void setResultKeyListPaginated(Class<T> clz, Object conditionObj, Page<T> pagination, int second);
+
 	
 	/**
 	 * 高效的获取缓存对象Key列表<br>
