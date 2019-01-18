@@ -111,9 +111,7 @@ public class SqlRepository implements Repository {
 
 				} else {
 					long idOne = Long.valueOf(key);
-
 					obj = syncDao.get(clz, idOne);
-
 				}
 
 				/*

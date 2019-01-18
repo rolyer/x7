@@ -169,7 +169,9 @@ public class LevelTwoCacheResolver implements CacheResolver {
 		long startTime = System.currentTimeMillis();
 		String key =  VerifyUtil.toMD5(getPrefix(clz) + condition);
 		long endTime = System.currentTimeMillis();
-		System.out.println("time_getKey = "+(endTime - startTime));
+		if (logger.isDebugEnabled()){
+			logger.debug("LevelTwoCacheResolver.getKey() cost time = " + (endTime - startTime) + "s");
+		}
 		return key;
 	}
 
@@ -229,11 +231,7 @@ public class LevelTwoCacheResolver implements CacheResolver {
 	@Override
 	public List<String> getResultKeyList(Class clz, Object condition) {
 		String key = getKey(clz, condition);
-		System.out.println("get key: " + key);
-		long startTime = System.currentTimeMillis();
 		String str = JedisConnector_Cache.getInstance().get(key);
-		long endTime = System.currentTimeMillis();
-		System.out.println("time_getResultKeyList = "+(endTime - startTime));
 		if (StringUtil.isNullOrEmpty(str))
 			return new ArrayList<String>();
 		
@@ -244,13 +242,12 @@ public class LevelTwoCacheResolver implements CacheResolver {
 	@Override
 	public Page<String> getResultKeyListPaginated(Class clz, Object condition) {
 		String key = getKey(clz, condition);
-		System.out.println("get key: " + key);
 		String json = JedisConnector_Cache.getInstance().get(key);
 		
 		if (StringUtil.isNullOrEmpty(json))
 			return null;
 		
-		return ObjectUtil.toPagination(json, String.class);
+		return ObjectUtil.toPagination(json);
 	}
 
 	@Override
@@ -301,7 +298,7 @@ public class LevelTwoCacheResolver implements CacheResolver {
 		String str = JedisConnector_Cache.getInstance().get(key);
 		if (StringUtil.isNullOrEmpty(str))
 			return null;
-		List mapList = (List)JsonX.toList(str,Map.class);
+		List mapList = JsonX.toList(str,Map.class);
 		return mapList;
 	}
 

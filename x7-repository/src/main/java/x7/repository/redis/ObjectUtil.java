@@ -79,25 +79,13 @@ public class ObjectUtil {
 		return null;
 	}
 
-	public static <T> Page<T> toPagination(String json, Class<T> clz) {
+	public static <T> Page<T> toPagination(String json) {
 		if (StringUtil.isNullOrEmpty(json))
 			return null;
 		try {
 
 			Page<T> pagination = JsonX.toObject(json, Page.class);
-			List tempList = pagination.getList();
-			if (!tempList.isEmpty()) {
-				if (!JsonX.isJsonable(clz))
-					return pagination;
-				
-				List<T> list = new ArrayList<T>();
-				for (Object jsonObject : tempList) {
-					T t = JsonX.toObject(jsonObject, clz);
-					list.add(t);
-				}
-				pagination.getList().clear();
-				pagination.getList().addAll(list);
-			}
+
 			return pagination;
 		} catch (Exception e) {
 			e.printStackTrace();
