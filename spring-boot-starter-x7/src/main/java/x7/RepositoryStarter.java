@@ -109,9 +109,6 @@ public class RepositoryStarter {
 
 			return null;
 		}
-//        spring.datasource.url=jdbc:mysql://127.0.0.1:3306/test?&characterEncoding=utf-8&useSSL=false
-//        spring.datasource.username=root
-//        spring.datasource.password=123456
 
 		String driverClassName = Configs.getString("spring.datasource.driver-class-name");
 		String username = Configs.getString("spring.datasource.username");
