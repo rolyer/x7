@@ -273,7 +273,7 @@ public abstract class BaseRepository<T> implements X7Repository<T> {
         return SqlRepository.getInstance().in(inCondition);
     }
 
-    private List<T> in0(InCondition inCondition) {
+    private static <T> List<T> in0(InCondition inCondition) {
         if (inCondition.getInList().isEmpty())
             return new ArrayList<T>();
 
@@ -303,6 +303,14 @@ public abstract class BaseRepository<T> implements X7Repository<T> {
 
     @Override
     public List<T> list(Criteria criteria) {
+
+        if (criteria instanceof Criteria.ResultMapped)
+            throw new RuntimeException("Codeing Exception: maybe {Criteria.ResultMapped criteria = builder.get();} instead of {Criteria criteria = builder.get();}");
+
+        return SqlRepository.getInstance().list(criteria);
+    }
+
+    private static <T> List<T> list0(Criteria criteria) {
 
         if (criteria instanceof Criteria.ResultMapped)
             throw new RuntimeException("Codeing Exception: maybe {Criteria.ResultMapped criteria = builder.get();} instead of {Criteria criteria = builder.get();}");
@@ -389,53 +397,59 @@ public abstract class BaseRepository<T> implements X7Repository<T> {
     @Override
     public <WITH> List<DomainObject<T, WITH>> listDomainObject(Criteria.DomainObjectCriteria domainObjectCriteria) {
 
-        try {
 
-            /*
-             * knownMainIdList step 1
-             */
-            List<Object> mainInList = domainObjectCriteria.getKnownMainIdList();
-            List<T> mainList = null;
-            if (mainInList == null || mainInList.isEmpty()) {
+        if (domainObjectCriteria.getRelativeClz() == null){
 
-                mainList = list((Criteria) domainObjectCriteria);
-
-                Parsed mainParsed = Parser.get(domainObjectCriteria.getClz());
-                Field mainField = mainParsed.getKeyField(X.KEY_ONE);
-                mainField.setAccessible(true);
-
-                for (Object t : mainList) {
-                    Object in = mainField.get(t);
-                    mainInList.add(in);
-                }
+            if (domainObjectCriteria.getKnownMainIdList() == null || domainObjectCriteria.getKnownMainIdList().isEmpty()){
+                return DomainObjectRepositoy.listDomainObject_NonRelative(domainObjectCriteria);
+            }else{
+                return DomainObjectRepositoy.listDomainObject_Known_NonRelative(domainObjectCriteria);
             }
 
+        }else{
+            if (domainObjectCriteria.getKnownMainIdList() == null || domainObjectCriteria.getKnownMainIdList().isEmpty()){
+                return DomainObjectRepositoy.listDomainObject_HasRelative(domainObjectCriteria);
+            }else{
+                return DomainObjectRepositoy.listDomainObject_Known_HasRelative(domainObjectCriteria);
+            }
+        }
 
-            /*
-             * step 2  if relativeClass
-             */
-            Parsed withParsed = Parser.get(domainObjectCriteria.getWithClz());
-            Parsed relativeParsed = null;
+    }
 
-            List relativeList = null;
-            List withList = null;
-            if (domainObjectCriteria.getRelativeClz() == null){
 
-                InCondition withInCondition = new InCondition(domainObjectCriteria.getMainPropperty(), mainInList);
-                withInCondition.setClz(domainObjectCriteria.getWithClz());
-                withList = in0(withInCondition);
 
-            }else {
+    public static class DomainObjectRepositoy {
+
+        protected static <T,WITH> List<DomainObject<T, WITH>> listDomainObject_Known_HasRelative(Criteria.DomainObjectCriteria domainObjectCriteria) {
+
+            try {
+
+                /*
+                 * knownMainIdList step 1
+                 */
+                List<Object> mainInList = domainObjectCriteria.getKnownMainIdList();
+                List<T> mainList = null;
+
+
+                /*
+                 * step 2  if relativeClass
+                 */
+                Parsed withParsed = Parser.get(domainObjectCriteria.getWithClz());
+                Parsed relativeParsed = null;
+
+                List relativeList = null;
+                List withList = null;
+
                 withParsed = Parser.get(domainObjectCriteria.getRelativeClz());
                 InCondition relativeInCondition = new InCondition(domainObjectCriteria.getMainPropperty(), mainInList);
                 relativeInCondition.setClz(domainObjectCriteria.getRelativeClz());
                 relativeList = in0(relativeInCondition);
 
-                BeanElement be = relativeParsed.getElement(domainObjectCriteria.getWithProperty());
+                BeanElement relativeWithBe = relativeParsed.getElement(domainObjectCriteria.getWithProperty());
 
                 List<Object> withInList = new ArrayList<>();
                 for (Object r : relativeList) {
-                    Object in = be.getMethod.invoke(r);
+                    Object in = relativeWithBe.getMethod.invoke(r);
                     withInList.add(in);
                 }
 
@@ -444,54 +458,43 @@ public abstract class BaseRepository<T> implements X7Repository<T> {
                 InCondition withInCondition = new InCondition(key, withInList);
                 withInCondition.setClz(domainObjectCriteria.getWithClz());
                 withList = in0(withInCondition);
-            }
-
-            List<DomainObject<T, WITH>> list = new ArrayList<>();
 
 
-
-            /*
-             * result assemble step3
-             */
-            BeanElement relatievMainBe = domainObjectCriteria.getRelativeClz() == null ? null :
-                    relativeParsed.getElement(domainObjectCriteria.getMainPropperty());
-
-            Field withKeyF = withParsed.getKeyField(X.KEY_ONE);
-            withKeyF.setAccessible(true);
-
-            if (mainList == null){
+                List<DomainObject<T, WITH>> list = new ArrayList<>();
 
 
-                BeanElement wBe= withParsed.getElement(domainObjectCriteria.getMainPropperty());// maybe null
+
+                /*
+                 * result assemble step3
+                 */
+                BeanElement relatievMainBe = domainObjectCriteria.getRelativeClz() == null ? null :
+                        relativeParsed.getElement(domainObjectCriteria.getMainPropperty());
+
+                Field withKeyF = withParsed.getKeyField(X.KEY_ONE);
+                withKeyF.setAccessible(true);
+
+                BeanElement wBe = withParsed.getElement(domainObjectCriteria.getMainPropperty());// maybe null
 
                 for (Object mainKeyOne : domainObjectCriteria.getKnownMainIdList()) {
 
                     List withListOne = new ArrayList();
 
-                    if (relativeList == null){
-                        for (Object w : withList) {
-                            Object withR = wBe.getMethod.invoke(w);
-                            if (mainKeyOne.toString().equals(withR.toString())) {
-                                withListOne.add(w);
-                            }
-                        }
-                    }else{
-                        BeanElement be = relativeParsed.getElement(domainObjectCriteria.getWithProperty());
-                        for (Object r : relativeList) {
-                            Object oRelative = relatievMainBe.getMethod.invoke(r);
-                            if (mainKeyOne.toString().equals(oRelative.toString())) {
-                                Object relativeWithKey = be.getMethod.invoke(r);
 
-                                for (Object w : withList) {
-                                    Object withId = withKeyF.get(w);
-                                    if (relativeWithKey.toString().equals(withId.toString())) {
-                                        withListOne.add(w);
-                                    }
+                    for (Object r : relativeList) {
+                        Object oRelative = relatievMainBe.getMethod.invoke(r);
+                        if (mainKeyOne.toString().equals(oRelative.toString())) {
+                            Object relativeWithKey = relativeWithBe.getMethod.invoke(r);
+
+                            for (Object w : withList) {
+                                Object withId = withKeyF.get(w);
+                                if (relativeWithKey.toString().equals(withId.toString())) {
+                                    withListOne.add(w);
                                 }
-
                             }
+
                         }
                     }
+
 
                     DomainObject domainObject = new DomainObject();
                     domainObject.setMainId(mainKeyOne);
@@ -501,13 +504,151 @@ public abstract class BaseRepository<T> implements X7Repository<T> {
                     list.add(domainObject);
                 }
 
-            }else {
+
+                return list;
+            } catch (Exception e) {
+                throw new RuntimeException(ExceptionUtil.getMessage(e));
+            }
+
+        }
+
+        protected static <T,WITH> List<DomainObject<T, WITH>> listDomainObject_Known_NonRelative(Criteria.DomainObjectCriteria domainObjectCriteria) {
+
+            try {
+                /*
+                 * knownMainIdList step 1
+                 */
+                List<Object> mainInList = domainObjectCriteria.getKnownMainIdList();
+                List<T> mainList = null;
+
+
+                /*
+                 * step 2  if relativeClass
+                 */
+                Parsed withParsed = Parser.get(domainObjectCriteria.getWithClz());
+                Parsed relativeParsed = null;
+
+
+                InCondition withInCondition = new InCondition(domainObjectCriteria.getMainPropperty(), mainInList);
+                withInCondition.setClz(domainObjectCriteria.getWithClz());
+                List withList = in0(withInCondition);
+
+
+                List<DomainObject<T, WITH>> list = new ArrayList<>();
+
+
+
+                /*
+                 * result assemble step3
+                 */
+                BeanElement relatievMainBe = domainObjectCriteria.getRelativeClz() == null ? null :
+                        relativeParsed.getElement(domainObjectCriteria.getMainPropperty());
+
+                Field withKeyF = withParsed.getKeyField(X.KEY_ONE);
+                withKeyF.setAccessible(true);
+
+                BeanElement wBe = withParsed.getElement(domainObjectCriteria.getMainPropperty());// maybe null
+
+                for (Object mainKeyOne : domainObjectCriteria.getKnownMainIdList()) {
+
+                    List withListOne = new ArrayList();
+
+
+                    for (Object w : withList) {
+                        Object withR = wBe.getMethod.invoke(w);
+                        if (mainKeyOne.toString().equals(withR.toString())) {
+                            withListOne.add(w);
+                        }
+                    }
+
+
+                    DomainObject domainObject = new DomainObject();
+                    domainObject.setMainId(mainKeyOne);
+
+                    domainObject.setWithList(withListOne);
+
+                    list.add(domainObject);
+                }
+
+
+                return list;
+            } catch (Exception e) {
+                throw new RuntimeException(ExceptionUtil.getMessage(e));
+            }
+
+        }
+
+
+        protected static <T,WITH> List<DomainObject<T, WITH>> listDomainObject_HasRelative(Criteria.DomainObjectCriteria domainObjectCriteria) {
+
+            try {
+
+                /*
+                 * knownMainIdList step 1
+                 */
+                List<Object> mainInList = new ArrayList<>();
+                List<T> mainList = null;
+                if (mainInList == null || mainInList.isEmpty()) {
+
+                    mainList = list0((Criteria) domainObjectCriteria);
+
+                    Parsed mainParsed = Parser.get(domainObjectCriteria.getClz());
+                    Field mainField = mainParsed.getKeyField(X.KEY_ONE);
+                    mainField.setAccessible(true);
+
+                    for (Object t : mainList) {
+                        Object in = mainField.get(t);
+                        mainInList.add(in);
+                    }
+                }
+
+
+                /*
+                 * step 2  if relativeClass
+                 */
+                Parsed withParsed = Parser.get(domainObjectCriteria.getWithClz());
+                Parsed relativeParsed = null;
+
+                List relativeList = null;
+                List withList = null;
+
+                withParsed = Parser.get(domainObjectCriteria.getRelativeClz());
+                InCondition relativeInCondition = new InCondition(domainObjectCriteria.getMainPropperty(), mainInList);
+                relativeInCondition.setClz(domainObjectCriteria.getRelativeClz());
+                relativeList = in0(relativeInCondition);
+
+                BeanElement relativeWithBe = relativeParsed.getElement(domainObjectCriteria.getWithProperty());
+
+                List<Object> withInList = new ArrayList<>();
+                for (Object r : relativeList) {
+                    Object in = relativeWithBe.getMethod.invoke(r);
+                    withInList.add(in);
+                }
+
+                String key = withParsed.getKey(X.KEY_ONE);
+
+                InCondition withInCondition = new InCondition(key, withInList);
+                withInCondition.setClz(domainObjectCriteria.getWithClz());
+                withList = in0(withInCondition);
+
+                List<DomainObject<T, WITH>> list = new ArrayList<>();
+
+
+                /*
+                 * result assemble step3
+                 */
+                BeanElement relatievMainBe = domainObjectCriteria.getRelativeClz() == null ? null :
+                        relativeParsed.getElement(domainObjectCriteria.getMainPropperty());
+
+                Field withKeyF = withParsed.getKeyField(X.KEY_ONE);
+                withKeyF.setAccessible(true);
+
 
                 Parsed mainParsed = Parser.get(domainObjectCriteria.getClz());
                 Field mainField = mainParsed.getKeyField(X.KEY_ONE);
                 mainField.setAccessible(true);
 
-                BeanElement wBe= withParsed.getElement(domainObjectCriteria.getMainPropperty());
+                BeanElement wBe = withParsed.getElement(domainObjectCriteria.getMainPropperty());
 
                 for (Object main : mainList) {
 
@@ -515,34 +656,22 @@ public abstract class BaseRepository<T> implements X7Repository<T> {
 
                     List withListOne = new ArrayList();
 
-                    if (relativeList == null){
 
+                    for (Object r : relativeList) {
+                        Object oRelative = relatievMainBe.getMethod.invoke(r);
+                        if (mainKeyOne.toString().equals(oRelative.toString())) {
+                            Object relativeWithKey = relativeWithBe.getMethod.invoke(r);
 
-                        for (Object w : withList) {
-                            Object withR = wBe.getMethod.invoke(w);
-                            if (mainKeyOne.toString().equals(withR.toString())) {
-                                withListOne.add(w);
-                            }
-                        }
-
-                    }else {
-
-                        BeanElement be = relativeParsed.getElement(domainObjectCriteria.getWithProperty());
-                        for (Object r : relativeList) {
-                            Object oRelative = relatievMainBe.getMethod.invoke(r);
-                            if (mainKeyOne.toString().equals(oRelative.toString())) {
-                                Object relativeWithKey = be.getMethod.invoke(r);
-
-                                for (Object w : withList) {
-                                    Object withId = withKeyF.get(w);
-                                    if (relativeWithKey.toString().equals(withId.toString())) {
-                                        withListOne.add(w);
-                                    }
+                            for (Object w : withList) {
+                                Object withId = withKeyF.get(w);
+                                if (relativeWithKey.toString().equals(withId.toString())) {
+                                    withListOne.add(w);
                                 }
-
                             }
+
                         }
                     }
+
 
                     DomainObject domainObject = new DomainObject();
                     domainObject.setMain(main);
@@ -550,14 +679,106 @@ public abstract class BaseRepository<T> implements X7Repository<T> {
 
                     list.add(domainObject);
                 }
+
+
+                return list;
+            } catch (Exception e) {
+                throw new RuntimeException(ExceptionUtil.getMessage(e));
             }
 
-            return list;
-        } catch (Exception e) {
-            throw new RuntimeException(ExceptionUtil.getMessage(e));
         }
 
-    }
 
+        protected static <T,WITH> List<DomainObject<T, WITH>> listDomainObject_NonRelative(Criteria.DomainObjectCriteria domainObjectCriteria) {
+
+            try {
+
+                /*
+                 * knownMainIdList step 1
+                 */
+                List<Object> mainInList = new ArrayList<>();
+                List<T> mainList = null;
+                if (mainInList == null || mainInList.isEmpty()) {
+
+                    mainList = list0((Criteria) domainObjectCriteria);
+
+                    Parsed mainParsed = Parser.get(domainObjectCriteria.getClz());
+                    Field mainField = mainParsed.getKeyField(X.KEY_ONE);
+                    mainField.setAccessible(true);
+
+                    for (Object t : mainList) {
+                        Object in = mainField.get(t);
+                        mainInList.add(in);
+                    }
+                }
+
+
+                /*
+                 * step 2  if relativeClass
+                 */
+                Parsed withParsed = Parser.get(domainObjectCriteria.getWithClz());
+                Parsed relativeParsed = null;
+
+                List relativeList = null;
+                List withList = null;
+
+
+                InCondition withInCondition = new InCondition(domainObjectCriteria.getMainPropperty(), mainInList);
+                withInCondition.setClz(domainObjectCriteria.getWithClz());
+                withList = in0(withInCondition);
+
+
+                List<DomainObject<T, WITH>> list = new ArrayList<>();
+
+
+
+                /*
+                 * result assemble step3
+                 */
+                BeanElement relatievMainBe = domainObjectCriteria.getRelativeClz() == null ? null :
+                        relativeParsed.getElement(domainObjectCriteria.getMainPropperty());
+
+                Field withKeyF = withParsed.getKeyField(X.KEY_ONE);
+                withKeyF.setAccessible(true);
+
+
+                Parsed mainParsed = Parser.get(domainObjectCriteria.getClz());
+                Field mainField = mainParsed.getKeyField(X.KEY_ONE);
+                mainField.setAccessible(true);
+
+                BeanElement wBe = withParsed.getElement(domainObjectCriteria.getMainPropperty());
+
+                for (Object main : mainList) {
+
+                    Object mainKeyOne = mainField.get(main);
+
+                    List withListOne = new ArrayList();
+
+
+                    for (Object w : withList) {
+                        Object withR = wBe.getMethod.invoke(w);
+                        if (mainKeyOne.toString().equals(withR.toString())) {
+                            withListOne.add(w);
+                        }
+                    }
+
+
+                    DomainObject domainObject = new DomainObject();
+                    domainObject.setMain(main);
+                    domainObject.setWithList(withListOne);
+
+                    list.add(domainObject);
+                }
+
+
+                return list;
+            } catch (Exception e) {
+                throw new RuntimeException(ExceptionUtil.getMessage(e));
+            }
+
+        }
+
+
+    }
 
 }
