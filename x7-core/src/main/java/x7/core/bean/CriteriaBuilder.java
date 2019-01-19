@@ -557,6 +557,13 @@ public class CriteriaBuilder {
         return builder;
     }
 
+    public static DomainObjectBuilder buildDomainObject(Class<?> clz){
+        CriteriaBuilder b = new CriteriaBuilder();
+        DomainObjectBuilder builder = b.new DomainObjectBuilder(clz);
+
+        return builder;
+    }
+
 
     public Class<?> getClz() {
         return this.criteria.getClz();
@@ -833,8 +840,55 @@ public class CriteriaBuilder {
             return this;
         }
 
+    }
+
+
+    public class DomainObjectBuilder extends CriteriaBuilder {
+
+        private void init() {
+            super.instance = this;
+            Criteria c = new Criteria();
+            Criteria.DomainObjectCriteria domainObjectCriteria = c.new DomainObjectCriteria();
+            super.criteria = domainObjectCriteria;
+        }
+
+        private void init(Class<?> clz) {
+            Criteria.DomainObjectCriteria doc = (Criteria.DomainObjectCriteria) super.criteria;
+            doc.setClz(clz);
+            Parsed parsed = Parser.get(clz);
+            doc.setParsed(parsed);
+        }
+
+
+        public DomainObjectBuilder(Class clz){
+            init();
+            init(clz);
+        }
+
+        public DomainBuilder domain(){
+            return new DomainBuilder() {
+                @Override
+                public DomainBuilder relative(Class relativeClz, String mainProperty) {
+                    Criteria.DomainObjectCriteria doc = (Criteria.DomainObjectCriteria) criteria;
+                    doc.setRelativeClz(relativeClz);
+                    doc.setMainPropperty(mainProperty);
+                    return this;
+                }
+
+                @Override
+                public void with(Class withClz, String withProperty) {
+                    Criteria.DomainObjectCriteria doc = (Criteria.DomainObjectCriteria) criteria;
+                    doc.setWithClz(withClz);
+                    doc.setWithProperty(withProperty);
+                }
+            };
+        }
 
     }
 
+    public interface DomainBuilder {
+        DomainBuilder relative(Class relativeClz,String mainProperty);
+        void with(Class withClz, String withProperty);
+    }
 
 }

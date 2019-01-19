@@ -30,25 +30,25 @@ public class AppTest {
     @Test
     public void testAll(){
 
-        IdGenerator g1 = new IdGenerator();
-        g1.setClzName("xxx.dog");
-        g1.setMaxId(10);
+//        IdGenerator g1 = new IdGenerator();
+//        g1.setClzName("xxx.dog");
+//        g1.setMaxId(10);
+//
+//        String str1 = JsonX.toJson(g1);
+//
+//        String clzName = g1.getClass().getName();
+//
+//        String key = clzName+"."+g1.getClzName();
+//        stringRedisTemplate.opsForValue().set(key,str1);
+//        Object obj = stringRedisTemplate.opsForValue().get(key);
+//        System.out.println(obj);
+//
+//        List<String> keyList = new ArrayList<>();
+//        keyList.add(key);
+//        List<String> list = stringRedisTemplate.opsForValue().multiGet(keyList);
+//        System.out.println(list);
 
-        String str1 = JsonX.toJson(g1);
-
-        String clzName = g1.getClass().getName();
-
-        String key = clzName+"."+g1.getClzName();
-        stringRedisTemplate.opsForValue().set(key,str1);
-        Object obj = stringRedisTemplate.opsForValue().get(key);
-        System.out.println(obj);
-
-        List<String> keyList = new ArrayList<>();
-        keyList.add(key);
-        List<String> list = stringRedisTemplate.opsForValue().multiGet(keyList);
-        System.out.println(list);
-
-//        xxxTest.testNonPaged();
+        xxxTest.testNonPaged();
 
     }
 

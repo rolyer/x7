@@ -212,8 +212,9 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 				'}';
 	}
 
-	public class ResultMapped extends Criteria {
+	public class ResultMapped extends Criteria implements Serializable{
 
+		private static final long serialVersionUID = -2365612538012282380L;
 		private List<String> resultKeyList = new ArrayList<String>();
 		private String sourceScript;
 		private Distinct distinct;
@@ -455,6 +456,63 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 		public String toString() {
 			return "MapMapper [propertyMapperMap=" + propertyMapperMap + ", mapperPropertyMap=" + mapperPropertyMap
 					+ "]";
+		}
+	}
+
+	/**
+	 *
+	 * 查询条件仅仅来自主表, 但要返回同一个域里的相关表结果<br>
+	 * 不需要Fetched查询<br>
+	 * 支持L2Cache<br>
+	 */
+	public class DomainObjectCriteria extends Criteria implements Serializable {
+
+		private static final long serialVersionUID = -886967622448599208L;
+		private Class withClz;
+		private Class relativeClz;
+		private String mainPropperty;
+		private String withProperty;
+
+		public Class getWithClz() {
+			return withClz;
+		}
+
+		public void setWithClz(Class withClz) {
+			this.withClz = withClz;
+		}
+
+		public Class getRelativeClz() {
+			return relativeClz;
+		}
+
+		public void setRelativeClz(Class relativeClz) {
+			this.relativeClz = relativeClz;
+		}
+
+		public String getMainPropperty() {
+			return mainPropperty;
+		}
+
+		public void setMainPropperty(String mainPropperty) {
+			this.mainPropperty = mainPropperty;
+		}
+
+		public String getWithProperty() {
+			return withProperty;
+		}
+
+		public void setWithProperty(String withProperty) {
+			this.withProperty = withProperty;
+		}
+
+		@Override
+		public String toString() {
+			return "DomainObjectCriteria{" +
+					"withClz=" + withClz +
+					", relativeClz=" + relativeClz +
+					", mainPropperty='" + mainPropperty + '\'' +
+					", withProperty='" + withProperty + '\'' +
+					'}';
 		}
 	}
 

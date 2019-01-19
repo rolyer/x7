@@ -17,6 +17,7 @@
 package x7.repository.api;
 
 import x7.core.bean.Criteria;
+import x7.core.bean.DomainObject;
 import x7.core.bean.condition.InCondition;
 import x7.core.bean.condition.ReduceCondition;
 import x7.core.bean.condition.RefreshCondition;
@@ -112,5 +113,7 @@ public interface X7Repository<T> {
 
 	List<Map<String,Object>> list(Criteria.ResultMapped resultMapped);
 
-	<T> List<T> list(Criteria criteria);
+	List<T> list(Criteria criteria);
+
+	<WITH> List<DomainObject<T,WITH>>  findDomainObject(Criteria.DomainObjectCriteria domainObjectCriteria);
 }

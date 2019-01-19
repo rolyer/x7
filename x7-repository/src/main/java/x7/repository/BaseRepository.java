@@ -24,6 +24,7 @@ import x7.core.bean.condition.InCondition;
 import x7.core.bean.condition.ReduceCondition;
 import x7.core.bean.condition.RefreshCondition;
 import x7.core.repository.X;
+import x7.core.util.ExceptionUtil;
 import x7.core.util.StringUtil;
 import x7.core.web.Direction;
 import x7.core.web.Page;
@@ -272,6 +273,13 @@ public abstract class BaseRepository<T> implements X7Repository<T> {
         return SqlRepository.getInstance().in(inCondition);
     }
 
+    private List<T> in0(InCondition inCondition) {
+        if (inCondition.getInList().isEmpty())
+            return new ArrayList<T>();
+
+        return SqlRepository.getInstance().in(inCondition);
+    }
+
     @Override
     public Page<T> find(Criteria criteria) {
 
@@ -294,7 +302,7 @@ public abstract class BaseRepository<T> implements X7Repository<T> {
     }
 
     @Override
-    public <T> List<T> list(Criteria criteria) {
+    public  List<T> list(Criteria criteria) {
 
         if (criteria instanceof Criteria.ResultMapped)
             throw new RuntimeException("Codeing Exception: maybe {Criteria.ResultMapped criteria = builder.get();} instead of {Criteria criteria = builder.get();}");
@@ -376,6 +384,84 @@ public abstract class BaseRepository<T> implements X7Repository<T> {
             logger.info("X7 Repository " + (flag ? "still " : "") + "started" + (flag ? " OK, wtih some problem" : ""));
 
         }
+    }
+
+    @Override
+    public <WITH> List<DomainObject<T,WITH>>  findDomainObject(Criteria.DomainObjectCriteria domainObjectCriteria) {
+
+        try {
+            List<T> mainList = list((Criteria) domainObjectCriteria);
+
+            List<Object> mainInList = new ArrayList<>();
+
+            Parsed mainParsed = Parser.get(domainObjectCriteria.getClz());
+            Field mainField = mainParsed.getKeyField(X.KEY_ONE);
+            mainField.setAccessible(true);
+
+            for (Object t : mainList) {
+                Object in = mainField.get(t);
+                mainInList.add(in);
+            }
+
+            InCondition relativeInCondition = new InCondition(domainObjectCriteria.getMainPropperty(),mainInList);
+            relativeInCondition.setClz(domainObjectCriteria.getRelativeClz());
+            List relativeList = in0(relativeInCondition);
+
+            Parsed relativeParsed = Parser.get(domainObjectCriteria.getRelativeClz());
+            BeanElement be = relativeParsed.getElement(domainObjectCriteria.getWithProperty());
+
+
+            List<Object> withInList = new ArrayList<>();
+            for (Object r : relativeList){
+                Object in = be.getMethod.invoke(r);
+                withInList.add(in);
+            }
+
+            Parsed withParsed = Parser.get(domainObjectCriteria.getWithClz());
+            String key = withParsed.getKey(X.KEY_ONE);
+
+            InCondition withInCondition = new InCondition(key,withInList);
+            withInCondition.setClz(domainObjectCriteria.getWithClz());
+            List withList = in0(withInCondition);
+
+            List<DomainObject<T,WITH>> list = new ArrayList<>();
+
+            BeanElement beMain = relativeParsed.getElement(domainObjectCriteria.getMainPropperty());
+            Field wKF = withParsed.getKeyField(X.KEY_ONE);
+            wKF.setAccessible(true);
+
+            for (Object main : mainList){
+
+                Object oKeyOne = mainField.get(main);
+
+                List withListOne = new ArrayList();
+                for (Object r : relativeList){
+                    Object oRelative = beMain.getMethod.invoke(r);
+                    if (oKeyOne.toString().equals(oRelative.toString())){
+                        Object withKey = be.getMethod.invoke(r);
+
+                        for (Object w :withList){
+                            Object withId = wKF.get(w);
+                            if (withKey.toString().equals(withId.toString())){
+                                withListOne.add(w);
+                            }
+                        }
+
+                    }
+                }
+
+                DomainObject domainObject = new DomainObject();
+                domainObject.setMain(main);
+                domainObject.setWithList(withListOne);
+
+                list.add(domainObject);
+            }
+
+            return list;
+        }catch (Exception e){
+            throw new RuntimeException(ExceptionUtil.getMessage(e));
+        }
+
     }
 
 
