@@ -432,7 +432,6 @@ public class TextParser{
 	public void readConfigs(String path,String[] ativeProfiles){
 
 		File file = new File(path);
-		System.out.println("______path: " + file.getAbsolutePath());
 
 		if (file == null)
 			return;

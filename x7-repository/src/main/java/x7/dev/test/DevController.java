@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 import x7.core.config.Configs;
 import x7.core.util.StringUtil;
 import x7.core.web.ViewEntity;
-import x7.repository.ConfigKey;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
@@ -34,8 +33,8 @@ public class DevController {
 
 	@RequestMapping("test")
 	public ViewEntity test(HttpServletRequest req) {
-		
-		boolean isDev = Configs.isTrue(ConfigKey.IS_DEVELOPING);
+
+		boolean isDev = Configs.Inner.isDev;
 		
 		if (!isDev) {
 			return ViewEntity.toast("NOT DEV OR NOT TEST");

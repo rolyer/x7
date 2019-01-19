@@ -37,6 +37,10 @@ public class Parser {
 
 	private final static Map<Class, ReflectionCache> cacheMap = new ConcurrentHashMap<Class, ReflectionCache>();
 
+	public static String mappingPrefix;
+	public static String mappingSpec;
+
+
 	@SuppressWarnings("rawtypes")
 	public static void put(Class clz, Parsed parsed) {
 		map.put(clz, parsed);
@@ -73,8 +77,7 @@ public class Parser {
 		}
 		boolean isNoSpec = true;
 		try{
-			String str = Configs.getString("x7.db.naming.spec");
-			if (StringUtil.isNotNull(str)){
+			if (StringUtil.isNotNull(mappingSpec)){
 				isNoSpec = false;
 			}else {
 				for (BeanElement element : elementList) {
@@ -103,7 +106,7 @@ public class Parser {
 			} else {
 				String name = BeanUtil.getByFirstLower(clz.getSimpleName());
 				String mapper = BeanUtil.getMapper(name);
-				String prefix = Configs.getString("x7.db.naming.prefix");
+				String prefix = mappingPrefix;
 				if (StringUtil.isNotNull(prefix)) {
 					if (!prefix.endsWith("_")) {
 						prefix += "_";
@@ -116,7 +119,7 @@ public class Parser {
 		} else {
 			String name = BeanUtil.getByFirstLower(clz.getSimpleName());
 			String mapper = BeanUtil.getMapper(name);
-			String prefix = Configs.getString("x7.db.naming.prefix");
+			String prefix = mappingPrefix;
 			if (StringUtil.isNotNull(prefix)) {
 				if (!prefix.endsWith("_")) {
 					prefix += "_";

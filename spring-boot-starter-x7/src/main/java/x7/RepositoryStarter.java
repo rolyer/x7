@@ -18,12 +18,16 @@ package x7;
 
 import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
+import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import x7.core.bean.Parser;
 import x7.core.bean.SpringHelper;
 import x7.core.config.Configs;
 import x7.repository.RepositoryBooter;
@@ -31,11 +35,13 @@ import x7.repository.RepositoryProperties;
 import x7.repository.pool.HikariPoolUtil;
 
 import javax.sql.DataSource;
+import java.util.Map;
 import java.util.Objects;
 
 @EnableConfigurationProperties({
 		DataSourceProperties_R.class})
-public class RepositoryStarter {
+public class RepositoryStarter  {
+
 
 	@Autowired
 	private DataSourceProperties_R dataSourceProperties_r;
@@ -151,4 +157,7 @@ public class RepositoryStarter {
 		RepositoryBooter.boot(dsW,dsR);
 
 	}
+
+
+
 }

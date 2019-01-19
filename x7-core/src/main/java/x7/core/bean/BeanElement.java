@@ -43,7 +43,7 @@ public class BeanElement {
 
 	private String getPrefix() {
 		try {
-			String prefix = Configs.getString("x7.db.naming.prefix");
+			String prefix = Parser.mappingPrefix;
 			if (StringUtil.isNotNull(prefix))
 				return prefix;
 		} catch (Exception e) {

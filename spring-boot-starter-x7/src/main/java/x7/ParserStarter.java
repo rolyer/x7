@@ -14,13 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package x7.repository;
+package x7;
 
-public interface ConfigKey{
-	String IS_DEVELOPING = "x7.developing";
-	String IS_CACHEABLE = "x7.cache.serving";
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
+import org.springframework.core.type.AnnotationMetadata;
+import x7.core.bean.Parser;
 
-	String DB_NAMING_SPEC = "x7.db.naming.spec";
-	String DB_NAMING_PREFIX = "x7.db.naming.prefix";
+import java.util.Map;
+
+public class ParserStarter implements ImportBeanDefinitionRegistrar {
+
+	@Override
+	public void registerBeanDefinitions(AnnotationMetadata annotationMetadata, BeanDefinitionRegistry beanDefinitionRegistry) {
+		Map<String, Object> attributes = annotationMetadata.getAnnotationAttributes(EnableX7Repository.class.getName());
+
+		Object prefix = attributes.get("mappingPrefix");
+		Object spec = attributes.get("mappingSpec");
+
+		Parser.mappingPrefix = prefix.toString();
+		Parser.mappingSpec = spec.toString();
+
+	}
 
 }

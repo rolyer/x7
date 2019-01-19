@@ -308,7 +308,7 @@ public class BeanUtil {
 		int max = AZ.charAt(1) + 1;
 		
 		try {
-			String spec = Configs.getString("x7.db.naming.spec");
+			String spec = Parser.mappingSpec;
 			if (StringUtil.isNotNull(spec)) {
 				char[] arr = property.toCharArray();
 				int length = arr.length;

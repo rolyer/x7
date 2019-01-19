@@ -16,15 +16,11 @@
  */
 package x7.config;
 
+import x7.core.config.Configs;
+
 public class ConfigBuilder {
 
 	private static ConfigBuilder instance;
-	public static ConfigBuilder newInstance(){
-		if (instance == null){
-			instance = new ConfigBuilder();
-		}
-		return instance;
-	}
 	
 	public static void build(String[] ativeProfiles){
 		if (instance == null){
@@ -34,6 +30,18 @@ public class ConfigBuilder {
 	}
 	
 	private static void init(String[] ativeProfiles) {
+
+		if (ativeProfiles == null || ativeProfiles.length == 0){
+			Configs.Inner.isDev = true;
+		}else {
+			for (String active : ativeProfiles) {
+				if (active.equals("default") || active.equals("dev")) {
+					Configs.Inner.isDev = true;
+				}
+			}
+		}
+
+		System.out.println("_________Env: isDev = " + Configs.Inner.isDev + ", [L2Cache will disenable]");
 
 		TextParser.getInstance().load(ativeProfiles);
 

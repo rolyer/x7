@@ -23,8 +23,15 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Documented
-@Import({RepositoryStarter.class})
+@Import({ParserStarter.class,RepositoryStarter.class})
 public @interface EnableX7Repository {
 
-
+    /**
+     * t_
+     */
+    String mappingPrefix() default "";
+    /**
+     * _
+     */
+    String mappingSpec() default "";
 }

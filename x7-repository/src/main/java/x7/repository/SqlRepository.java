@@ -21,6 +21,7 @@ import x7.core.bean.*;
 import x7.core.bean.condition.InCondition;
 import x7.core.bean.condition.ReduceCondition;
 import x7.core.bean.condition.RefreshCondition;
+import x7.core.config.Configs;
 import x7.core.repository.CacheResolver;
 import x7.core.repository.Repository;
 import x7.core.repository.X;
@@ -63,6 +64,10 @@ public class SqlRepository implements Repository {
 
 	public void setCacheResolver(CacheResolver cacheResolver) {
 		this.cacheResolver = cacheResolver;
+	}
+
+	private boolean isNoCache(){
+		return Configs.Inner.isDev || cacheResolver == null;
 	}
 
 	private String getCacheKey(Object obj, Parsed parsed) {
@@ -118,11 +123,11 @@ public class SqlRepository implements Repository {
 				 * 更新或重置缓存
 				 */
 				if (obj == null) {
-					if (cacheResolver != null && !parsed.isNoCache())
+					if (!isNoCache() && !parsed.isNoCache())
 						cacheResolver.markForRefresh(clz);
 				} else {
 					list.add(obj);
-					if (cacheResolver != null && !parsed.isNoCache())
+					if (!isNoCache() && !parsed.isNoCache())
 						cacheResolver.set(clz, key, obj);
 				}
 			}
@@ -155,7 +160,7 @@ public class SqlRepository implements Repository {
 		Parsed parsed = Parser.get(clz);
 		long id = syncDao.create(obj);
 
-		if (cacheResolver != null && !parsed.isNoCache())
+		if (!isNoCache() && !parsed.isNoCache())
 			cacheResolver.markForRefresh(clz);
 		return id;
 	}
@@ -170,7 +175,7 @@ public class SqlRepository implements Repository {
 
 		if (flag) {
 			String key = getCacheKey(obj, parsed);
-			if (cacheResolver != null && !parsed.isNoCache()) {
+			if (!isNoCache() && !parsed.isNoCache()) {
 				if (key != null)
 					cacheResolver.remove(clz, key);
 				cacheResolver.markForRefresh(clz);
@@ -194,7 +199,7 @@ public class SqlRepository implements Repository {
 
 		flag = syncDao.refreshByCondition(refreshCondition);
 
-		if (cacheResolver != null && !parsed.isNoCache()) {
+		if (!isNoCache() && !parsed.isNoCache()) {
 
 			T obj = refreshCondition.getObj();
 			if (Objects.isNull(obj)){
@@ -217,7 +222,7 @@ public class SqlRepository implements Repository {
 	 */
 	public <T> void refreshCache(Class<T> clz) {
 		Parsed parsed = Parser.get(clz);
-		if (cacheResolver != null && !parsed.isNoCache()) {
+		if (!isNoCache() && !parsed.isNoCache()) {
 			cacheResolver.markForRefresh(clz);
 		}
 	}
@@ -231,7 +236,7 @@ public class SqlRepository implements Repository {
 		String key = getCacheKey(obj, parsed);
 		flag = syncDao.remove(obj);
 
-		if (cacheResolver != null && !parsed.isNoCache()) {
+		if (!isNoCache() && !parsed.isNoCache()) {
 			if (key != null)
 				cacheResolver.remove(clz, key);
 			cacheResolver.markForRefresh(clz);
@@ -244,9 +249,8 @@ public class SqlRepository implements Repository {
 		testAvailable();
 		Parsed parsed = Parser.get(clz);
 
-		if (cacheResolver == null || parsed.isNoCache()) {
+		if (isNoCache()|| parsed.isNoCache()) {
 			return syncDao.get(clz, idOne);
-
 		}
 
 		String key = String.valueOf(idOne);
@@ -270,9 +274,8 @@ public class SqlRepository implements Repository {
 		Class clz = conditionObj.getClass();
 		Parsed parsed = Parser.get(clz);
 
-		if (cacheResolver == null || parsed.isNoCache()) {
+		if (isNoCache() || parsed.isNoCache()) {
 			return syncDao.list(conditionObj);
-
 		}
 
 		List<T> list = null;
@@ -312,7 +315,7 @@ public class SqlRepository implements Repository {
 		Class<T> clz = (Class<T>) conditionObj.getClass();
 		Parsed parsed = Parser.get(clz);
 
-		if (cacheResolver == null || parsed.isNoCache()) {
+		if (isNoCache() || parsed.isNoCache()) {
 			List<T> list = syncDao.list(conditionObj);
 				if (list.isEmpty())
 					return null;
@@ -347,9 +350,8 @@ public class SqlRepository implements Repository {
 		Class<T> clz = (Class<T>) conditionObj.getClass();
 		Parsed parsed = Parser.get(clz);
 
-		if (cacheResolver == null || parsed.isNoCache()) {
+		if (isNoCache() || parsed.isNoCache()) {
 			return (T) syncDao.getOne(conditionObj, orderBy, sc);
-
 		}
 
 		String condition = JsonX.toJson(conditionObj) + orderBy + sc;
@@ -374,7 +376,7 @@ public class SqlRepository implements Repository {
 		Parsed parsed = Parser.get(clz);
 		
 
-		if (cacheResolver == null) {
+		if (isNoCache()) {
 			return syncDao.find(criteria);
 		}
 
@@ -433,7 +435,7 @@ public class SqlRepository implements Repository {
 		Class clz = criteria.getClz();
 		Parsed parsed = Parser.get(clz);
 
-		if (cacheResolver == null) {
+		if (isNoCache()) {
 			return syncDao.list(criteria);
 		}
 
@@ -474,7 +476,7 @@ public class SqlRepository implements Repository {
 		testAvailable();
 		Parsed parsed = Parser.get(clz);
 
-		if (cacheResolver == null || parsed.isNoCache()) {
+		if (isNoCache() || parsed.isNoCache()) {
 			return syncDao.list(clz);
 
 		}
@@ -515,8 +517,6 @@ public class SqlRepository implements Repository {
 	@Override
 	public Object reduce(ReduceCondition reduceCondition) {
 		testAvailable();
-		Class clz = reduceCondition.getClz();
-		Parsed parsed = Parser.get(clz);
 		return syncDao.reduce(reduceCondition);
 
 	}
@@ -529,7 +529,7 @@ public class SqlRepository implements Repository {
 
 		if (b) {
 			String key = getCacheKey(obj, parsed);
-			if (cacheResolver != null && !parsed.isNoCache()) {
+			if (!isNoCache() && !parsed.isNoCache()) {
 				if (key != null) {
 					cacheResolver.remove(obj.getClass(), key);
 				}
@@ -565,7 +565,7 @@ public class SqlRepository implements Repository {
 		
 		Parsed parsed = Parser.get(clz);
 
-		if (cacheResolver == null || parsed.isNoCache()) {
+		if (isNoCache()|| parsed.isNoCache()) {
 			return syncDao.in(inCondition);
 		}
 
@@ -611,21 +611,13 @@ public class SqlRepository implements Repository {
 	@Override
 	public Page<Map<String, Object>> find(Criteria.ResultMapped resultMapped) {
 		testAvailable();
-		Class clz = resultMapped.getClz();
-		Parsed parsed = Parser.get(clz);
-		
 		return syncDao.find(resultMapped);
-
 	}
 
 	@Override
 	public List<Map<String, Object>> list(Criteria.ResultMapped resultMapped) {
 		testAvailable();
-		Class clz = resultMapped.getClz();
-		Parsed parsed = Parser.get(clz);
-
 		return syncDao.list(resultMapped);
-
 	}
 
 	@Override
@@ -635,15 +627,17 @@ public class SqlRepository implements Repository {
 			return false;
 		Class clz = objList.get(0).getClass();
 		Parsed parsed = Parser.get(clz);
-		if (cacheResolver != null && !parsed.isNoCache())
+		boolean flag = this.syncDao.createBatch(objList);
+		if (!isNoCache() && !parsed.isNoCache())
 			cacheResolver.markForRefresh(clz);
-		return this.syncDao.createBatch(objList);
+
+		return flag;
 	}
 
 	protected List<Map<String, Object>> list(Class clz, String sql, List<Object> conditionList) {
 		
 		Parsed parsed = Parser.get(clz);
-		if (cacheResolver == null || parsed.isNoCache()) {
+		if (isNoCache() || parsed.isNoCache()) {
 			return syncDao.list(clz, sql, conditionList);
 		}
 

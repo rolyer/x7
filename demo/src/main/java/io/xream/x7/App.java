@@ -18,7 +18,7 @@ import x7.EnableX7Repository;
 @EnableTransactionManagement
 @EnableTransactionManagementReadable
 @EnableX7L2Cache(timeSeconds = 120)
-@EnableX7Repository
+@EnableX7Repository(mappingPrefix = "t_",mappingSpec = "_")
 public class App {
     public static void main( String[] args )
     {

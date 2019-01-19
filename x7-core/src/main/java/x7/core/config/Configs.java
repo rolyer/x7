@@ -27,14 +27,16 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Configs {
 
-	private static Map<String, Object> map = new ConcurrentHashMap<String, Object>();
+	public static class Inner {
+		public static boolean isDev = false;
+	}
 
+	private static Map<String, Object> map = new ConcurrentHashMap<String, Object>();
 
 	private static Environment environment;
 	public static void setEnvironment(Environment env){
 		environment = env;
 	}
-
 
 	public static Map<String, Object> referMap() {
 		return map;
