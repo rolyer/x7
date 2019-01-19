@@ -472,6 +472,7 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 		private Class relativeClz;
 		private String mainPropperty;
 		private String withProperty;
+		private List<Object> knownMainIdList;
 
 		public Class getWithClz() {
 			return withClz;
@@ -505,6 +506,14 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 			this.withProperty = withProperty;
 		}
 
+		public List<Object> getKnownMainIdList() {
+			return knownMainIdList;
+		}
+
+		public void setKnownMainIdList(List<Object> knownMainIdList) {
+			this.knownMainIdList = knownMainIdList;
+		}
+
 		@Override
 		public String toString() {
 			return "DomainObjectCriteria{" +
@@ -512,6 +521,7 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 					", relativeClz=" + relativeClz +
 					", mainPropperty='" + mainPropperty + '\'' +
 					", withProperty='" + withProperty + '\'' +
+					", knownMainIdList=" + knownMainIdList +
 					'}';
 		}
 	}

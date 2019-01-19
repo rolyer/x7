@@ -868,6 +868,11 @@ public class CriteriaBuilder {
         public DomainBuilder domain(){
             return new DomainBuilder() {
                 @Override
+                public DomainBuilder known(List<?> mainIdList) {
+                    return this;
+                }
+
+                @Override
                 public DomainBuilder relative(Class relativeClz, String mainProperty) {
                     Criteria.DomainObjectCriteria doc = (Criteria.DomainObjectCriteria) criteria;
                     doc.setRelativeClz(relativeClz);
@@ -876,10 +881,11 @@ public class CriteriaBuilder {
                 }
 
                 @Override
-                public void with(Class withClz, String withProperty) {
+                public CriteriaBuilder with(Class withClz, String withProperty) {
                     Criteria.DomainObjectCriteria doc = (Criteria.DomainObjectCriteria) criteria;
                     doc.setWithClz(withClz);
                     doc.setWithProperty(withProperty);
+                    return instance;
                 }
             };
         }
@@ -887,8 +893,9 @@ public class CriteriaBuilder {
     }
 
     public interface DomainBuilder {
+        DomainBuilder known(List<? extends Object> mainIdList);
         DomainBuilder relative(Class relativeClz,String mainProperty);
-        void with(Class withClz, String withProperty);
+        CriteriaBuilder with(Class withClz, String withProperty);
     }
 
 }
