@@ -115,5 +115,5 @@ public interface X7Repository<T> {
 
 	List<T> list(Criteria criteria);
 
-	<WITH> List<DomainObject<T,WITH>>  findDomainObject(Criteria.DomainObjectCriteria domainObjectCriteria);
+	<WITH> List<DomainObject<T,WITH>>  listDomainObject(Criteria.DomainObjectCriteria domainObjectCriteria);
 }

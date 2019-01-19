@@ -387,7 +387,7 @@ public abstract class BaseRepository<T> implements X7Repository<T> {
     }
 
     @Override
-    public <WITH> List<DomainObject<T,WITH>>  findDomainObject(Criteria.DomainObjectCriteria domainObjectCriteria) {
+    public <WITH> List<DomainObject<T,WITH>>  listDomainObject(Criteria.DomainObjectCriteria domainObjectCriteria) {
 
         try {
             List<T> mainList = list((Criteria) domainObjectCriteria);
