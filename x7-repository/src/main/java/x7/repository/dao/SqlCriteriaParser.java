@@ -38,9 +38,9 @@ public class SqlCriteriaParser implements CriteriaParser {
     }
 
 
-    private Criteria.MapMapper getMapMapper(Criteria criteria) {
+    private MapMapper getMapMapper(Criteria criteria) {
         Criteria.ResultMapped resultMapped = (Criteria.ResultMapped) criteria;
-        Criteria.MapMapper mapMapper = resultMapped.getMapMapper();//
+        MapMapper mapMapper = resultMapped.getMapMapper();//
         return mapMapper;
     }
 
@@ -155,9 +155,9 @@ public class SqlCriteriaParser implements CriteriaParser {
     private void env(Criteria criteria) {
         if (criteria instanceof Criteria.ResultMapped) {
             Criteria.ResultMapped resultMapped = (Criteria.ResultMapped) criteria;
-            Criteria.MapMapper mapMapper = resultMapped.getMapMapper();//
+            MapMapper mapMapper = resultMapped.getMapMapper();//
             if (Objects.isNull(mapMapper)) {
-                mapMapper = new Criteria.MapMapper();
+                mapMapper = new MapMapper();
                 resultMapped.setMapMapper(mapMapper);
             }
         }
@@ -172,7 +172,7 @@ public class SqlCriteriaParser implements CriteriaParser {
         Criteria.ResultMapped resultMapped = (Criteria.ResultMapped) criteria;
         StringBuilder column = new StringBuilder();
 
-        Criteria.MapMapper mapMapper = resultMapped.getMapMapper();
+        MapMapper mapMapper = resultMapped.getMapMapper();
 
         if (Objects.nonNull(resultMapped.getDistinct())) {
 

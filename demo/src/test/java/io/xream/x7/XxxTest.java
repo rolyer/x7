@@ -65,4 +65,8 @@ public class XxxTest {
     public void create(){
         this.controller.create();
     }
+
+    public void domain(){
+        this.controller.domain();
+    }
 }

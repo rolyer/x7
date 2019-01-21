@@ -333,6 +333,10 @@ public abstract class BaseRepository<T> implements X7Repository<T> {
 
         protected static void onStarted() {
 
+            for (BaseRepository repository : repositoryList) {
+                Parser.get(repository.getClz());
+            }
+
             Parsed parsed = Parser.get(IdGenerator.class);
 
 
@@ -343,7 +347,7 @@ public abstract class BaseRepository<T> implements X7Repository<T> {
                     + ") ENGINE=InnoDB DEFAULT CHARSET=utf8 ";
 
             try {
-                ManuRepository.execute(IdGenerator.class, sql);
+                ManuRepository.execute(new IdGenerator(), sql);
             } catch (Exception e) {
 
             }
@@ -435,12 +439,11 @@ public abstract class BaseRepository<T> implements X7Repository<T> {
                  * step 2  if relativeClass
                  */
                 Parsed withParsed = Parser.get(domainObjectCriteria.getWithClz());
-                Parsed relativeParsed = null;
+                Parsed relativeParsed = Parser.get(domainObjectCriteria.getRelativeClz());
 
                 List relativeList = null;
                 List withList = null;
 
-                withParsed = Parser.get(domainObjectCriteria.getRelativeClz());
                 InCondition relativeInCondition = new InCondition(domainObjectCriteria.getMainPropperty(), mainInList);
                 relativeInCondition.setClz(domainObjectCriteria.getRelativeClz());
                 relativeList = in0(relativeInCondition);
@@ -526,7 +529,7 @@ public abstract class BaseRepository<T> implements X7Repository<T> {
                  * step 2  if relativeClass
                  */
                 Parsed withParsed = Parser.get(domainObjectCriteria.getWithClz());
-                Parsed relativeParsed = null;
+                Parsed relativeParsed = Parser.get(domainObjectCriteria.getRelativeClz());
 
 
                 InCondition withInCondition = new InCondition(domainObjectCriteria.getMainPropperty(), mainInList);
@@ -541,8 +544,6 @@ public abstract class BaseRepository<T> implements X7Repository<T> {
                 /*
                  * result assemble step3
                  */
-                BeanElement relatievMainBe = domainObjectCriteria.getRelativeClz() == null ? null :
-                        relativeParsed.getElement(domainObjectCriteria.getMainPropperty());
 
                 Field withKeyF = withParsed.getKeyField(X.KEY_ONE);
                 withKeyF.setAccessible(true);
@@ -607,12 +608,12 @@ public abstract class BaseRepository<T> implements X7Repository<T> {
                  * step 2  if relativeClass
                  */
                 Parsed withParsed = Parser.get(domainObjectCriteria.getWithClz());
-                Parsed relativeParsed = null;
+                Parsed relativeParsed = Parser.get(domainObjectCriteria.getRelativeClz());
 
                 List relativeList = null;
                 List withList = null;
 
-                withParsed = Parser.get(domainObjectCriteria.getRelativeClz());
+
                 InCondition relativeInCondition = new InCondition(domainObjectCriteria.getMainPropperty(), mainInList);
                 relativeInCondition.setClz(domainObjectCriteria.getRelativeClz());
                 relativeList = in0(relativeInCondition);
@@ -717,9 +718,8 @@ public abstract class BaseRepository<T> implements X7Repository<T> {
                  * step 2  if relativeClass
                  */
                 Parsed withParsed = Parser.get(domainObjectCriteria.getWithClz());
-                Parsed relativeParsed = null;
+                Parsed relativeParsed = Parser.get(domainObjectCriteria.getRelativeClz());
 
-                List relativeList = null;
                 List withList = null;
 
 
@@ -729,7 +729,6 @@ public abstract class BaseRepository<T> implements X7Repository<T> {
 
 
                 List<DomainObject<T, WITH>> list = new ArrayList<>();
-
 
 
                 /*

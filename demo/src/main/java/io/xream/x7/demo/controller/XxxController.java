@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import x7.core.bean.Criteria;
 import x7.core.bean.CriteriaBuilder;
+import x7.core.bean.DomainObject;
 import x7.core.bean.SpringHelper;
 import x7.core.bean.condition.InCondition;
 import x7.core.bean.condition.RefreshCondition;
@@ -240,5 +241,29 @@ public class XxxController {
 
 		return ViewEntity.ok(p);
 	}
+
+
+	@RequestMapping("/domain")
+    public ViewEntity domain() {
+
+		List<Long> catIdList = new ArrayList<>();
+		catIdList.add(2L);
+		catIdList.add(3L);
+
+	    CriteriaBuilder.DomainObjectBuilder builder = CriteriaBuilder.buildDomainObject(Cat.class,Mouse.class);
+
+	    builder.and().in("id",catIdList);
+	    builder.domain().relative(CatMouse.class).on("catId").with("mouseId");
+
+//		builder.domain().known(catIdList).relative(CatMouse.class).on("catId").with("mouseId");
+
+	    Criteria.DomainObjectCriteria criteria = builder.get();
+
+	    List<DomainObject<Cat,Mouse>> list = this.catRepository.listDomainObject(criteria);
+
+	    System.out.println(list);
+
+	    return ViewEntity.ok(list);
+    }
 
 }

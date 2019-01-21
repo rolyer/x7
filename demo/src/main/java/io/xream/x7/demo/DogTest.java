@@ -1,9 +1,12 @@
 package io.xream.x7.demo;
 
+import x7.core.repository.X;
+
 import java.math.BigDecimal;
 
 public class DogTest  {
 
+    @X.Key
     private long id;
 
     private BigDecimal number;

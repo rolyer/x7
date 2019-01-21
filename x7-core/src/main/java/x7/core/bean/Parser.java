@@ -23,6 +23,7 @@ import x7.core.util.BeanUtil;
 import x7.core.util.BeanUtilX;
 import x7.core.util.StringUtil;
 
+import java.lang.reflect.Field;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +55,9 @@ public class Parser {
 		if (parsed == null) {
 			parse(clz);
 			parsed = map.get(clz);
+			Field f = parsed.getKeyField(X.KEY_ONE);
+			if (f == null)
+				throw new RuntimeException("No Primary Key, class: " + clz.getName());
 		}
 		return parsed;
 	}

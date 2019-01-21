@@ -419,45 +419,6 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 		}
 	}
 
-	public enum ReduceType {
-		SUM,
-		COUNT,
-		MAX,
-		MIN,
-		AVG
-	}
-
-	public static class MapMapper {
-		private Map<String, String> propertyMapperMap = new HashMap<String, String>();
-		private Map<String, String> mapperPropertyMap = new HashMap<String, String>();
-
-		public Map<String, String> getPropertyMapperMap() {
-			return propertyMapperMap;
-		}
-
-		public Map<String, String> getMapperPropertyMap() {
-			return mapperPropertyMap;
-		}
-
-		public void put(String property, String mapper) {
-			this.propertyMapperMap.put(property, mapper);
-			this.mapperPropertyMap.put(mapper, property);
-		}
-
-		public String mapper(String property) {
-			return this.propertyMapperMap.get(property);
-		}
-
-		public String property(String mapper) {
-			return this.mapperPropertyMap.get(mapper);
-		}
-
-		@Override
-		public String toString() {
-			return "MapMapper [propertyMapperMap=" + propertyMapperMap + ", mapperPropertyMap=" + mapperPropertyMap
-					+ "]";
-		}
-	}
 
 	/**
 	 *
@@ -465,14 +426,14 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 	 * 不需要Fetched查询<br>
 	 * 支持L2Cache<br>
 	 */
-	public class DomainObjectCriteria extends Criteria implements Serializable {
+	public class DomainObjectCriteria<T,WITH> extends Criteria implements Serializable {
 
 		private static final long serialVersionUID = -886967622448599208L;
 		private Class withClz;
 		private Class relativeClz;
 		private String mainPropperty;
 		private String withProperty;
-		private List<Object> knownMainIdList;
+		private List<? extends  Object> knownMainIdList;
 
 		public Class getWithClz() {
 			return withClz;
@@ -506,11 +467,11 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 			this.withProperty = withProperty;
 		}
 
-		public List<Object> getKnownMainIdList() {
+		public List<? extends  Object> getKnownMainIdList() {
 			return knownMainIdList;
 		}
 
-		public void setKnownMainIdList(List<Object> knownMainIdList) {
+		public void setKnownMainIdList(List<? extends  Object> knownMainIdList) {
 			this.knownMainIdList = knownMainIdList;
 		}
 
@@ -524,6 +485,15 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 					", knownMainIdList=" + knownMainIdList +
 					'}';
 		}
+	}
+
+	public enum ReduceType {
+
+		SUM,
+		COUNT,
+		MAX,
+		MIN,
+		AVG
 	}
 
 }
