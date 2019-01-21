@@ -401,6 +401,8 @@ public abstract class BaseRepository<T> implements X7Repository<T> {
     @Override
     public <WITH> List<DomainObject<T, WITH>> listDomainObject(Criteria.DomainObjectCriteria domainObjectCriteria) {
 
+        if (StringUtil.isNullOrEmpty(domainObjectCriteria.getMainPropperty()))
+            throw new RuntimeException("BaseRepository.listDomainObject(domainObjectCriteria), domainObjectCriteria.getMainPropperty()is null");
 
         if (domainObjectCriteria.getRelativeClz() == null){
 
@@ -522,24 +524,18 @@ public abstract class BaseRepository<T> implements X7Repository<T> {
                  * knownMainIdList step 1
                  */
                 List<Object> mainInList = domainObjectCriteria.getKnownMainIdList();
-                List<T> mainList = null;
-
 
                 /*
                  * step 2  if relativeClass
                  */
                 Parsed withParsed = Parser.get(domainObjectCriteria.getWithClz());
-                Parsed relativeParsed = Parser.get(domainObjectCriteria.getRelativeClz());
 
 
                 InCondition withInCondition = new InCondition(domainObjectCriteria.getMainPropperty(), mainInList);
                 withInCondition.setClz(domainObjectCriteria.getWithClz());
                 List withList = in0(withInCondition);
 
-
                 List<DomainObject<T, WITH>> list = new ArrayList<>();
-
-
 
                 /*
                  * result assemble step3
@@ -553,7 +549,6 @@ public abstract class BaseRepository<T> implements X7Repository<T> {
                 for (Object mainKeyOne : domainObjectCriteria.getKnownMainIdList()) {
 
                     List withListOne = new ArrayList();
-
 
                     for (Object w : withList) {
                         Object withR = wBe.getMethod.invoke(w);
@@ -699,13 +694,15 @@ public abstract class BaseRepository<T> implements X7Repository<T> {
                  */
                 List<Object> mainInList = new ArrayList<>();
                 List<T> mainList = null;
+
+                Parsed mainParsed = Parser.get(domainObjectCriteria.getClz());
+                Field mainField = mainParsed.getKeyField(X.KEY_ONE);
+                mainField.setAccessible(true);
+
                 if (mainInList == null || mainInList.isEmpty()) {
 
                     mainList = list0((Criteria) domainObjectCriteria);
 
-                    Parsed mainParsed = Parser.get(domainObjectCriteria.getClz());
-                    Field mainField = mainParsed.getKeyField(X.KEY_ONE);
-                    mainField.setAccessible(true);
 
                     for (Object t : mainList) {
                         Object in = mainField.get(t);
@@ -718,7 +715,7 @@ public abstract class BaseRepository<T> implements X7Repository<T> {
                  * step 2  if relativeClass
                  */
                 Parsed withParsed = Parser.get(domainObjectCriteria.getWithClz());
-                Parsed relativeParsed = Parser.get(domainObjectCriteria.getRelativeClz());
+//                Parsed relativeParsed = Parser.get(domainObjectCriteria.getRelativeClz());
 
                 List withList = null;
 
@@ -734,16 +731,9 @@ public abstract class BaseRepository<T> implements X7Repository<T> {
                 /*
                  * result assemble step3
                  */
-                BeanElement relatievMainBe = domainObjectCriteria.getRelativeClz() == null ? null :
-                        relativeParsed.getElement(domainObjectCriteria.getMainPropperty());
+//                BeanElement relatievMainBe = domainObjectCriteria.getRelativeClz() == null ? null :
+//                        relativeParsed.getElement(domainObjectCriteria.getMainPropperty());
 
-                Field withKeyF = withParsed.getKeyField(X.KEY_ONE);
-                withKeyF.setAccessible(true);
-
-
-                Parsed mainParsed = Parser.get(domainObjectCriteria.getClz());
-                Field mainField = mainParsed.getKeyField(X.KEY_ONE);
-                mainField.setAccessible(true);
 
                 BeanElement wBe = withParsed.getElement(domainObjectCriteria.getMainPropperty());
 
@@ -752,7 +742,6 @@ public abstract class BaseRepository<T> implements X7Repository<T> {
                     Object mainKeyOne = mainField.get(main);
 
                     List withListOne = new ArrayList();
-
 
                     for (Object w : withList) {
                         Object withR = wBe.getMethod.invoke(w);

@@ -243,10 +243,10 @@ public class XxxController {
 		catIdList.add(2L);
 		catIdList.add(3L);
 
-	    CriteriaBuilder.DomainObjectBuilder builder = CriteriaBuilder.buildDomainObject(Cat.class,Mouse.class);
+	    CriteriaBuilder.DomainObjectBuilder builder = CriteriaBuilder.buildDomainObject(Cat.class,Pig.class);
 
 	    builder.and().in("id",catIdList);
-	    builder.domain().relative(CatMouse.class).on("catId").with("mouseId");
+	    builder.domain().known(catIdList).on("catId");
 
 //		builder.domain().known(catIdList).relative(CatMouse.class).on("catId").with("mouseId");
 
