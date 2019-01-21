@@ -39,7 +39,7 @@ public class SqlCriteriaParser implements CriteriaParser {
 
 
     private MapMapper getMapMapper(Criteria criteria) {
-        Criteria.ResultMapped resultMapped = (Criteria.ResultMapped) criteria;
+        Criteria.ResultMappedCriteria resultMapped = (Criteria.ResultMappedCriteria) criteria;
         MapMapper mapMapper = resultMapped.getMapMapper();//
         return mapMapper;
     }
@@ -73,7 +73,7 @@ public class SqlCriteriaParser implements CriteriaParser {
             return value;
         }
 
-        if (criteria instanceof Criteria.ResultMapped) {
+        if (criteria instanceof Criteria.ResultMappedCriteria) {
 
             Parsed parsed = Parser.get(key);
             if (parsed != null) {
@@ -153,8 +153,8 @@ public class SqlCriteriaParser implements CriteriaParser {
 
 
     private void env(Criteria criteria) {
-        if (criteria instanceof Criteria.ResultMapped) {
-            Criteria.ResultMapped resultMapped = (Criteria.ResultMapped) criteria;
+        if (criteria instanceof Criteria.ResultMappedCriteria) {
+            Criteria.ResultMappedCriteria resultMapped = (Criteria.ResultMappedCriteria) criteria;
             MapMapper mapMapper = resultMapped.getMapMapper();//
             if (Objects.isNull(mapMapper)) {
                 mapMapper = new MapMapper();
@@ -164,12 +164,12 @@ public class SqlCriteriaParser implements CriteriaParser {
     }
 
     private void resultKey(Criteria criteria) {
-        if (!(criteria instanceof Criteria.ResultMapped))
+        if (!(criteria instanceof Criteria.ResultMappedCriteria))
             return;
 
         boolean flag = false;
 
-        Criteria.ResultMapped resultMapped = (Criteria.ResultMapped) criteria;
+        Criteria.ResultMappedCriteria resultMapped = (Criteria.ResultMappedCriteria) criteria;
         StringBuilder column = new StringBuilder();
 
         MapMapper mapMapper = resultMapped.getMapMapper();
@@ -260,8 +260,8 @@ public class SqlCriteriaParser implements CriteriaParser {
     }
 
     private void groupBy(StringBuilder sb, Criteria criteria) {
-        if (criteria instanceof Criteria.ResultMapped) {
-            Criteria.ResultMapped rm = (Criteria.ResultMapped) criteria;
+        if (criteria instanceof Criteria.ResultMappedCriteria) {
+            Criteria.ResultMappedCriteria rm = (Criteria.ResultMappedCriteria) criteria;
 
             String groupByS = rm.getGroupBy();
             if (StringUtil.isNullOrEmpty(groupByS))

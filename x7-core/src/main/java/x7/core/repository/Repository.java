@@ -136,7 +136,7 @@ public interface Repository {
 	 * @param resultMapped
 	 * 
 	 */
-	Page<Map<String,Object>> find(Criteria.ResultMapped resultMapped);
+	Page<Map<String,Object>> find(Criteria.ResultMappedCriteria resultMapped);
 	
 	/**
 	 * 
@@ -144,7 +144,7 @@ public interface Repository {
 	 * @param resultMapped
 	 * 
 	 */
-	List<Map<String,Object>> list(Criteria.ResultMapped resultMapped);
+	List<Map<String,Object>> list(Criteria.ResultMappedCriteria resultMapped);
 
 	<T> List<T> list(Criteria criteria);
 

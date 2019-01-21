@@ -69,7 +69,7 @@ public class Parser {
 	@SuppressWarnings({ "rawtypes" })
 	public static void parse(Class clz) {
 
-		if (clz == Criteria.class || clz == Criteria.ResultMapped.class)
+		if (clz == Criteria.class || clz == Criteria.ResultMappedCriteria.class)
 			throw new RuntimeException("parser unsupport Criteria, CriteriaJoinable, ....");
 
 		List<BeanElement> elementList = BeanUtilX.getElementList(clz);

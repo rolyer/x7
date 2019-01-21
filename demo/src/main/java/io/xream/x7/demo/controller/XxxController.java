@@ -158,7 +158,7 @@ public class XxxController {
 
 		String sourceScript = "catTest LEFT JOIN dogTest on catTest.dogId = dogTest.id";
 
-		Criteria.ResultMapped resultMapped = builder.get();
+		Criteria.ResultMappedCriteria resultMapped = builder.get();
 		resultMapped.setSourceScript(sourceScript);
 
 		Page<Map<String,Object>> pagination = repository.find(resultMapped);
@@ -199,7 +199,7 @@ public class XxxController {
 		inList.add("BL");
 
 		CriteriaBuilder.ResultMappedBuilder builder = CriteriaBuilder.buildResultMapped(Cat.class,ro);
-//		builder.distinct("id").reduce(Criteria.ReduceType.COUNT,"dogId").groupBy("id");
+		builder.distinct("id").reduce(Criteria.ReduceType.COUNT,"dogId").groupBy("id");
 		builder.and().in("type", inList);
 		builder.paged().orderIn("type",inList);
 
@@ -213,7 +213,7 @@ public class XxxController {
 
 //		String sourceScript = "cat";
 
-		Criteria.ResultMapped resultMapped = builder.get();
+		Criteria.ResultMappedCriteria resultMapped = builder.get();
 
 		Page<Map<String,Object>> pagination = repository.find(resultMapped);
 
@@ -235,7 +235,7 @@ public class XxxController {
 		builder.and().in("type",inList);
 		builder.paged().orderIn("type",inList);
 
-//		Criteria.ResultMapped criteria = builder.get();
+//		Criteria.ResultMappedCriteria criteria = builder.get();
 		Criteria criteria = builder.get();
 		Page p = catRepository.find(criteria);
 

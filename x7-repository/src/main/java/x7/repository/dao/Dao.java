@@ -66,9 +66,9 @@ public interface Dao {
 	
 	<T> List<T> in(InCondition inCondition);
 	
-	Page<Map<String, Object>> find(Criteria.ResultMapped resultMapped);
+	Page<Map<String, Object>> find(Criteria.ResultMappedCriteria resultMapped);
 
-	List<Map<String,Object>> list(Criteria.ResultMapped resultMapped);
+	List<Map<String,Object>> list(Criteria.ResultMappedCriteria resultMapped);
 
 	<T> Page<T> find(Criteria criteria);
 

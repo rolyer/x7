@@ -16,7 +16,7 @@
  */
 package x7.core.bean;
 
-import x7.core.bean.Criteria.ResultMapped;
+import x7.core.bean.Criteria.ResultMappedCriteria;
 import x7.core.bean.Criteria.X;
 import x7.core.util.BeanMapUtil;
 import x7.core.util.BeanUtilX;
@@ -721,19 +721,19 @@ public class CriteriaBuilder {
 
 
         @Override
-        public Criteria.ResultMapped get() {
-            return (ResultMapped) super.get();
+        public Criteria.ResultMappedCriteria get() {
+            return (ResultMappedCriteria) super.get();
         }
 
         private void init() {
             super.instance = this;
             Criteria c = new Criteria();
-            Criteria.ResultMapped resultMapped = c.new ResultMapped();
+            Criteria.ResultMappedCriteria resultMapped = c.new ResultMappedCriteria();
             super.criteria = resultMapped;
         }
 
         private void init(Class<?> clz) {
-            ResultMapped f = (Criteria.ResultMapped) super.criteria;
+            ResultMappedCriteria f = (Criteria.ResultMappedCriteria) super.criteria;
             f.setClz(clz);
             Parsed parsed = Parser.get(clz);
             f.setParsed(parsed);
@@ -785,7 +785,7 @@ public class CriteriaBuilder {
         public ResultMappedBuilder distinct(Object... objs) {
             if (objs == null)
                 throw new RuntimeException("distinct non resultKey");
-            ResultMapped resultMapped = get();
+            ResultMappedCriteria resultMapped = get();
             Distinct distinct = resultMapped.getDistinct();
             if (Objects.isNull(distinct)) {
                 distinct = new Distinct();

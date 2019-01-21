@@ -609,13 +609,13 @@ public class SqlRepository implements Repository {
 	}
 
 	@Override
-	public Page<Map<String, Object>> find(Criteria.ResultMapped resultMapped) {
+	public Page<Map<String, Object>> find(Criteria.ResultMappedCriteria resultMapped) {
 		testAvailable();
 		return syncDao.find(resultMapped);
 	}
 
 	@Override
-	public List<Map<String, Object>> list(Criteria.ResultMapped resultMapped) {
+	public List<Map<String, Object>> list(Criteria.ResultMappedCriteria resultMapped) {
 		testAvailable();
 		return syncDao.list(resultMapped);
 	}

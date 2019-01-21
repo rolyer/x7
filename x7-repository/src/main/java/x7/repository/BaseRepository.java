@@ -230,7 +230,7 @@ public abstract class BaseRepository<T> implements X7Repository<T> {
     @Override
     public List<T> list(T conditionObj) {
 
-        if (conditionObj instanceof Criteria.ResultMapped) {
+        if (conditionObj instanceof Criteria.ResultMappedCriteria) {
             throw new RuntimeException(
                     "Exception supported, no pagination not to invoke SqlRepository.getInstance().list(criteriaJoinalbe);");
         }
@@ -283,37 +283,37 @@ public abstract class BaseRepository<T> implements X7Repository<T> {
     @Override
     public Page<T> find(Criteria criteria) {
 
-        if (criteria instanceof Criteria.ResultMapped)
-            throw new RuntimeException("Codeing Exception: maybe {Criteria.ResultMapped criteria = builder.get();} instead of {Criteria criteria = builder.get();}");
+        if (criteria instanceof Criteria.ResultMappedCriteria)
+            throw new RuntimeException("Codeing Exception: maybe {Criteria.ResultMappedCriteria criteria = builder.get();} instead of {Criteria criteria = builder.get();}");
         return SqlRepository.getInstance().find(criteria);
     }
 
 
     @Override
-    public Page<Map<String, Object>> find(Criteria.ResultMapped criteria) {
+    public Page<Map<String, Object>> find(Criteria.ResultMappedCriteria criteria) {
 
         return SqlRepository.getInstance().find(criteria);
     }
 
 
     @Override
-    public List<Map<String, Object>> list(Criteria.ResultMapped resultMapped) {
+    public List<Map<String, Object>> list(Criteria.ResultMappedCriteria resultMapped) {
         return SqlRepository.getInstance().list(resultMapped);
     }
 
     @Override
     public List<T> list(Criteria criteria) {
 
-        if (criteria instanceof Criteria.ResultMapped)
-            throw new RuntimeException("Codeing Exception: maybe {Criteria.ResultMapped criteria = builder.get();} instead of {Criteria criteria = builder.get();}");
+        if (criteria instanceof Criteria.ResultMappedCriteria)
+            throw new RuntimeException("Codeing Exception: maybe {Criteria.ResultMappedCriteria criteria = builder.get();} instead of {Criteria criteria = builder.get();}");
 
         return SqlRepository.getInstance().list(criteria);
     }
 
     private static <T> List<T> list0(Criteria criteria) {
 
-        if (criteria instanceof Criteria.ResultMapped)
-            throw new RuntimeException("Codeing Exception: maybe {Criteria.ResultMapped criteria = builder.get();} instead of {Criteria criteria = builder.get();}");
+        if (criteria instanceof Criteria.ResultMappedCriteria)
+            throw new RuntimeException("Codeing Exception: maybe {Criteria.ResultMappedCriteria criteria = builder.get();} instead of {Criteria criteria = builder.get();}");
 
         return SqlRepository.getInstance().list(criteria);
     }

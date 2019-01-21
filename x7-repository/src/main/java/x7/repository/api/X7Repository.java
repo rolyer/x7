@@ -102,7 +102,7 @@ public interface X7Repository<T> {
 	 * 
 	 * @param criteria
 	 */
-	Page<Map<String, Object>> find(Criteria.ResultMapped criteria);
+	Page<Map<String, Object>> find(Criteria.ResultMappedCriteria criteria);
 
 	/**
 	 *  SUM | COUNT | AVG | MIN | MAX
@@ -111,7 +111,7 @@ public interface X7Repository<T> {
 	 */
 	Object reduce(ReduceCondition condition);
 
-	List<Map<String,Object>> list(Criteria.ResultMapped resultMapped);
+	List<Map<String,Object>> list(Criteria.ResultMappedCriteria resultMapped);
 
 	List<T> list(Criteria criteria);
 

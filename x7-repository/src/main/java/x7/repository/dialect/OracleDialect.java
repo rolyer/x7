@@ -226,7 +226,7 @@ public class OracleDialect implements Mapper.Dialect {
     }
 
     @Override
-    public String filterResultKey(String mapper, Criteria.ResultMapped criteria) {
+    public String filterResultKey(String mapper, Criteria.ResultMappedCriteria criteria) {
         Map<String,String> aliaMap = criteria.getAliaMap();
         String alian = ALIA_NAME + aliaMap.size();
         aliaMap.put(mapper, alian);

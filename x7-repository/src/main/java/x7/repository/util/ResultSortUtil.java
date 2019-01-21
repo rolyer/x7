@@ -53,7 +53,7 @@ public class ResultSortUtil {
 
     }
 
-    public static void sort(List<Map<String, Object>> list, Criteria.ResultMapped criteria) {
+    public static void sort(List<Map<String, Object>> list, Criteria.ResultMappedCriteria criteria) {
 
         if (list.isEmpty())
             return;

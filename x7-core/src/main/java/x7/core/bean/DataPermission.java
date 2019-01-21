@@ -80,7 +80,7 @@ public interface DataPermission {
             /*
              * DataPermission
              */
-            String property = (criteria instanceof Criteria.ResultMapped) ? (BeanUtil.getByFirstLower(criteria.getClz().getSimpleName()) + "." + key) : key;
+            String property = (criteria instanceof Criteria.ResultMappedCriteria) ? (BeanUtil.getByFirstLower(criteria.getClz().getSimpleName()) + "." + key) : key;
             if (value instanceof String) {
                 String s = (String) value;
 

@@ -1106,14 +1106,14 @@ public class DaoImpl implements Dao {
     }
 
     @Override
-    public Page<Map<String, Object>> find(Criteria.ResultMapped resultMapped) {
+    public Page<Map<String, Object>> find(Criteria.ResultMappedCriteria resultMapped) {
 
         Connection conn = RcDataSourceUtil.getConnection();
 
         return this.find(resultMapped, conn);
     }
 
-    protected Page<Map<String, Object>> find(Criteria.ResultMapped resultMapped, Connection conn) {
+    protected Page<Map<String, Object>> find(Criteria.ResultMappedCriteria resultMapped, Connection conn) {
 
         List<Object> valueList = resultMapped.getValueList();
 
@@ -1209,7 +1209,7 @@ public class DaoImpl implements Dao {
     }
 
     @Override
-    public List<Map<String, Object>> list(Criteria.ResultMapped resultMapped) {
+    public List<Map<String, Object>> list(Criteria.ResultMappedCriteria resultMapped) {
 
         List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 

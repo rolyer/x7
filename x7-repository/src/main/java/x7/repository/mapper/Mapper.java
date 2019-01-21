@@ -114,6 +114,6 @@ public interface Mapper {
 
         Object filterValue(Object value);
 
-        String filterResultKey(String mapper, Criteria.ResultMapped criteria);
+        String filterResultKey(String mapper, Criteria.ResultMappedCriteria criteria);
     }
 }

@@ -212,7 +212,7 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 				'}';
 	}
 
-	public class ResultMapped extends Criteria implements Serializable{
+	public class ResultMappedCriteria extends Criteria implements Serializable{
 
 		private static final long serialVersionUID = -2365612538012282380L;
 		private List<String> resultKeyList = new ArrayList<String>();

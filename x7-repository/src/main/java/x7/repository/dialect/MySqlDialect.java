@@ -186,7 +186,7 @@ public class MySqlDialect implements Mapper.Dialect {
 
 
     @Override
-    public String filterResultKey(String mapper, Criteria.ResultMapped criteria) {
+    public String filterResultKey(String mapper, Criteria.ResultMappedCriteria criteria) {
         return mapper;
     }
 }
