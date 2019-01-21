@@ -44,20 +44,20 @@ public class XxxController {
 	public ViewEntity create(){
 
 		Cat cat = new Cat();
-		cat.setId(238);
+		cat.setId(243);
 		cat.setDogId(2);
 
 		this.catRepository.create(cat);
 
 		Cat cat2 = new Cat();
-		cat2.setId(239);
+		cat2.setId(244);
 		cat2.setDogId(2);
 
 		this.catRepository.create(cat2);
 
-		throw new RuntimeException("-----------------------------> test wawawawa");
+//		throw new RuntimeException("-----------------------------> test wawawawa");
 
-//		return ViewEntity.ok();
+		return ViewEntity.ok();
 	}
 
 	@RequestMapping("/refresh")

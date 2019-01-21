@@ -163,6 +163,7 @@ public class DaoImpl implements Dao {
             throw new RollbackException("RollbackException: " + ExceptionUtil.getMessage(e) + ", while create: " + obj);
 
         } finally {
+            close(pstmt);
             DataSourceUtil.releaseConnection(conn);
         }
 
@@ -198,6 +199,7 @@ public class DaoImpl implements Dao {
             throw new RollbackException("RollbackException: " + e.getMessage());
 
         } finally {
+            close(pstmt);
             DataSourceUtil.releaseConnection(conn);
         }
 
@@ -285,7 +287,7 @@ public class DaoImpl implements Dao {
             throw new RollbackException("RollbackException occoured: " + ExceptionUtil.getMessage(e) + ", while create " + obj);
 
         } finally {
-
+            close(pstmt);
             DataSourceUtil.releaseConnection(conn);
         }
 
@@ -341,6 +343,7 @@ public class DaoImpl implements Dao {
             throw new RollbackException("RollbackException: " + e.getMessage());
 
         } finally {
+            close(pstmt);
             DataSourceUtil.releaseConnection(conn);
         }
 
@@ -934,6 +937,7 @@ public class DaoImpl implements Dao {
             e.printStackTrace();
             throw new RuntimeException(e.getMessage());
         } finally {
+            close(pstmt);
             DataSourceUtil.releaseConnection(conn);
         }
 
@@ -983,6 +987,7 @@ public class DaoImpl implements Dao {
                     "Exception occured by class = " + clz.getName() + ", message: " + ExceptionUtil.getMessage(e));
 
         } finally {
+            close(pstmt);
             DataSourceUtil.releaseConnection(conn);
         }
 

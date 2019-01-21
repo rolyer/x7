@@ -61,4 +61,8 @@ public class XxxTest {
 
         System.out.println("\n______Result: " + ve);
     }
+
+    public void create(){
+        this.controller.create();
+    }
 }

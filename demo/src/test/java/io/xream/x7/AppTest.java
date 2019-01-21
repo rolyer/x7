@@ -48,7 +48,7 @@ public class AppTest {
 //        List<String> list = stringRedisTemplate.opsForValue().multiGet(keyList);
 //        System.out.println(list);
 
-        xxxTest.testNonPaged();
+        xxxTest.create();
 
     }
 
