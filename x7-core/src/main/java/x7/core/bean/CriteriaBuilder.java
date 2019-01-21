@@ -821,7 +821,7 @@ public class CriteriaBuilder {
         }
 
 
-        public ResultMappedBuilder reduce(Criteria.ReduceType type, String property) {
+        public ResultMappedBuilder reduce(Reduce.ReduceType type, String property) {
             Reduce reduce = new Reduce();
             reduce.setType(type);
             reduce.setProperty(property);

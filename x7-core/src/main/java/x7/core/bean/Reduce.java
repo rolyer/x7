@@ -2,13 +2,13 @@ package x7.core.bean;
 
 
 public class Reduce {
-    private Criteria.ReduceType type;
+    private ReduceType type;
     private String property;
 
-    public Criteria.ReduceType getType() {
+    public ReduceType getType() {
         return type;
     }
-    public void setType(Criteria.ReduceType type) {
+    public void setType(ReduceType type) {
         this.type = type;
     }
     public String getProperty() {
@@ -24,5 +24,14 @@ public class Reduce {
                 "type=" + type +
                 ", property='" + property + '\'' +
                 '}';
+    }
+
+    public enum ReduceType {
+
+        SUM,
+        COUNT,
+        MAX,
+        MIN,
+        AVG
     }
 }

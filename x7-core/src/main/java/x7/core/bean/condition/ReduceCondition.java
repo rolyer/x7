@@ -1,26 +1,26 @@
 package x7.core.bean.condition;
 
-import x7.core.bean.Criteria;
 import x7.core.bean.CriteriaBuilder;
 import x7.core.bean.CriteriaCondition;
+import x7.core.bean.Reduce;
 
 import java.util.Objects;
 
 
 public class ReduceCondition {
 
-    private Criteria.ReduceType type;
+    private Reduce.ReduceType type;
     private String reduceProperty;
     private CriteriaCondition condition;
 
     private transient Class clz;
     private transient CriteriaBuilder builder;
 
-    public Criteria.ReduceType getType() {
+    public Reduce.ReduceType getType() {
         return type;
     }
 
-    public void setType(Criteria.ReduceType type) {
+    public void setType(Reduce.ReduceType type) {
         this.type = type;
     }
 
@@ -62,7 +62,7 @@ public class ReduceCondition {
     public ReduceCondition(){
     }
 
-    public ReduceCondition(Criteria.ReduceType type,String reduceProperty){
+    public ReduceCondition(Reduce.ReduceType type,String reduceProperty){
         this.type= type;
         this.reduceProperty = reduceProperty;
         CriteriaBuilder builder = CriteriaBuilder.buildCondition();

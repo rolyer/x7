@@ -487,13 +487,5 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 		}
 	}
 
-	public enum ReduceType {
-
-		SUM,
-		COUNT,
-		MAX,
-		MIN,
-		AVG
-	}
 
 }

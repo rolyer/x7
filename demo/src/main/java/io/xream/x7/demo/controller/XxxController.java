@@ -4,21 +4,14 @@ import io.xream.x7.demo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import x7.core.bean.Criteria;
-import x7.core.bean.CriteriaBuilder;
-import x7.core.bean.DomainObject;
-import x7.core.bean.SpringHelper;
-import x7.core.bean.condition.InCondition;
+import x7.core.bean.*;
 import x7.core.bean.condition.RefreshCondition;
-import x7.core.web.Direction;
 import x7.core.web.Page;
 import x7.core.web.ViewEntity;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -144,7 +137,7 @@ public class XxxController {
 		inList.add("xxxxx");
 
 		CriteriaBuilder.ResultMappedBuilder builder = CriteriaBuilder.buildResultMapped(CatTest.class,ro);
-//		builder.distinct("catTest.id").reduce(Criteria.ReduceType.COUNT,"catTest.id").groupBy("catTest.id");
+//		builder.distinct("catTest.id").reduce(Reduce.ReduceType.COUNT,"catTest.id").groupBy("catTest.id");
 		builder.and().in("catTest.catFriendName", inList);
 		builder.paged().orderIn("catTest.catFriendName",inList);
 
@@ -199,7 +192,7 @@ public class XxxController {
 		inList.add("BL");
 
 		CriteriaBuilder.ResultMappedBuilder builder = CriteriaBuilder.buildResultMapped(Cat.class,ro);
-		builder.distinct("id").reduce(Criteria.ReduceType.COUNT,"dogId").groupBy("id");
+		builder.distinct("id").reduce(Reduce.ReduceType.COUNT,"dogId").groupBy("id");
 		builder.and().in("type", inList);
 		builder.paged().orderIn("type",inList);
 
