@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.xream.x7</groupId>
     <artifactId>x7-demo</artifactId>
-    <version>1.6.4.RELEASE</version>
+    <version>1.6.4-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>x7-demo</name>
     <url>http://xream.io</url>
@@ -15,7 +15,7 @@
         <maven.compiler.compilerVersion>1.8</maven.compiler.compilerVersion>
         <maven.test.skip>true</maven.test.skip>
         <docker.image.prefix>demoPrefix</docker.image.prefix>
-        <x7.version>1.6.4.RELEASE</x7.version>
+        <x7.version>1.6.4-SNAPSHOT</x7.version>
     </properties>
 
     <dependencyManagement>
