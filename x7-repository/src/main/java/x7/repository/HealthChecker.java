@@ -41,6 +41,7 @@ public class HealthChecker {
     protected static void onStarted() {
 
         for (BaseRepository repository : repositoryList) {
+            System.out.println("_________Parsing " + repository.getClz());
             Parser.get(repository.getClz());
         }
 
