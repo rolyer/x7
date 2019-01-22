@@ -45,8 +45,6 @@ public class HealthChecker {
             Parser.get(repository.getClz());
         }
 
-        Parsed parsed = Parser.get(IdGenerator.class);
-
 
         String sql = "CREATE TABLE IF NOT EXISTS `idGenerator` ( "
                 + "`clzName` varchar(120) NOT NULL, "
