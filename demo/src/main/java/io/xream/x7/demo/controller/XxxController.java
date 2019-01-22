@@ -244,28 +244,20 @@ public class XxxController {
 		catIdList.add(2L);
 		catIdList.add(3L);
 
-	    CriteriaBuilder.DomainObjectBuilder builder = CriteriaBuilder.buildDomainObject(Cat.class,Pig.class);
-
+	    CriteriaBuilder.DomainObjectBuilder builder = CriteriaBuilder.buildDomainObject(Cat.class,Mouse.class);
+		//根据ID，查出主对象
 	    builder.and().in("id",catIdList);
-	    builder.domain().known(catIdList).on("catId");
-
+	    //查出多对多关系的对象
+	    builder.domain().relative(CatMouse.class).on("catId").with("mouseId");
+	    //已知主对象，根据主对象查出多对多关系的对象
 //		builder.domain().known(catIdList).relative(CatMouse.class).on("catId").with("mouseId");
-
 	    Criteria.DomainObjectCriteria criteria = builder.get();
 
+	    //多对多关系查询，仅限于同一域下的对象, 必须遵守面向领域的设计
 	    List<DomainObject<Cat,Mouse>> list = this.catRepository.listDomainObject(criteria);
 
-	    for (DomainObject<Cat,Mouse> domainObject : list){
-	    	List<Mouse> mouseList = domainObject.getWithList();
-	    	System.out.println("_______MouseList: " + mouseList);
-		}
-
-	    String str = JsonX.toJson(list);
-
-	    System.out.println(str);
-
-		List<DomainObject> test = JsonX.toList(str,DomainObject.class);
-
+	    String str = JsonX.toJson(list);//测试序列化
+		List<DomainObject> test = JsonX.toList(str,DomainObject.class);//测试反序列化
 	    System.out.println(test);
 
 	    return ViewEntity.ok(list);
