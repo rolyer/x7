@@ -415,7 +415,7 @@ public class DaoImpl implements Dao {
         } catch (Exception e) {
             e.printStackTrace();
             throw new RollbackException(
-                    "Exception occured by class = " + clz.getName() + ", message: " + ExceptionUtil.getMessage(e));
+                    "Exception occured by class = " + clz.getName() + ",column："+ tempEle!=null?(tempEle.property+"|"+tempEle.getMapper()):"" + ", message: " + ExceptionUtil.getMessage(e));
 
         } finally {
             close(pstmt);
@@ -525,7 +525,7 @@ public class DaoImpl implements Dao {
         } catch (Exception e) {
             e.printStackTrace();
             throw new RollbackException(
-                    "Exception occured by class = " + clz.getName() + ", message: " + ExceptionUtil.getMessage(e));
+                    "Exception occured by class = " + clz.getName() + ",column："+ tempEle!=null?(tempEle.property+"|"+tempEle.getMapper()):"" + ", message: " + ExceptionUtil.getMessage(e));
         } finally {
             close(pstmt);
             close(conn);
@@ -572,7 +572,7 @@ public class DaoImpl implements Dao {
         } catch (Exception e) {
             e.printStackTrace();
             throw new RollbackException(
-                    "Exception occured by class = " + clz.getName() + ", message: " + ExceptionUtil.getMessage(e));
+                    "Exception occured by class = " + clz.getName() + ",column："+ tempEle!=null?(tempEle.property+"|"+tempEle.getMapper()):"" +", message: " + ExceptionUtil.getMessage(e));
         } finally {
             close(pstmt);
             close(conn);
@@ -637,7 +637,7 @@ public class DaoImpl implements Dao {
         } catch (Exception e) {
             e.printStackTrace();
             throw new RollbackException(
-                    "Exception occured by class = " + clz.getName() + ", message: " + ExceptionUtil.getMessage(e));
+                    "Exception occured by class = " + clz.getName() + ",column："+ tempEle!=null?(tempEle.property+"|"+tempEle.getMapper()):"" + ", message: " + ExceptionUtil.getMessage(e));
         } finally {
             close(pstmt);
             close(conn);
