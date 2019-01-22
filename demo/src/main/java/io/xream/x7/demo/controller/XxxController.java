@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import x7.core.bean.*;
 import x7.core.bean.condition.RefreshCondition;
+import x7.core.util.JsonX;
 import x7.core.web.Page;
 import x7.core.web.ViewEntity;
 
@@ -254,7 +255,18 @@ public class XxxController {
 
 	    List<DomainObject<Cat,Mouse>> list = this.catRepository.listDomainObject(criteria);
 
-	    System.out.println(list);
+	    for (DomainObject<Cat,Mouse> domainObject : list){
+	    	List<Mouse> mouseList = domainObject.getWithList();
+	    	System.out.println("_______MouseList: " + mouseList);
+		}
+
+	    String str = JsonX.toJson(list);
+
+	    System.out.println(str);
+
+		List<DomainObject> test = JsonX.toList(str,DomainObject.class);
+
+	    System.out.println(test);
 
 	    return ViewEntity.ok(list);
     }

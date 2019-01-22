@@ -16,7 +16,6 @@
  */
 package x7.core.bean;
 
-import x7.core.config.Configs;
 import x7.core.util.BeanUtil;
 import x7.core.util.BeanUtilX;
 import x7.core.util.StringUtil;

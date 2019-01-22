@@ -14,13 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package x7.core.bean;
+package x7.repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public interface DomainBuilder {
-    DomainBuilder known(List<? extends Object> mainIdList);
-    DomainBuilder relative(Class relativeClz);
-    DomainBuilder on(String mainProperty);
-    CriteriaBuilder with(String withProperty);
+public class EntityHolder {
+    private final static List<Class> list = new ArrayList<>();
+
+    public static List<Class> listAll() {
+        return list;
+    }
 }

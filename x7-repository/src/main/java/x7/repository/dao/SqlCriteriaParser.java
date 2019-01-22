@@ -38,12 +38,6 @@ public class SqlCriteriaParser implements CriteriaParser {
     }
 
 
-    private MapMapper getMapMapper(Criteria criteria) {
-        Criteria.ResultMappedCriteria resultMapped = (Criteria.ResultMappedCriteria) criteria;
-        MapMapper mapMapper = resultMapped.getMapMapper();//
-        return mapMapper;
-    }
-
     private void mapping(String script, Criteria criteria, StringBuilder sb) {
         String[] keyArr = script.split(SqlScript.SPACE);//
         int length = keyArr.length;
