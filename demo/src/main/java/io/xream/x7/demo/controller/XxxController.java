@@ -245,7 +245,7 @@ public class XxxController {
 		catIdList.add(3L);
 
 	    CriteriaBuilder.DomainObjectBuilder builder = CriteriaBuilder.buildDomainObject(Cat.class,Mouse.class);
-		//根据ID，查出主对象
+		//根据各种条件，例如ID，查出主对象
 	    builder.and().in("id",catIdList);
 	    //查出多对多关系的对象
 	    builder.domain().relative(CatMouse.class).on("catId").with("mouseId");
