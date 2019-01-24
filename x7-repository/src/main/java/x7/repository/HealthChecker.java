@@ -70,13 +70,11 @@ public class HealthChecker {
                 String createSql = MapperFactory.tryToCreate(clz);
                 String test = MapperFactory.getSql(clz, Mapper.CREATE);
                 if (StringUtil.isNullOrEmpty(test)) {
-                    System.out.println("FAILED TO START X7-REPOSITORY, check Bean: " + clz);
+                    logger.info("FAILED TO START X7-REPOSITORY, check Bean: " + clz);
                     System.exit(1);
                 }
 
                 if (DbType.value.equals(DbType.MYSQL)) {
-                    System.out.println("________ table check: " + clz.getName());
-                    System.out.println("________ SQL   check: " + createSql);
                     SqlRepository.getInstance().execute(clz.newInstance(), createSql);
                 }
 

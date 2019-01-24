@@ -26,6 +26,7 @@ import x7.core.util.*;
 import x7.core.web.Direction;
 import x7.core.web.Page;
 import x7.repository.CriteriaParser;
+import x7.core.config.ConfigAdapter;
 import x7.repository.util.ResultSetUtil;
 import x7.repository.exception.PersistenceException;
 import x7.repository.exception.RollbackException;
@@ -309,7 +310,8 @@ public class DaoImpl implements Dao {
 
         String sql = SqlUtil.concatRefresh(sb, parsed, refreshMap);
 
-        System.out.println("refresh normally: " + sql);
+        if (ConfigAdapter.isIsShowSql())
+            System.out.println("refresh normally: " + sql);
 
         if (sql.contains("SET  WHERE"))
             return false;
@@ -392,6 +394,9 @@ public class DaoImpl implements Dao {
         String sql = MapperFactory.getSql(clz, Mapper.QUERY);
         List<BeanElement> eles = MapperFactory.getElementList(clz);
 
+        if (ConfigAdapter.isIsShowSql())
+            System.out.println(sql);
+
         PreparedStatement pstmt = null;
         BeanElement tempEle = null;
         try {
@@ -442,6 +447,9 @@ public class DaoImpl implements Dao {
 
         sql = BeanUtilX.mapper(sql, parsed);//FIXME 解析之后, 替换,拼接
         sql = BeanUtilX.mapperForManu(sql, parsed);//FIXME 解析之后, 替换,拼接
+
+        if (ConfigAdapter.isIsShowSql())
+            System.out.println(sql);
 
         List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 
@@ -544,6 +552,9 @@ public class DaoImpl implements Dao {
 
         Map<String, Object> queryMap = BeanUtilX.getQueryMap(parsed, conditionObj);
         sql = SqlUtil.concat(parsed, sql, queryMap);
+
+        if (ConfigAdapter.isIsShowSql())
+            System.out.println(sql);
 
         List<T> list = new ArrayList<T>();
 
@@ -774,7 +785,8 @@ public class DaoImpl implements Dao {
 
         sql = BeanUtilX.mapper(sql, parsed);
 
-        System.out.println(sql);
+        if (ConfigAdapter.isIsShowSql())
+            System.out.println(sql);
 
         Object result = null;
 
@@ -867,6 +879,9 @@ public class DaoImpl implements Dao {
 
         sql += sb.toString();
 
+        if (ConfigAdapter.isIsShowSql())
+            System.out.println(sql);
+
         List<Object> list = new ArrayList<Object>();
 
         Connection conn = null;
@@ -923,6 +938,10 @@ public class DaoImpl implements Dao {
         sql = sql.replace(" drop ", SqlScript.SPACE).replace(" delete ", SqlScript.SPACE).replace(" insert ", SqlScript.SPACE).replace(";", SqlScript.SPACE); // 手动拼接SQL,
         // 必须考虑应用代码的漏洞
         sql = BeanUtilX.mapper(sql, parsed);
+
+        if (ConfigAdapter.isIsShowSql())
+            System.out.println(sql);
+
         boolean b = false;
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -959,7 +978,8 @@ public class DaoImpl implements Dao {
         sb.append(SqlScript.UPDATE).append(SqlScript.SPACE).append(tableName).append(SqlScript.SPACE);
         String sql = SqlUtil.concatRefresh(sb, parsed, refreshMap, refreshCondition, this.criteriaParser);
 
-        System.out.println("________SQL: refreshByCondition: " + sql);
+        if (ConfigAdapter.isIsShowSql())
+            System.out.println("________refreshByCondition: " + sql);
 
         if (sql.contains("SET  WHERE"))
             return false;
@@ -1070,8 +1090,8 @@ public class DaoImpl implements Dao {
         sb.append(SqlScript.RIGHT_PARENTTHESIS);
 
         sql = sb.toString();
-
-        System.out.println(sql);
+        if (ConfigAdapter.isIsShowSql())
+            System.out.println(sql);
 
         List<T> list = new ArrayList<T>();// return list
 
@@ -1128,8 +1148,8 @@ public class DaoImpl implements Dao {
         int start = (page - 1) * rows;
 
         sql = dialect.match(sql, start, rows);
-
-        System.out.println(sql);
+        if (ConfigAdapter.isIsShowSql())
+            System.out.println(sql);
 
         Page<Map<String, Object>> pagination = new Page<Map<String, Object>>();
         pagination.setClz(Map.class);
@@ -1225,8 +1245,8 @@ public class DaoImpl implements Dao {
 
 
         sql = dialect.match(sql, start, rows);
-
-        System.out.println(sql);
+        if (ConfigAdapter.isIsShowSql())
+            System.out.println(sql);
 
         Connection conn = null;
         PreparedStatement pstmt = null;

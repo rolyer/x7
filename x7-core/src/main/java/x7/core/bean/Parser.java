@@ -164,8 +164,6 @@ public class Parser {
 
 		put(clz, parsed);
 
-		System.out.println(elementList.toString());
-
 		/*
 		 * parse search
 		 */

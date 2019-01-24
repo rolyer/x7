@@ -19,6 +19,7 @@ package x7.repository.mapper;
 import x7.core.bean.BeanElement;
 import x7.core.bean.Parsed;
 import x7.core.bean.Parser;
+import x7.core.config.ConfigAdapter;
 import x7.core.repository.Mapped;
 import x7.core.repository.X;
 import x7.core.util.BeanUtil;
@@ -147,7 +148,8 @@ public class MapperFactory implements Mapper {
 
 			sqlsMap.get(clz).put(REFRESH, sql);
 
-			System.out.println(sql);
+			if (ConfigAdapter.isIsShowSql())
+				System.out.println(sql);
 
 			return sql;
 
@@ -169,7 +171,8 @@ public class MapperFactory implements Mapper {
 
 			sqlsMap.get(clz).put(REMOVE, sql);
 
-			System.out.println(sql);
+			if (ConfigAdapter.isIsShowSql())
+				System.out.println(sql);
 
 			return sql;
 
@@ -200,7 +203,8 @@ public class MapperFactory implements Mapper {
 
 			sqlsMap.get(clz).put(QUERY, sql);
 
-			System.out.println(sql);
+			if (ConfigAdapter.isIsShowSql())
+				System.out.println(sql);
 
 			return sql;
 
@@ -219,7 +223,8 @@ public class MapperFactory implements Mapper {
 
 			sqlsMap.get(clz).put(LOAD, sql);
 
-			System.out.println(sql);
+			if (ConfigAdapter.isIsShowSql())
+				System.out.println(sql);
 
 			return sql;
 
@@ -269,7 +274,8 @@ public class MapperFactory implements Mapper {
 			sql = BeanUtilX.mapper(sql, parsed);
 			sqlsMap.get(clz).put(CREATE, sql);
 
-			System.out.println(sql);
+			if (ConfigAdapter.isIsShowSql())
+				System.out.println(sql);
 
 			return sql;
 
@@ -302,7 +308,6 @@ public class MapperFactory implements Mapper {
 			BeanElement be = map.get(keyOne);
 			String sqlType = Mapper.getSqlTypeRegX(be);
 
-			System.out.println("p = " + be.property + " sqlType = " + sqlType);
 			if (sqlType.equals(Dialect.INT)) {
 				sb.append(Dialect.INT + " NOT NULL");
 			} else if (sqlType.equals(Dialect.LONG)) {
@@ -357,7 +362,9 @@ public class MapperFactory implements Mapper {
 			sql = Dialect.match(sql, CREATE_TABLE);
 
 			sql = BeanUtilX.mapper(sql, parsed);
-			System.out.println(sql);
+
+			if (ConfigAdapter.isIsShowSql())
+				System.out.println(sql);
 
 			sqlsMap.get(clz).put(CREATE_TABLE, sql);
 
@@ -376,7 +383,8 @@ public class MapperFactory implements Mapper {
 			sql = BeanUtilX.mapper(sql, parsed);
 			sqlsMap.get(clz).put(TAG, sql);
 
-			System.out.println(sql);
+			if (ConfigAdapter.isIsShowSql())
+				System.out.println(sql);
 
 			return sql;
 

@@ -29,6 +29,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import x7.core.bean.Parser;
 import x7.core.bean.SpringHelper;
+import x7.core.config.ConfigAdapter;
 import x7.core.config.Configs;
 import x7.repository.RepositoryBooter;
 import x7.repository.RepositoryProperties;
@@ -150,6 +151,15 @@ public class RepositoryStarter  {
 
 		if (Objects.isNull(dsW))
 			throw new RuntimeException("Writeable DataSource Got NULL");
+
+		if (Configs.isTrue("x7.repository.show-sql")
+				|| Configs.isTrue("x7.repository.showSql")
+				|| Configs.isTrue("spring.jpa.show-sql")
+				|| "debug".equals(Configs.getString("log4j.logger.org.springframework.jdbc.core.JdbcTemplate"))) {
+			ConfigAdapter.setIsShowSql(true);
+		}else{
+			System.out.println("_________X7 Repsository will not show SQL, for no config like one of: x7.repository.show-sql=true,spring.jpa.show-sql=true,log4j.logger.org....." );
+		}
 
 		String driverClassName = Configs.getString("spring.datasource.driver-class-name");
 

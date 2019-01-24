@@ -140,8 +140,6 @@ public class SqlCriteriaParser implements CriteriaParser {
         sqlSb.append(SqlScript.SELECT).append(SqlScript.SPACE).append(criteria.resultAllScript()).append(SqlScript.SPACE).append(sb);
         sqlArr[1] = sqlSb.toString();
 
-        System.out.println(sqlArr[1]);
-
         return sqlArr;
     }
 

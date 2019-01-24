@@ -312,10 +312,8 @@ public class DomainObjectRepositoy {
              * step 2  if relativeClass
              */
             Parsed withParsed = Parser.get(domainObjectCriteria.getWithClz());
-//                Parsed relativeParsed = Parser.get(domainObjectCriteria.getRelativeClz());
 
             List withList = null;
-
 
             InCondition withInCondition = new InCondition(domainObjectCriteria.getMainPropperty(), mainInList);
             withInCondition.setClz(domainObjectCriteria.getWithClz());

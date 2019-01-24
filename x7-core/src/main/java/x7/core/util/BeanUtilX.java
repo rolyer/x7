@@ -19,6 +19,7 @@ package x7.core.util;
 import x7.core.bean.BeanElement;
 import x7.core.bean.DataPermission;
 import x7.core.bean.Parsed;
+import x7.core.config.ConfigAdapter;
 import x7.core.repository.SqlFieldType;
 import x7.core.repository.X;
 import x7.core.search.Search;
@@ -478,7 +479,8 @@ public class BeanUtilX extends BeanUtil {
 			e.printStackTrace();
 		}
 
-		System.out.println("_queryMap: " + map);
+		if (ConfigAdapter.isIsShowSql())
+			System.out.println("_queryMap: " + map);
 
 		return map;
 

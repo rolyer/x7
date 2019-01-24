@@ -45,7 +45,6 @@ public class Cat implements Serializable, IdView {
 	}
 
 	public void setType(String type) {
-		System.out.println("JSON->OBJ,SETTER");
 		this.type = type;
 	}
 
