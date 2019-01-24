@@ -16,7 +16,8 @@
  */
 package x7.repository.redis;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import x7.core.repository.CacheException;
 import x7.core.repository.CacheResolver;
 import x7.core.util.JsonX;
@@ -39,7 +40,7 @@ import java.util.Set;
  */
 public class LevelTwoCacheResolver implements CacheResolver {
 
-	private final static Logger logger = Logger.getLogger(LevelTwoCacheResolver.class);
+	private final static Logger logger = LoggerFactory.getLogger(LevelTwoCacheResolver.class);
 	public final static String NANO_SECOND = ".N_S";
 	
 	private static LevelTwoCacheResolver instance = null;
@@ -54,7 +55,7 @@ public class LevelTwoCacheResolver implements CacheResolver {
 	public void setValidSecond(int validSecond){
 		this.validSecond = validSecond;
 		System.out.println("\n");
-		logger.info("L2 Cache started, cache time = " + validSecond + "s");
+		logger.info("L2 Cache try to starting.... cache time = " + validSecond + "s");
 		System.out.println("\n");
 	}
 	private int getValidSecondAdjusted(){

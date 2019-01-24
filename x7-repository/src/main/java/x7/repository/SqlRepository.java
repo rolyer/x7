@@ -16,7 +16,9 @@
  */
 package x7.repository;
 
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import x7.core.bean.*;
 import x7.core.bean.condition.InCondition;
 import x7.core.bean.condition.ReduceCondition;
@@ -41,7 +43,7 @@ import java.util.*;
  */
 public class SqlRepository implements Repository {
 
-	private final static Logger logger = Logger.getLogger(SqlRepository.class);
+	private final static Logger logger = LoggerFactory.getLogger(SqlRepository.class);
 	private static SqlRepository instance;
 
 	public static SqlRepository getInstance() {

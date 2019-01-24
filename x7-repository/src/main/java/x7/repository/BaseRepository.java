@@ -16,7 +16,8 @@
  */
 package x7.repository;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import x7.core.async.CasualWorker;
 import x7.core.async.IAsyncTask;
 import x7.core.bean.*;
@@ -24,20 +25,20 @@ import x7.core.bean.condition.InCondition;
 import x7.core.bean.condition.ReduceCondition;
 import x7.core.bean.condition.RefreshCondition;
 import x7.core.repository.X;
-import x7.core.util.ExceptionUtil;
 import x7.core.util.StringUtil;
 import x7.core.web.Direction;
 import x7.core.web.Page;
 import x7.repository.api.X7Repository;
 import x7.repository.exception.PersistenceException;
-import x7.repository.mapper.Mapper;
-import x7.repository.mapper.MapperFactory;
 import x7.repository.redis.JedisConnector_Persistence;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * Biz Repository extends BaseRepository
@@ -47,7 +48,7 @@ import java.util.*;
  */
 public abstract class BaseRepository<T> implements X7Repository<T> {
 
-    private final static Logger logger = Logger.getLogger(BaseRepository.class);
+    private final static Logger logger = LoggerFactory.getLogger(BaseRepository.class);
 
     public final static String ID_MAP_KEY = "ID_MAP_KEY";
 

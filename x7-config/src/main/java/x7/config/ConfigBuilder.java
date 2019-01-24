@@ -16,9 +16,13 @@
  */
 package x7.config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import x7.core.config.Configs;
 
 public class ConfigBuilder {
+
+	private final static Logger logger = LoggerFactory.getLogger(ConfigBuilder.class);
 
 	private static ConfigBuilder instance;
 	
@@ -31,17 +35,27 @@ public class ConfigBuilder {
 	
 	private static void init(String[] ativeProfiles) {
 
+		if (ativeProfiles == null || ativeProfiles.length==0){
+
+		}else {
+			for (String str : ativeProfiles){
+
+			}
+		}
+
 		if (ativeProfiles == null || ativeProfiles.length == 0){
 			Configs.Inner.isDev = true;
+			logger.info("Load configs of activeProfile: default");
 		}else {
 			for (String active : ativeProfiles) {
+				logger.info("Load configs of activeProfile: "+active);
 				if (active.equals("default") || active.equals("dev")) {
 					Configs.Inner.isDev = true;
 				}
 			}
 		}
 
-		System.out.println("_________Env: isDev = " + Configs.Inner.isDev + ", [L2Cache will disenable]");
+		logger.info("Env: isDev = " + Configs.Inner.isDev + ", [L2Cache will disenable]");
 
 		TextParser.getInstance().load(ativeProfiles);
 

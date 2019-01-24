@@ -30,14 +30,6 @@ public class X7ConfigStarter {
 
 		String[] ativeProfiles = environment.getActiveProfiles();
 
-		if (ativeProfiles == null || ativeProfiles.length==0){
-			System.out.println("_________Load configs of activeProfile: default");
-		}else {
-			for (String str : ativeProfiles){
-				System.out.println("_________Load configs of activeProfile: "+str);
-			}
-		}
-
 		ConfigBuilder.build(ativeProfiles);
 	}
 }

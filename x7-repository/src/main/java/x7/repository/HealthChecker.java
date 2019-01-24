@@ -16,7 +16,8 @@
  */
 package x7.repository;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import x7.core.bean.Parsed;
 import x7.core.bean.Parser;
 import x7.core.repository.X;
@@ -30,7 +31,7 @@ import java.util.List;
 
 public class HealthChecker {
 
-    private final static Logger logger = Logger.getLogger(HealthChecker.class);
+    private final static Logger logger = LoggerFactory.getLogger(HealthChecker.class);
 
     private static List<BaseRepository> repositoryList = new ArrayList<BaseRepository>();
 
@@ -41,7 +42,7 @@ public class HealthChecker {
     protected static void onStarted() {
 
         for (BaseRepository repository : repositoryList) {
-            System.out.println("_________Parsing " + repository.getClz());
+            logger.info("Parsing " + repository.getClz());
             Parser.get(repository.getClz());
         }
 
@@ -88,7 +89,7 @@ public class HealthChecker {
                 generator.setClzName(name);
                 List<IdGenerator> list = SqlRepository.getInstance().list(generator);
                 if (list.isEmpty()) {
-                    System.out.println("________ id init: " + generator.getClzName());
+                    logger.info("id init: " + generator.getClzName());
                     generator.setMaxId(0);
                     SqlRepository.getInstance().create(generator);
                 }

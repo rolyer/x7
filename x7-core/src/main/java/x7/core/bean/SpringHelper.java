@@ -17,13 +17,15 @@
 package x7.core.bean;
 
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import x7.core.util.ExceptionUtil;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -31,7 +33,7 @@ import java.util.Map;
 
 public class SpringHelper implements ApplicationContextAware {
 
-	private static Logger logger = Logger.getLogger(SpringHelper.class);
+	private static Logger logger = LoggerFactory.getLogger(SpringHelper.class);
 
 	private static ApplicationContext applicationContext;
 
@@ -42,6 +44,7 @@ public class SpringHelper implements ApplicationContextAware {
 		applicationContext = arg0;
 		getMapPaths();
 
+		System.out.println("\n");
 		logger.info("SpringHelper started, static methods[getContext,getObject,getRequestMapping] ");
 	}
 
@@ -52,7 +55,7 @@ public class SpringHelper implements ApplicationContextAware {
 		try {
 			object = applicationContext.getBean(beanName);
 		} catch (Exception e) {
-//			logger.error(e);
+			System.out.println("_________" + ExceptionUtil.getMessage(e));
 		}
 		return object;
 	}
@@ -67,7 +70,7 @@ public class SpringHelper implements ApplicationContextAware {
 		try {
 			return applicationContext.getBean(clazz);
 		} catch (Exception e) {
-			logger.error(e);
+			logger.error(ExceptionUtil.getMessage(e));
 		}
 		return null;
 	}
