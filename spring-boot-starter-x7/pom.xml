@@ -7,7 +7,7 @@
 
 	<name>spring-boot-starter-x7</name>
 	<description>http://x7.xream.io</description>
-	<url>http://xream.io</url>
+	<url>http:/x7.xream.io</url>
 
 	<parent>
 		<groupId>io.xream.x7</groupId>
