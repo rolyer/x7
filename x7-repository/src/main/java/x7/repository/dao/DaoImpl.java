@@ -435,7 +435,6 @@ public class DaoImpl implements Dao {
     @Override
     public <T> T get(Class<T> clz, long idOne) {
         Connection conn = RcDataSourceUtil.getConnection();
-
         return get(clz, idOne, conn);
     }
 
@@ -500,7 +499,6 @@ public class DaoImpl implements Dao {
 
     public List<Map<String, Object>> list(Class clz, String sql, List<Object> conditionList) {
         Connection conn = RcDataSourceUtil.getConnection();
-
         return list(clz, sql, conditionList, conn);
     }
 
@@ -595,7 +593,6 @@ public class DaoImpl implements Dao {
     @Override
     public <T> List<T> list(Object conditionObj) {
         Connection conn = RcDataSourceUtil.getConnection();
-
         return list(conditionObj, conn);
     }
 
