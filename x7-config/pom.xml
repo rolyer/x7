@@ -5,13 +5,14 @@
 	<parent>
 		<groupId>io.xream.x7</groupId>
 		<artifactId>x7-parent</artifactId>
-		<version>1.6.6.RELEASE</version>
+		<version>1.6.7-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>x7-config</artifactId>
 	<packaging>jar</packaging>
 
 	<name>x7-config</name>
+	<description>http://x7.xream.io</description>
 	<url>http://x7.xream.io</url>
 
 	<dependencies>
@@ -19,7 +20,7 @@
 		<dependency>
 			<groupId>io.xream.x7</groupId>
 			<artifactId>x7-core</artifactId>
-			<version>1.6.6.RELEASE</version>
+			<version>1.6.7-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
 
