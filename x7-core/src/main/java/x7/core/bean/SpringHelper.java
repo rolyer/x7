@@ -16,6 +16,7 @@
  */
 package x7.core.bean;
 
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
