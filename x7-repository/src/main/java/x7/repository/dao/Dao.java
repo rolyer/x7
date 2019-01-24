@@ -61,7 +61,8 @@ public interface Dao {
 			List<Object> conditionList);
 
 	<T> List<T> list(Class<T> clz);
-	
+
+	<T> T getOne(T conditionObj);
 	<T> T getOne(T conditionObj, String orderBy, Direction sc);
 	
 	<T> List<T> in(InCondition inCondition);

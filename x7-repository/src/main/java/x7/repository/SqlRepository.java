@@ -260,7 +260,6 @@ public class SqlRepository implements Repository {
 
 		if (obj == null) {
 			obj = syncDao.get(clz, idOne);
-
 			cacheResolver.set(clz, key, obj);
 		}
 
@@ -318,29 +317,17 @@ public class SqlRepository implements Repository {
 		Parsed parsed = Parser.get(clz);
 
 		if (isNoCache() || parsed.isNoCache()) {
-			List<T> list = syncDao.list(conditionObj);
-				if (list.isEmpty())
-					return null;
-				return list.get(0);
-
+			T t = syncDao.getOne(conditionObj);
+			return t;
 		}
 
 		String condition = JsonX.toJson(conditionObj);
 		T obj = cacheResolver.get(clz, condition);
 
 		if (obj == null) {
-			T t = null;
-			List<T> list = syncDao.list(conditionObj);
-				if (list.isEmpty()) {
-					t = null;
-				} else {
-					t = list.get(0);
-				}
-
-
+			obj = syncDao.getOne(conditionObj);
 			cacheResolver.set(clz, condition, obj);
-
-			return t;
+			return obj;
 		}
 
 		return obj;

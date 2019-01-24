@@ -1302,6 +1302,12 @@ public class DaoImpl implements Dao {
         return list;
     }
 
+    @Override
+    public <T> T getOne(T conditionObj) {
+        Connection conn = RcDataSourceUtil.getConnection();
+        return getOne(conditionObj ,conn);
+    }
+
     private <T> void initObj(T obj, ResultSet rs, BeanElement tempEle, List<BeanElement> eles)
             throws IllegalArgumentException, SecurityException, SQLException, IOException, IllegalAccessException, InvocationTargetException {
 
@@ -1317,23 +1323,4 @@ public class DaoImpl implements Dao {
         return list.get(0);
     }
 
-    public class Monitor {
-
-        public List<x7.repository.monitor.mysql.Process> showProcessList(boolean isRead) {
-            String sql = "SHOW PROCESSLIST";
-
-            List<Map<String, Object>> mapList = DaoImpl.getInstance().list(x7.repository.monitor.mysql.Process.class,
-                    sql, null);
-
-            List<x7.repository.monitor.mysql.Process> objList = new ArrayList<x7.repository.monitor.mysql.Process>();
-
-            for (Map<String, Object> map : mapList) {
-                x7.repository.monitor.mysql.Process process = BeanMapUtil
-                        .toObject(x7.repository.monitor.mysql.Process.class, map);
-                objList.add(process);
-            }
-
-            return objList;
-        }
-    }
 }
