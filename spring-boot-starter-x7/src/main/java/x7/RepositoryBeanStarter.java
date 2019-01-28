@@ -23,6 +23,7 @@ import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.stereotype.Repository;
 import x7.core.util.ClassFileReader;
+import x7.repository.BaseRepository;
 import x7.repository.inner.impl.RepositoryProxy;
 
 import java.lang.annotation.Annotation;
@@ -51,10 +52,11 @@ public class RepositoryBeanStarter implements ImportBeanDefinitionRegistrar {
             if (annotation == null)
                 continue;
 
-            if (!clz.isInterface())
+            Type[] types = clz.getGenericInterfaces();
+
+            if (! (types[0].getTypeName().startsWith(BaseRepository.class.getName())))
                 continue;
 
-            Type[] types = clz.getGenericInterfaces();
             ParameterizedType parameterized = (ParameterizedType) types[0];
             Class clazz = (Class) parameterized.getActualTypeArguments()[0];
 
