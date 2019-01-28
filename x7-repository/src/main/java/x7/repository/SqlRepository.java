@@ -467,7 +467,6 @@ public class SqlRepository implements Repository {
 
 		if (isNoCache() || parsed.isNoCache()) {
 			return syncDao.list(clz);
-
 		}
 
 		List<T> list = null;

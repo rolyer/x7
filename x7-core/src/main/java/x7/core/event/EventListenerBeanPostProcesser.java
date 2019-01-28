@@ -16,7 +16,9 @@
  */
 package x7.core.event;
 
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -32,7 +34,7 @@ import java.lang.reflect.Method;
  */
 public class EventListenerBeanPostProcesser implements BeanPostProcessor {
 
-    private static Logger logger = Logger.getLogger(EventListenerBeanPostProcesser.class);
+    private static Logger logger = LoggerFactory.getLogger(EventListenerBeanPostProcesser.class);
 
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {

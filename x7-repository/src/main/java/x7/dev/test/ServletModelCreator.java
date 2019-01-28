@@ -16,7 +16,9 @@
  */
 package x7.dev.test;
 
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import x7.core.util.JsonX;
 import x7.core.util.StringUtil;
 
@@ -26,7 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ServletModelCreator {
-	private static Logger logger = Logger.getLogger(ServletModelCreator.class.getName());
+	private static Logger logger = LoggerFactory.getLogger(ServletModelCreator.class.getName());
 
 
 	public static Map<String, String> createMap(HttpServletRequest request) {

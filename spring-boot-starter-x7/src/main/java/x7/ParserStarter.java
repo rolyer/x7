@@ -17,11 +17,15 @@
 package x7;
 
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.type.AnnotationMetadata;
+import org.springframework.stereotype.Repository;
 import x7.core.bean.Parser;
 
 import java.util.Map;
+
 
 public class ParserStarter implements ImportBeanDefinitionRegistrar {
 

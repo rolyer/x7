@@ -16,7 +16,8 @@
  */
 package x7.core.mq;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.event.EventListener;
@@ -32,7 +33,7 @@ import java.util.List;
 
 public class MessageEventBeanPostProcesser implements BeanPostProcessor {
 
-    private static Logger logger = Logger.getLogger(MessageEventBeanPostProcesser.class);
+    private static Logger logger = LoggerFactory.getLogger(MessageEventBeanPostProcesser.class);
 
     private static List<KV> subscribeList = new ArrayList<KV>();
 

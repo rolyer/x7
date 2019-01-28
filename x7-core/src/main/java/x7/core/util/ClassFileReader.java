@@ -57,7 +57,6 @@ public class ClassFileReader {
 				String protocol = url.getProtocol();
 
 				if ("file".equals(protocol)) {
-					System.err.println("file类型的扫描");
 
 					String filePath = URLDecoder.decode(url.getFile(), "UTF-8");
 

@@ -1,4 +1,4 @@
-package io.xream.x7.demo;
+package io.xream.x7.demo.bean;
 
 import java.sql.Timestamp;
 

@@ -1,6 +1,12 @@
 package io.xream.x7.demo.controller;
 
-import io.xream.x7.demo.*;
+import io.xream.x7.demo.CatRO;
+import io.xream.x7.demo.CatRepository;
+import io.xream.x7.demo.CatTestRepository;
+import io.xream.x7.demo.bean.Cat;
+import io.xream.x7.demo.bean.CatMouse;
+import io.xream.x7.demo.bean.CatTest;
+import io.xream.x7.demo.bean.Mouse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -28,6 +34,8 @@ public class XxxController {
 
 	@Autowired
 	private CatRepository catRepository;// sample
+
+
 
 //	@Resource(name = "redisTemplate")
 //	private RedisTemplate template;
@@ -67,18 +75,6 @@ public class XxxController {
 	public ViewEntity refreshByCondition(@RequestBody Cat cat){
 
 
-		StringRedisTemplate stringRedisTemplate = (StringRedisTemplate) SpringHelper.getObject("stringRedisTemplate");
-//		stringRedisTemplate.opsForValue().set("xxx.test","ddddd");
-//		String test = stringRedisTemplate.opsForValue().get("xxx.test");
-
-//		System.out.println("_________: " + test);
-
-		RedisTemplate template = (RedisTemplate) SpringHelper.getObject("redisTemplate");
-		template.opsForValue().set("xxx.test".getBytes(),"ddddddddd".getBytes());
-		Object obytes = template.opsForValue().get("xxx.test".getBytes());
-		byte[] bytes = (byte[]) obytes;
-
-		System.out.println("__________: " + new String(bytes) );
 
 //		System.out.println("______: "  + test);
 //		CriteriaBuilder builder = CriteriaBuilder.buildCondition();
@@ -91,10 +87,10 @@ public class XxxController {
 
 		RefreshCondition<Cat> refreshCondition = new RefreshCondition<Cat>(null);
 		refreshCondition.and().eq("type","NL");
-		refreshCondition.refresh("test=test+1002");
-
-
-		this.catRepository.refresh(cat);
+		//refreshCondition.refresh("test=test+1");//表达式更新
+		refreshCondition.refresh("test",3333).refresh("type","XL");//赋值更新
+		this.catRepository.refresh(refreshCondition);//必须带ID更新，没ID报错
+		this.catRepository.refreshUnSafe(refreshCondition);//可以多条更新
 
 //		if (true){
 //			throw new RuntimeException("xxxxxxxxxxxxxxxxxxxx");
@@ -138,24 +134,13 @@ public class XxxController {
 		inList.add("xxxxx");
 
 		CriteriaBuilder.ResultMappedBuilder builder = CriteriaBuilder.buildResultMapped(CatTest.class,ro);
-//		builder.distinct("catTest.id").reduce(Reduce.ReduceType.COUNT,"catTest.id").groupBy("catTest.id");
+		//builder.distinct("catTest.id").reduce(Reduce.ReduceType.COUNT,"catTest.id").groupBy("catTest.id");
 		builder.and().in("catTest.catFriendName", inList);
-		builder.paged().orderIn("catTest.catFriendName",inList);
-
-
-//		builder.or().beginSub().eq("dogTest.userName","yyy")
-//				.or().like("dogTest.userName",null)
-//				.or().likeRight("dogTest.userName", "xxx")
-//				.endSub();
-//		builder.or().beginSub().eq("dogTest.userName", "uuu").endSub();
-		
-
+		builder.paged().orderIn("catTest.catFriendName",inList);//按IN查询条件排序，有值，就过滤掉orderBy
 		String sourceScript = "catTest LEFT JOIN dogTest on catTest.dogId = dogTest.id";
-
 		Criteria.ResultMappedCriteria resultMapped = builder.get();
 		resultMapped.setSourceScript(sourceScript);
-
-		Page<Map<String,Object>> pagination = repository.find(resultMapped);
+		Page<Map<String,Object>> page = repository.find(resultMapped);
 
 //		Cat cat = this.catRepository.get(110);
 //
@@ -169,7 +154,7 @@ public class XxxController {
 
 //		System.out.println("____catList: " + catList);
 
-		return ViewEntity.ok(pagination);
+		return ViewEntity.ok(page);
 
 	}
 
@@ -244,7 +229,7 @@ public class XxxController {
 		catIdList.add(2L);
 		catIdList.add(3L);
 
-	    CriteriaBuilder.DomainObjectBuilder builder = CriteriaBuilder.buildDomainObject(Cat.class,Mouse.class);
+	    CriteriaBuilder.DomainObjectBuilder builder = CriteriaBuilder.buildDomainObject(Cat.class, Mouse.class);
 		//根据各种条件，例如ID，查出主对象
 	    builder.and().in("id",catIdList);
 	    //查出多对多关系的对象

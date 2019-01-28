@@ -35,11 +35,11 @@ public class HealthChecker {
 
     private static List<BaseRepository> repositoryList = new ArrayList<BaseRepository>();
 
-    protected static List<BaseRepository> getRepositoryList(){
+    public static List<BaseRepository> getRepositoryList(){
         return repositoryList;
     }
 
-    protected static void onStarted() {
+    public static void onStarted() {
 
         for (BaseRepository repository : repositoryList) {
             logger.info("Parsing " + repository.getClz());
@@ -75,7 +75,7 @@ public class HealthChecker {
                 }
 
                 if (DbType.value.equals(DbType.MYSQL)) {
-                    SqlRepository.getInstance().execute(clz.newInstance(), createSql);
+                    ManuRepository.execute(clz.newInstance(), createSql);
                 }
 
                 Parsed clzParsed = Parser.get(clz);

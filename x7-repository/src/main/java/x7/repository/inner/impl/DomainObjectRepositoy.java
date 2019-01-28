@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package x7.repository;
+package x7.repository.inner.impl;
 
 import x7.core.bean.*;
 import x7.core.bean.condition.InCondition;
@@ -49,7 +49,7 @@ public class DomainObjectRepositoy {
 
             InCondition relativeInCondition = new InCondition(domainObjectCriteria.getMainPropperty(), mainInList);
             relativeInCondition.setClz(domainObjectCriteria.getRelativeClz());
-            relativeList = BaseRepository.in0(relativeInCondition);
+            relativeList = ProxyRepository.in0(relativeInCondition);
 
             BeanElement relativeWithBe = relativeParsed.getElement(domainObjectCriteria.getWithProperty());
 
@@ -63,7 +63,7 @@ public class DomainObjectRepositoy {
 
             InCondition withInCondition = new InCondition(key, withInList);
             withInCondition.setClz(domainObjectCriteria.getWithClz());
-            withList = BaseRepository.in0(withInCondition);
+            withList = ProxyRepository.in0(withInCondition);
 
 
             List<DomainObject<T, WITH>> list = new ArrayList<>();
@@ -133,7 +133,7 @@ public class DomainObjectRepositoy {
 
             InCondition withInCondition = new InCondition(domainObjectCriteria.getMainPropperty(), mainInList);
             withInCondition.setClz(domainObjectCriteria.getWithClz());
-            List withList = BaseRepository.in0(withInCondition);
+            List withList = ProxyRepository.in0(withInCondition);
 
             List<DomainObject<T, WITH>> list = new ArrayList<>();
 
@@ -184,7 +184,7 @@ public class DomainObjectRepositoy {
             List<T> mainList = null;
             if (mainInList == null || mainInList.isEmpty()) {
 
-                mainList = BaseRepository.list0((Criteria) domainObjectCriteria);
+                mainList = ProxyRepository.list0((Criteria) domainObjectCriteria);
 
                 Parsed mainParsed = Parser.get(domainObjectCriteria.getClz());
                 Field mainField = mainParsed.getKeyField(X.KEY_ONE);
@@ -209,7 +209,7 @@ public class DomainObjectRepositoy {
 
             InCondition relativeInCondition = new InCondition(domainObjectCriteria.getMainPropperty(), mainInList);
             relativeInCondition.setClz(domainObjectCriteria.getRelativeClz());
-            relativeList = BaseRepository.in0(relativeInCondition);
+            relativeList = ProxyRepository.in0(relativeInCondition);
 
             BeanElement relativeWithBe = relativeParsed.getElement(domainObjectCriteria.getWithProperty());
 
@@ -223,7 +223,7 @@ public class DomainObjectRepositoy {
 
             InCondition withInCondition = new InCondition(key, withInList);
             withInCondition.setClz(domainObjectCriteria.getWithClz());
-            withList = BaseRepository.in0(withInCondition);
+            withList = ProxyRepository.in0(withInCondition);
 
             List<DomainObject<T, WITH>> list = new ArrayList<>();
 
@@ -298,7 +298,7 @@ public class DomainObjectRepositoy {
 
             if (mainInList == null || mainInList.isEmpty()) {
 
-                mainList = BaseRepository.list0((Criteria) domainObjectCriteria);
+                mainList = ProxyRepository.list0((Criteria) domainObjectCriteria);
 
 
                 for (Object t : mainList) {
@@ -317,7 +317,7 @@ public class DomainObjectRepositoy {
 
             InCondition withInCondition = new InCondition(domainObjectCriteria.getMainPropperty(), mainInList);
             withInCondition.setClz(domainObjectCriteria.getWithClz());
-            withList = BaseRepository.in0(withInCondition);
+            withList = ProxyRepository.in0(withInCondition);
 
 
             List<DomainObject<T, WITH>> list = new ArrayList<>();

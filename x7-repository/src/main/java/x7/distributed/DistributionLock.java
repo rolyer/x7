@@ -16,13 +16,15 @@
  */
 package x7.distributed;
 
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import x7.repository.redis.JedisConnector_Persistence;
 
 
 public class DistributionLock {
 
-    private static Logger logger = Logger.getLogger(DistributionLock.class);
+    private static Logger logger = LoggerFactory.getLogger(DistributionLock.class);
 
     private static void lock(String key) {
 

@@ -1,4 +1,4 @@
-package io.xream.x7.demo;
+package io.xream.x7.demo.bean;
 
 import org.apache.commons.collections.MapUtils;
 import x7.core.repository.X;

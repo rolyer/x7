@@ -1,9 +1,10 @@
 package io.xream.x7.demo;
 
+import io.xream.x7.demo.bean.DogTest;
 import org.springframework.stereotype.Repository;
 import x7.repository.BaseRepository;
 
 @Repository
-public class DogTestRepository extends BaseRepository<DogTest>{
+public interface DogTestRepository extends BaseRepository<DogTest> {
 
 }

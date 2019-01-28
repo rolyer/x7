@@ -20,6 +20,7 @@ import x7.core.async.CasualWorker;
 import x7.core.async.IAsyncTask;
 import x7.core.config.Configs;
 import x7.repository.dao.DaoImpl;
+import x7.repository.inner.impl.DefaultRepository;
 import x7.repository.mapper.Mapper;
 import x7.repository.mapper.MapperFactory;
 import x7.repository.redis.JedisConnector_Persistence;
@@ -80,18 +81,18 @@ public class RepositoryBooter {
             String name = generator.getClzName();
             long maxId = generator.getMaxId();
 
-            String idInRedis = JedisConnector_Persistence.getInstance().hget(BaseRepository.ID_MAP_KEY, name);
+            String idInRedis = JedisConnector_Persistence.getInstance().hget(DefaultRepository.ID_MAP_KEY, name);
 
             System.out.println(name + ",test, idInDB = " + maxId + ", idInRedis = " + idInRedis);
 
 
             if (idInRedis == null) {
-                JedisConnector_Persistence.getInstance().hset(BaseRepository.ID_MAP_KEY, name, String.valueOf(maxId));
+                JedisConnector_Persistence.getInstance().hset(DefaultRepository.ID_MAP_KEY, name, String.valueOf(maxId));
             } else if (idInRedis != null && maxId > Long.valueOf(idInRedis)) {
-                JedisConnector_Persistence.getInstance().hset(BaseRepository.ID_MAP_KEY, name, String.valueOf(maxId));
+                JedisConnector_Persistence.getInstance().hset(DefaultRepository.ID_MAP_KEY, name, String.valueOf(maxId));
             }
 
-            System.out.println(name + ",final, idInRedis = " + JedisConnector_Persistence.getInstance().hget(BaseRepository.ID_MAP_KEY, name));
+            System.out.println(name + ",final, idInRedis = " + JedisConnector_Persistence.getInstance().hget(DefaultRepository.ID_MAP_KEY, name));
 
 
         }
