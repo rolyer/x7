@@ -23,7 +23,7 @@ import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.stereotype.Repository;
 import x7.core.util.ClassFileReader;
-import x7.repository.inner.impl.ProxyRepository;
+import x7.repository.inner.impl.RepositoryProxy;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
@@ -67,7 +67,7 @@ public class RepositoryBeanStarter implements ImportBeanDefinitionRegistrar {
                 GenericBeanDefinition definition = (GenericBeanDefinition) builder.getRawBeanDefinition();
                 definition.getPropertyValues().add("objectType", clz);
                 definition.getPropertyValues().add("clz", clazz);
-                definition.setBeanClass(ProxyRepository.class);
+                definition.setBeanClass(RepositoryProxy.class);
                 definition.setAutowireMode(GenericBeanDefinition.AUTOWIRE_BY_TYPE);
 
                 registry.registerBeanDefinition(beanName, definition);

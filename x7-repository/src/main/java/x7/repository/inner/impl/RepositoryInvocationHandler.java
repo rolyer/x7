@@ -21,10 +21,10 @@ import java.lang.reflect.Method;
 
 public class RepositoryInvocationHandler implements InvocationHandler {
 
-    private ProxyRepository repository;
+    private RepositoryProxy repository;
 
 
-    public RepositoryInvocationHandler(ProxyRepository repository){
+    public RepositoryInvocationHandler(RepositoryProxy repository){
         this.repository = repository;
     }
 

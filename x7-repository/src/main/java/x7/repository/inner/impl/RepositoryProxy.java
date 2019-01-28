@@ -26,7 +26,7 @@ import java.lang.reflect.Proxy;
  * @param <T>
  * @author Sim
  */
-public class ProxyRepository<T> extends DefaultRepository<T> implements FactoryBean {
+public class RepositoryProxy<T> extends DefaultRepository<T> implements FactoryBean {
 
     @Override
     public Class<T> getClz() {
