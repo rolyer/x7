@@ -17,6 +17,8 @@
 package x7;
 
 import com.zaxxer.hikari.HikariDataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -26,7 +28,6 @@ import x7.core.bean.SpringHelper;
 import x7.core.config.ConfigAdapter;
 import x7.core.config.Configs;
 import x7.repository.RepositoryBooter;
-import x7.repository.pool.HikariPoolUtil;
 
 import javax.sql.DataSource;
 import java.util.Objects;
@@ -35,7 +36,7 @@ import java.util.Objects;
         DataSourceProperties_R.class})
 public class RepositoryStarter  {
 
-
+    private Logger logger = LoggerFactory.getLogger(RepositoryStarter.class);
     @Autowired
     private DataSourceProperties_R dataSourceProperties_r;
     @Autowired
@@ -78,29 +79,13 @@ public class RepositoryStarter  {
     }
 
 
-
-
-
     public HikariDataSource getReadDataSource() {
 
-        System.out.println("\n_________Readable DataSource Creating....");
-
-        HikariDataSource ds = null;
-
-        Object key = Configs.get("x7.db");
-        if (Objects.nonNull(key)) {
-            ds = HikariPoolUtil.create(false);
-        }
-
-        if (Objects.nonNull(ds)) {
-            System.out.println("_________Readable DataSource Created By X7 Config: " + ds);
-            return ds;
-        }
 
         if (Objects.isNull(dataSourceProperties_r.getUrl())) {
-            System.out.println("_________Readable DataSource Config Key: x7(x7.db.address.r) or springBoot(spring.datasource.read.url)");
-            System.out.println("_________Readable DataSource Config Value: null");
-            System.out.println("_________Readable DataSource Ignored\n");
+            logger.info("Readable DataSource Config Key: spring.datasource.read.url");
+            logger.info("Readable DataSource Config Value: null");
+            logger.info("Readable DataSource Ignored");
 
             return null;
         }
@@ -128,14 +113,12 @@ public class RepositoryStarter  {
         dsR.setDriverClassName(driverClassName);
 
 
-        System.out.println("_________Readable DataSource Created By SpringBoot Config: " + dsR);
+        logger.info("Readable DataSource Created, url:"+dataSourceProperties_r.getUrl());
         return dsR;
     }
 
 
     public void startX7Repsository(DataSource dsW, DataSource dsR) {//FIXME
-
-        System.out.println("_________X7 Repsository Starter....");
 
         if (Objects.isNull(dsW))
             throw new RuntimeException("Writeable DataSource Got NULL");
@@ -146,7 +129,7 @@ public class RepositoryStarter  {
                 || "debug".equals(Configs.getString("log4j.logger.org.springframework.jdbc.core.JdbcTemplate"))) {
             ConfigAdapter.setIsShowSql(true);
         }else{
-            System.out.println("_________X7 Repsository will not show SQL, for no config like one of: x7.repository.show-sql=true,spring.jpa.show-sql=true,log4j.logger.org....." );
+            logger.info("X7 Repsository will not show SQL, for no config like one of: x7.repository.show-sql=true,spring.jpa.show-sql=true,log4j.logger.org....." );
         }
 
         String driverClassName = Configs.getString("spring.datasource.driver-class-name");
@@ -155,7 +138,5 @@ public class RepositoryStarter  {
         RepositoryBooter.boot(dsW,dsR);
 
     }
-
-
 
 }
