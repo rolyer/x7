@@ -18,7 +18,7 @@ package x7.repository;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
-import x7.core.bean.SpringHelper;
+import x7.config.SpringHelper;
 import x7.core.util.TimeUtil;
 import x7.core.web.ViewEntity;
 import x7.repository.dao.Tx;

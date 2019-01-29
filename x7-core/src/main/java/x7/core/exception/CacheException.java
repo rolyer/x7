@@ -14,8 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package x7.core.repository;
+package x7.core.exception;
 
-public interface Mapped {
-	String TAG = "${TAG}";
+public class CacheException extends RuntimeException {
+	
+	private static final long serialVersionUID = -264402035167527666L;
+	public CacheException(){
+		
+	}
+	public CacheException(String msg){
+		super(msg);
+	}
 }

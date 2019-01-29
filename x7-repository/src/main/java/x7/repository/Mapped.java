@@ -14,18 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package x7.core.repository;
+package x7.repository;
 
-public interface SqlFieldType {
-
-	String TEXT = "text";
-	String VARCHAR = "varchar";
-	String DATE = "timestamp";
-	String INT = "int";
-	String LONG = "bigint";
-	String BYTE = "tinyint";
-	String DOUBLE = "float";//float
-	String FLOAT = "float";//real
-	String DOUBLE_COMMON = "double";//float
-	String DECIMAL = "decimal";
+public interface Mapped {
+	String TAG = "${TAG}";
 }

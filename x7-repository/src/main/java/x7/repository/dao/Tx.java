@@ -21,7 +21,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
-import x7.core.bean.SpringHelper;
+import x7.config.SpringHelper;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

@@ -20,7 +20,7 @@ import x7.core.bean.BeanElement;
 import x7.core.bean.Parsed;
 import x7.core.bean.Parser;
 import x7.core.config.ConfigAdapter;
-import x7.core.repository.Mapped;
+import x7.repository.Mapped;
 import x7.core.repository.X;
 import x7.core.util.BeanUtil;
 import x7.core.util.BeanUtilX;

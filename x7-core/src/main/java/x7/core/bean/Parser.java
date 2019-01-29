@@ -16,7 +16,6 @@
  */
 package x7.core.bean;
 
-import x7.core.config.Configs;
 import x7.core.repository.ReflectionCache;
 import x7.core.repository.X;
 import x7.core.util.BeanUtil;

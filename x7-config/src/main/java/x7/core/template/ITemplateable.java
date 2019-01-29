@@ -14,15 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package x7.core.repository;
+package x7.core.template;
 
-public class CacheException extends RuntimeException {
-	
-	private static final long serialVersionUID = -264402035167527666L;
-	public CacheException(){
-		
-	}
-	public CacheException(String msg){
-		super(msg);
-	}
+/**
+ * 模板化的<br>
+ * 仅仅用于模板类
+ * @author Sim Wang
+ *
+ */
+public interface ITemplateable {
+
+	void setTemplateId(Object id);
+	Object getTemplateId();
 }

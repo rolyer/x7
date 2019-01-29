@@ -24,7 +24,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
-import x7.core.bean.SpringHelper;
+import x7.config.SpringHelper;
 import x7.core.config.ConfigAdapter;
 import x7.core.config.Configs;
 import x7.repository.RepositoryBooter;

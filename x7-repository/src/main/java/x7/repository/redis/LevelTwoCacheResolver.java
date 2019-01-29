@@ -18,7 +18,7 @@ package x7.repository.redis;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import x7.core.repository.CacheException;
+import x7.core.exception.CacheException;
 import x7.core.repository.CacheResolver;
 import x7.core.util.JsonX;
 import x7.core.util.StringUtil;

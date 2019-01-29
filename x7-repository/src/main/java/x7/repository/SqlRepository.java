@@ -25,7 +25,6 @@ import x7.core.bean.condition.ReduceCondition;
 import x7.core.bean.condition.RefreshCondition;
 import x7.core.config.Configs;
 import x7.core.repository.CacheResolver;
-import x7.core.repository.Repository;
 import x7.core.repository.X;
 import x7.core.util.JsonX;
 import x7.core.web.Direction;

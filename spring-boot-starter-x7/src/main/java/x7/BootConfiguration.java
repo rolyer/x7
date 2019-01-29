@@ -22,7 +22,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
-import x7.core.bean.SpringHelper;
+import x7.config.SpringHelper;
 
 import java.util.Objects;
 

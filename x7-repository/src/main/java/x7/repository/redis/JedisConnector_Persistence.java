@@ -18,9 +18,7 @@ package x7.repository.redis;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import x7.core.bean.SpringHelper;
-import x7.core.config.Configs;
-import x7.core.util.StringUtil;
+import x7.config.SpringHelper;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
