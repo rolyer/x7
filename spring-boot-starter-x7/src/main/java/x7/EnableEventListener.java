@@ -14,9 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package x7.core.mq;
+package x7;
+
+import org.springframework.context.annotation.Import;
+import x7.core.event.EventListenerBeanPostProcesser;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 
-public interface CompensationTask {
-	void submit(MessageEvent event) throws Exception;
+@Target({java.lang.annotation.ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Import({EventListenerBeanPostProcesser.class})
+public @interface EnableEventListener {
 }
