@@ -26,5 +26,4 @@ import java.lang.annotation.*;
 @Documented
 @Import({RcDataSrouceConfiguration.class})
 public @interface EnableTransactionManagementReadable {
-
 }

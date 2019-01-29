@@ -27,5 +27,4 @@ import java.lang.annotation.*;
 @Documented
 @Import({AsyncDaoImpl.class,AsyncRepository.class})
 public @interface EnableAsyncRepository {
-
 }
