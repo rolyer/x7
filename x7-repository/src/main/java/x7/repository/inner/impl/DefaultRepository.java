@@ -18,7 +18,6 @@ package x7.repository.inner.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.FactoryBean;
 import x7.core.async.CasualWorker;
 import x7.core.async.IAsyncTask;
 import x7.core.bean.*;
@@ -35,7 +34,6 @@ import x7.repository.redis.JedisConnector_Persistence;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -283,17 +281,46 @@ public abstract class DefaultRepository<T> implements BaseRepository<T> {
         if (inCondition.getInList().isEmpty())
             return new ArrayList<T>();
 
-        inCondition.setClz(this.clz);
+        List<Object> inList = new ArrayList<Object>();
 
-        return SqlRepository.getInstance().in(inCondition);
-    }
+        for (Object obj : inCondition.getInList()) {
+            if (Objects.isNull(obj))
+                continue;
+            if (!inList.contains(obj)) {
+                inList.add(obj);
+            }
+        }
 
-    protected static <T> List<T> in0(InCondition inCondition) {
-        if (inCondition.getInList().isEmpty())
+        if (inList.isEmpty())
             return new ArrayList<T>();
 
-        return SqlRepository.getInstance().in(inCondition);
+        int size = inList.size();
+
+        if (size <= IN_MAX){
+            inCondition.setClz(this.clz);
+            inCondition.setInList(inList);
+            return SqlRepository.getInstance().in(inCondition);
+        }
+
+        List<T> list = new ArrayList<>(size);
+        int i = 0;
+        while (size > 0) {
+            int segSize = (size > IN_MAX ? IN_MAX : size);
+            size -= segSize;
+            int fromIndex = i++ * IN_MAX;
+            int toIndex = fromIndex + segSize;
+            List<? extends Object> segInList = inList.subList(fromIndex,toIndex);
+
+            InCondition ic = new InCondition(inCondition.getProperty(), segInList);
+            ic.setClz(this.clz);
+            List<T> segList = SqlRepository.getInstance().in(ic);
+            list.addAll(segList);
+
+        }
+
+        return list;
     }
+
 
     @Override
     public Page<T> find(Criteria criteria) {
@@ -318,14 +345,6 @@ public abstract class DefaultRepository<T> implements BaseRepository<T> {
 
     @Override
     public List<T> list(Criteria criteria) {
-
-        if (criteria instanceof Criteria.ResultMappedCriteria)
-            throw new RuntimeException("Codeing Exception: maybe {Criteria.ResultMappedCriteria criteria = builder.get();} instead of {Criteria criteria = builder.get();}");
-
-        return SqlRepository.getInstance().list(criteria);
-    }
-
-    protected static <T> List<T> list0(Criteria criteria) {
 
         if (criteria instanceof Criteria.ResultMappedCriteria)
             throw new RuntimeException("Codeing Exception: maybe {Criteria.ResultMappedCriteria criteria = builder.get();} instead of {Criteria criteria = builder.get();}");

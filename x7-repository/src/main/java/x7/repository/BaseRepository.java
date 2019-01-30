@@ -35,6 +35,8 @@ import java.util.Map;
  */
 public interface BaseRepository<T> {
 
+	int IN_MAX = 500;
+
 	public Class<T> getClz();
 	long createId();
 

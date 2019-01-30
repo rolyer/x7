@@ -530,27 +530,13 @@ public class SqlRepository implements Repository {
 	@Override
 	public <T> List<T> in(InCondition inCondition) {
 		testAvailable();
-		
-		List<Object> inList = new ArrayList<Object>();
-
-		for (Object obj : inCondition.getInList()) {
-			if (Objects.isNull(obj))
-				continue;
-			if (!inList.contains(obj)) {
-				inList.add(obj);
-			}
-		}
-
-		if (inList.isEmpty())
-			return new ArrayList<T>();
-
-		inCondition.setInList(inList);
 
 		Class clz = inCondition.getClz();
 		String inProperty = inCondition.getProperty();
 
-		
 		Parsed parsed = Parser.get(clz);
+
+		List<? extends Object> inList = inCondition.getInList();
 
 		if (isNoCache()|| parsed.isNoCache()) {
 			return syncDao.in(inCondition);

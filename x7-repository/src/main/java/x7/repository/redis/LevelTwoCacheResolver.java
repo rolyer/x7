@@ -41,7 +41,7 @@ import java.util.Set;
 public class LevelTwoCacheResolver implements CacheResolver {
 
 	private final static Logger logger = LoggerFactory.getLogger(LevelTwoCacheResolver.class);
-	public final static String NANO_SECOND = ".N_S";
+	public final static String NANO_SECOND = ".ns.";
 	
 	private static LevelTwoCacheResolver instance = null;
 	public static LevelTwoCacheResolver getInstance(){
@@ -91,7 +91,7 @@ public class LevelTwoCacheResolver implements CacheResolver {
 
 	public void remove(Class clz) {
 
-		String key = getSimpleKey(clz);
+		String key = getSimpleKeyLike(clz);
 
 		Set<String> keySet = JedisConnector_Cache.getInstance().keys(key);
 
@@ -159,7 +159,7 @@ public class LevelTwoCacheResolver implements CacheResolver {
 		return "{"+clz.getName()+"}." + condition;
 	}
 
-	private String getSimpleKey(Class clz){
+	private String getSimpleKeyLike(Class clz){
 		return "{"+clz.getName()+"}.*" ;
 	}
 	
@@ -168,7 +168,7 @@ public class LevelTwoCacheResolver implements CacheResolver {
 	private String getKey(Class clz, Object conditionObj){
 		String condition = JsonX.toJson(conditionObj);
 		long startTime = System.currentTimeMillis();
-		String key =  VerifyUtil.toMD5(getPrefix(clz) + condition);
+		String key =  getPrefix(clz) +"."+VerifyUtil.toMD5(condition);
 		long endTime = System.currentTimeMillis();
 		if (logger.isDebugEnabled()){
 			logger.debug("LevelTwoCacheResolver.getKey() cost time = " + (endTime - startTime) + "s");
@@ -188,9 +188,9 @@ public class LevelTwoCacheResolver implements CacheResolver {
 		String nsStr = JedisConnector_Cache.getInstance().get(key);
 		if (nsStr == null){
 			String str = markForRefresh(clz);
-			return clz.getName() + str;
+			return "{"+clz.getName()+"}." + str;
 		}
-		return clz.getName() + nsStr;
+		return "{"+clz.getName()+"}."  + nsStr;
 	}
 
 	/**
