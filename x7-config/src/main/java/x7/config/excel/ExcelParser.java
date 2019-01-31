@@ -41,7 +41,7 @@ import java.util.*;
 
 public class ExcelParser {
 
-	private Map<String, Map<String, Class<ITemplateable>>> fileSheetClassMap = new HashMap<String, Map<String, Class<ITemplateable>>>();
+	private Map<String, Map<String, Class<? extends ITemplateable>>> fileSheetClassMap = new HashMap<String, Map<String, Class<? extends  ITemplateable>>>();
 	private Map<String, List<String>> fileSheetNameClassMap = new HashMap<String, List<String>>();
 
 	private Map<String, Long> lastModefyTimeMap = new HashMap<String, Long>();
@@ -111,7 +111,7 @@ public class ExcelParser {
 			String fileName = configItem.getAttributeValue("name");
 			fileNames.add(fileName);
 			// 创建按标签名进行查询键名的map表
-			Map<String, Class<ITemplateable>> sheetClassMap = new HashMap<String, Class<ITemplateable>>();
+			Map<String, Class<? extends ITemplateable>> sheetClassMap = new HashMap<String, Class<? extends ITemplateable>>();
 			List<String> sheetNameList = new ArrayList<String>();
 			// 将这个map表放入以文件名为查询键名的map表
 			fileSheetClassMap.put(fileName, sheetClassMap);
@@ -174,7 +174,7 @@ public class ExcelParser {
 			// 当文件扩展名为xls或者xlsx时
 			if (fileName.contains(".xls")) {
 				// 从某个配置表获取这个文件所对应的模板类名Map<标签页名, Class<模板类>>
-				Map<String, Class<ITemplateable>> sheetClassMap = fileSheetClassMap.get(fileName);
+				Map<String, Class<? extends ITemplateable>> sheetClassMap = fileSheetClassMap.get(fileName);
 				// 读取整个excel文件
 
 				if (sheetClassMap == null) {
@@ -559,7 +559,7 @@ public class ExcelParser {
 		
 		public static class ExcelBuilder {
 			
-			private Map<Class<? extends ITemplateable>, List<ITemplateable>> templateMap = new HashMap<>();
+			private Map<Class<? extends ITemplateable>, List<? extends ITemplateable>> templateMap = new HashMap<>();
 			
 			public ExcelBuilder add(Class<? extends ITemplateable> clz){
 				templateMap.put(clz, new ArrayList<>());
@@ -567,7 +567,7 @@ public class ExcelParser {
 			}
 			
 			
-			public Map<Class<? extends ITemplateable>, List<ITemplateable>> read(String filePath){			
+			public Map<Class<? extends ITemplateable>, List<? extends ITemplateable>> read(String filePath){
 				
 				File file = new File(filePath);
 				
@@ -605,7 +605,7 @@ public class ExcelParser {
 					}
 
 					
-					List<ITemplateable> list = templateMap.get(clz);
+					List<ITemplateable> list = (List<ITemplateable>) templateMap.get(clz);
 					// 存入配置表
 					// 获得配置表的行数
 					final int rows = sheet.getRows();

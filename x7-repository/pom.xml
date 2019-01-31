@@ -64,14 +64,6 @@
 			<artifactId>commons-pool2</artifactId>
 		</dependency>
 
-
-		<dependency>
-			<groupId>io.xream.x7</groupId>
-			<artifactId>x7-core</artifactId>
-			<version>1.6.8</version>
-			<scope>compile</scope>
-		</dependency>
-
 		<dependency>
 			<groupId>io.xream.x7</groupId>
 			<artifactId>x7-config</artifactId>
