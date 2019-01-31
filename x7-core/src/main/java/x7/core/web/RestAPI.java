@@ -136,7 +136,6 @@ public interface RestAPI {
 		private long time;
 		private String sign;
 
-
 		public ViewStatus getStatus() {
 			return status;
 		}
