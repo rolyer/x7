@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.xream.x7</groupId>
     <artifactId>x7-parent</artifactId>
-    <version>1.6.7.RELEASE</version>
+    <version>1.6.8.RELEASE</version>
     <packaging>pom</packaging>
     <name>x7-parent</name>
     <description>http://x7.xream.io</description>
@@ -16,14 +16,15 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.compilerVersion>1.8</maven.compiler.compilerVersion>
         <maven.test.skip>true</maven.test.skip>
-        <x7.version>1.6.7.RELEASE</x7.version>
+        <x7.version>1.6.8.RELEASE</x7.version>
+        <x7-core.version>1.6.8.RELEASE</x7-core.version>
     </properties>
 
     <scm>
         <connection>scm:git:https://github.com/x-ream/x7</connection>
         <developerConnection>scm:git:https://github.com/x-ream/x7</developerConnection>
         <url>scm:git:https://github.com/x-ream/x7</url>
-        <tag>1.6.7.RELEASE</tag>
+        <tag>1.6.8.RELEASE</tag>
     </scm>
 
     <licenses>
@@ -61,7 +62,6 @@
     </distributionManagement>
 
     <modules>
-        <module>x7-core</module>
         <module>x7-config</module>
         <module>x7-repository</module>
         <module>spring-boot-starter-x7</module>
@@ -87,6 +87,12 @@
     </dependencyManagement>
 
     <dependencies>
+
+        <dependency>
+            <groupId>io.xream.x7</groupId>
+            <artifactId>x7-core</artifactId>
+            <version>${x7-core.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
