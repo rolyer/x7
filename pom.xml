@@ -49,7 +49,6 @@
 
     <distributionManagement>
         <snapshotRepository>
-            <!-- setting.xml setid -->
             <id>oss-s</id>
             <name>x7 snopshots repo</name>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
