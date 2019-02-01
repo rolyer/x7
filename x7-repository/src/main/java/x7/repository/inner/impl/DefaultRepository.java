@@ -278,47 +278,10 @@ public abstract class DefaultRepository<T> implements BaseRepository<T> {
 
     @Override
     public List<T> in(InCondition inCondition) {
-        if (inCondition.getInList().isEmpty())
-            return new ArrayList<T>();
 
-        List<Object> inList = new ArrayList<Object>();
+        inCondition.setClz(this.clz);
 
-        for (Object obj : inCondition.getInList()) {
-            if (Objects.isNull(obj))
-                continue;
-            if (!inList.contains(obj)) {
-                inList.add(obj);
-            }
-        }
-
-        if (inList.isEmpty())
-            return new ArrayList<T>();
-
-        int size = inList.size();
-
-        if (size <= IN_MAX){
-            inCondition.setClz(this.clz);
-            inCondition.setInList(inList);
-            return SqlRepository.getInstance().in(inCondition);
-        }
-
-        List<T> list = new ArrayList<>(size);
-        int i = 0;
-        while (size > 0) {
-            int segSize = (size > IN_MAX ? IN_MAX : size);
-            size -= segSize;
-            int fromIndex = i++ * IN_MAX;
-            int toIndex = fromIndex + segSize;
-            List<? extends Object> segInList = inList.subList(fromIndex,toIndex);
-
-            InCondition ic = new InCondition(inCondition.getProperty(), segInList);
-            ic.setClz(this.clz);
-            List<T> segList = SqlRepository.getInstance().in(ic);
-            list.addAll(segList);
-
-        }
-
-        return list;
+        return SqlRepository.getInstance().in(inCondition);
     }
 
 

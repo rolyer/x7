@@ -36,603 +36,646 @@ import java.lang.reflect.Field;
 import java.util.*;
 
 /**
- * 
  * @author Sim
- *
  */
 public class SqlRepository implements Repository {
 
-	private final static Logger logger = LoggerFactory.getLogger(SqlRepository.class);
-	private static SqlRepository instance;
-
-	public static SqlRepository getInstance() {
-
-		if (instance == null) {
-			instance = new SqlRepository();
-		}
-		return instance;
-	}
-
-	private Dao syncDao;
-
-	public void setSyncDao(Dao syncDao) {
-		logger.info("X7 Repository on starting....");
-		this.syncDao = syncDao;
-	}
-
-
-	private CacheResolver cacheResolver;
-
-	public void setCacheResolver(CacheResolver cacheResolver) {
-		this.cacheResolver = cacheResolver;
-	}
-
-	private boolean isNoCache(){
-		return Configs.Inner.isDev || cacheResolver == null;
-	}
-
-	private String getCacheKey(Object obj, Parsed parsed) {
-		try {
-
-			Field field = obj.getClass().getDeclaredField(parsed.getKey(X.KEY_ONE));
-			field.setAccessible(true);
-			String keyOne = field.get(obj).toString();
-			return keyOne;
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	private <T> void replenishAndRefreshCache(List<String> keyList, List<T> list, Class<T> clz, Parsed parsed) {
-
-		Set<String> keySet = new HashSet<String>();
-		for (T t : list) {
-			String key = getCacheKey(t, parsed);
-			keySet.add(key);
-		}
-
-		for (String key : keyList) {
-			if (!keySet.contains(key)) {
-
-				T obj = null;
-
-				Field f = parsed.getKeyField(X.KEY_ONE);
-				if (f.getType() == String.class) {
-					T condition = null;
-					try {
-						condition = clz.newInstance();
-						f.set(condition, key);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-
-					List<T> tempList = null;
-					tempList = syncDao.list(condition);
-
-					if (!tempList.isEmpty()) {
-						obj = tempList.get(0);
-					}
-
-				} else {
-					long idOne = Long.valueOf(key);
-					obj = syncDao.get(clz, idOne);
-				}
-
-				/*
-				 * 更新或重置缓存
-				 */
-				if (obj == null) {
-					if (!isNoCache() && !parsed.isNoCache())
-						cacheResolver.markForRefresh(clz);
-				} else {
-					list.add(obj);
-					if (!isNoCache() && !parsed.isNoCache())
-						cacheResolver.set(clz, key, obj);
-				}
-			}
-		}
-
-	}
-
-	private <T> List<T> sort(List<String> keyList, List<T> list, Parsed parsed) {
-		List<T> sortedList = new ArrayList<T>();
-		for (String key : keyList) {
-			Iterator<T> ite = list.iterator();
-			while (ite.hasNext()) {
-				T t = ite.next();
-				if (key.equals(getCacheKey(t, parsed))) {
-					ite.remove();
-					sortedList.add(t);
-					break;
-				}
-			}
-		}
-		return sortedList;
-	}
-
-
-
-	@Override
-	public long create(Object obj) {
-		testAvailable();
-		Class clz = obj.getClass();
-		Parsed parsed = Parser.get(clz);
-		long id = syncDao.create(obj);
-
-		if (!isNoCache() && !parsed.isNoCache())
-			cacheResolver.markForRefresh(clz);
-		return id;
-	}
-
-	@Override
-	public boolean refresh(Object obj) {
-		testAvailable();
-		boolean flag = false;
-		Class clz = obj.getClass();
-		Parsed parsed = Parser.get(clz);
-		flag = syncDao.refresh(obj);
-
-		if (flag) {
-			String key = getCacheKey(obj, parsed);
-			if (!isNoCache() && !parsed.isNoCache()) {
-				if (key != null)
-					cacheResolver.remove(clz, key);
-				cacheResolver.markForRefresh(clz);
-			}
-		}
-		return flag;
-	}
-
-	@Override
-	public <T> boolean refresh(RefreshCondition<T> refreshCondition) {
-		testAvailable();
-		boolean flag = false;
-
-		CriteriaCondition condition = refreshCondition.getCondition();
-		Class clz = refreshCondition.getClz();
-		if (condition instanceof Criteria){
-			Criteria criteria = (Criteria)condition;
-			criteria.setClz(refreshCondition.getClz());
-		}
-		Parsed parsed = Parser.get(clz);
-
-		flag = syncDao.refreshByCondition(refreshCondition);
-
-		if (!isNoCache() && !parsed.isNoCache()) {
-
-			T obj = refreshCondition.getObj();
-			if (Objects.isNull(obj)){
-				cacheResolver.remove(clz);
-				cacheResolver.markForRefresh(clz);
-			}else {
-				String key = getCacheKey(obj, parsed);
-				if (key != null)
-					cacheResolver.remove(clz, key);
-				cacheResolver.markForRefresh(clz);
-			}
-		}
-		return flag;
-	}
-
-	/**
-	 * 配合refreshTime使用，后台按更新时间查询列表之前调用
-	 * 
-	 * @param clz
-	 */
-	public <T> void refreshCache(Class<T> clz) {
-		Parsed parsed = Parser.get(clz);
-		if (!isNoCache() && !parsed.isNoCache()) {
-			cacheResolver.markForRefresh(clz);
-		}
-	}
-
-	@Override
-	public boolean remove(Object obj) {
-		testAvailable();
-		boolean flag = false;
-		Class clz = obj.getClass();
-		Parsed parsed = Parser.get(clz);
-		String key = getCacheKey(obj, parsed);
-		flag = syncDao.remove(obj);
-
-		if (!isNoCache() && !parsed.isNoCache()) {
-			if (key != null)
-				cacheResolver.remove(clz, key);
-			cacheResolver.markForRefresh(clz);
-		}
-		return flag;
-	}
-
-	@Override
-	public <T> T get(Class<T> clz, long idOne) {
-		testAvailable();
-		Parsed parsed = Parser.get(clz);
-
-		if (isNoCache()|| parsed.isNoCache()) {
-			return syncDao.get(clz, idOne);
-		}
-
-		String key = String.valueOf(idOne);
-		T obj = cacheResolver.get(clz, key);
-
-		if (obj == null) {
-			obj = syncDao.get(clz, idOne);
-			cacheResolver.set(clz, key, obj);
-		}
-
-		return obj;
-	}
-
-	@Override
-	public <T> List<T> list(Object conditionObj) {
-		testAvailable();
-		if (conditionObj instanceof CriteriaBuilder || conditionObj instanceof Criteria)
-			throw new RuntimeException("Notes: parameter is not Criteria");
-
-		Class clz = conditionObj.getClass();
-		Parsed parsed = Parser.get(clz);
-
-		if (isNoCache() || parsed.isNoCache()) {
-			return syncDao.list(conditionObj);
-		}
-
-		List<T> list = null;
-
-		List<String> keyList = cacheResolver.getResultKeyList(clz, conditionObj);
-
-		if (keyList == null || keyList.isEmpty()) {
-			list = syncDao.list(conditionObj);
-
-			keyList = new ArrayList<String>();
-
-			for (T t : list) {
-				String key = getCacheKey(t, parsed);
-				keyList.add(key);
-			}
-
-			cacheResolver.setResultKeyList(clz, conditionObj, keyList);
-
-			return list;
-		}
-
-		list = cacheResolver.list(clz, keyList);
-
-		if (keyList.size() == list.size())
-			return list;
-
-		replenishAndRefreshCache(keyList, list, clz, parsed);
-
-		List<T> sortedList = sort(keyList, list, parsed);
-
-		return sortedList;
-	}
-
-	@Override
-	public <T> T getOne(T conditionObj) {
-		testAvailable();
-		Class<T> clz = (Class<T>) conditionObj.getClass();
-		Parsed parsed = Parser.get(clz);
+    private final static Logger logger = LoggerFactory.getLogger(SqlRepository.class);
+    private static SqlRepository instance;
+
+    public static SqlRepository getInstance() {
+
+        if (instance == null) {
+            instance = new SqlRepository();
+        }
+        return instance;
+    }
+
+    private Dao syncDao;
+
+    public void setSyncDao(Dao syncDao) {
+        logger.info("X7 Repository on starting....");
+        this.syncDao = syncDao;
+    }
+
+
+    private CacheResolver cacheResolver;
+
+    public void setCacheResolver(CacheResolver cacheResolver) {
+        this.cacheResolver = cacheResolver;
+    }
+
+    private boolean isNoCache() {
+        return Configs.Inner.isDev || cacheResolver == null;
+    }
+
+    private String getCacheKey(Object obj, Parsed parsed) {
+        try {
+
+            Field field = obj.getClass().getDeclaredField(parsed.getKey(X.KEY_ONE));
+            field.setAccessible(true);
+            String keyOne = field.get(obj).toString();
+            return keyOne;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private <T> void replenishAndRefreshCache(List<String> keyList, List<T> list, Class<T> clz, Parsed parsed) {
+
+        Set<String> keySet = new HashSet<String>();
+        for (T t : list) {
+            String key = getCacheKey(t, parsed);
+            keySet.add(key);
+        }
+
+        for (String key : keyList) {
+            if (!keySet.contains(key)) {
+
+                T obj = null;
+
+                Field f = parsed.getKeyField(X.KEY_ONE);
+                if (f.getType() == String.class) {
+                    T condition = null;
+                    try {
+                        condition = clz.newInstance();
+                        f.set(condition, key);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    List<T> tempList = null;
+                    tempList = syncDao.list(condition);
+
+                    if (!tempList.isEmpty()) {
+                        obj = tempList.get(0);
+                    }
+
+                } else {
+                    long idOne = Long.valueOf(key);
+                    obj = syncDao.get(clz, idOne);
+                }
+
+                /*
+                 * 更新或重置缓存
+                 */
+                if (obj == null) {
+                    if (!isNoCache() && !parsed.isNoCache())
+                        cacheResolver.markForRefresh(clz);
+                } else {
+                    list.add(obj);
+                    if (!isNoCache() && !parsed.isNoCache())
+                        cacheResolver.set(clz, key, obj);
+                }
+            }
+        }
+
+    }
+
+    private <T> List<T> sort(List<String> keyList, List<T> list, Parsed parsed) {
+        List<T> sortedList = new ArrayList<T>();
+        for (String key : keyList) {
+            Iterator<T> ite = list.iterator();
+            while (ite.hasNext()) {
+                T t = ite.next();
+                if (key.equals(getCacheKey(t, parsed))) {
+                    ite.remove();
+                    sortedList.add(t);
+                    break;
+                }
+            }
+        }
+        return sortedList;
+    }
+
+
+    @Override
+    public long create(Object obj) {
+        testAvailable();
+        Class clz = obj.getClass();
+        Parsed parsed = Parser.get(clz);
+        long id = syncDao.create(obj);
+
+        if (!isNoCache() && !parsed.isNoCache())
+            cacheResolver.markForRefresh(clz);
+        return id;
+    }
+
+    @Override
+    public boolean refresh(Object obj) {
+        testAvailable();
+        boolean flag = false;
+        Class clz = obj.getClass();
+        Parsed parsed = Parser.get(clz);
+        flag = syncDao.refresh(obj);
+
+        if (flag) {
+            String key = getCacheKey(obj, parsed);
+            if (!isNoCache() && !parsed.isNoCache()) {
+                if (key != null)
+                    cacheResolver.remove(clz, key);
+                cacheResolver.markForRefresh(clz);
+            }
+        }
+        return flag;
+    }
+
+    @Override
+    public <T> boolean refresh(RefreshCondition<T> refreshCondition) {
+        testAvailable();
+        boolean flag = false;
+
+        CriteriaCondition condition = refreshCondition.getCondition();
+        Class clz = refreshCondition.getClz();
+        if (condition instanceof Criteria) {
+            Criteria criteria = (Criteria) condition;
+            criteria.setClz(refreshCondition.getClz());
+        }
+        Parsed parsed = Parser.get(clz);
+
+        flag = syncDao.refreshByCondition(refreshCondition);
+
+        if (!isNoCache() && !parsed.isNoCache()) {
+
+            T obj = refreshCondition.getObj();
+            if (Objects.isNull(obj)) {
+                cacheResolver.remove(clz);
+                cacheResolver.markForRefresh(clz);
+            } else {
+                String key = getCacheKey(obj, parsed);
+                if (key != null)
+                    cacheResolver.remove(clz, key);
+                cacheResolver.markForRefresh(clz);
+            }
+        }
+        return flag;
+    }
+
+    /**
+     * 配合refreshTime使用，后台按更新时间查询列表之前调用
+     *
+     * @param clz
+     */
+    public <T> void refreshCache(Class<T> clz) {
+        Parsed parsed = Parser.get(clz);
+        if (!isNoCache() && !parsed.isNoCache()) {
+            cacheResolver.markForRefresh(clz);
+        }
+    }
+
+    @Override
+    public boolean remove(Object obj) {
+        testAvailable();
+        boolean flag = false;
+        Class clz = obj.getClass();
+        Parsed parsed = Parser.get(clz);
+        String key = getCacheKey(obj, parsed);
+        flag = syncDao.remove(obj);
+
+        if (!isNoCache() && !parsed.isNoCache()) {
+            if (key != null)
+                cacheResolver.remove(clz, key);
+            cacheResolver.markForRefresh(clz);
+        }
+        return flag;
+    }
+
+    @Override
+    public <T> T get(Class<T> clz, long idOne) {
+        testAvailable();
+        Parsed parsed = Parser.get(clz);
+
+        if (isNoCache() || parsed.isNoCache()) {
+            return syncDao.get(clz, idOne);
+        }
+
+        String key = String.valueOf(idOne);
+        T obj = cacheResolver.get(clz, key);
+
+        if (obj == null) {
+            obj = syncDao.get(clz, idOne);
+            cacheResolver.set(clz, key, obj);
+        }
+
+        return obj;
+    }
+
+    @Override
+    public <T> List<T> list(Object conditionObj) {
+        testAvailable();
+        if (conditionObj instanceof CriteriaBuilder || conditionObj instanceof Criteria)
+            throw new RuntimeException("Notes: parameter is not Criteria");
+
+        Class clz = conditionObj.getClass();
+        Parsed parsed = Parser.get(clz);
+
+        if (isNoCache() || parsed.isNoCache()) {
+            return syncDao.list(conditionObj);
+        }
+
+        List<T> list = null;
+
+        List<String> keyList = cacheResolver.getResultKeyList(clz, conditionObj);
+
+        if (keyList == null || keyList.isEmpty()) {
+            list = syncDao.list(conditionObj);
+
+            keyList = new ArrayList<String>();
+
+            for (T t : list) {
+                String key = getCacheKey(t, parsed);
+                keyList.add(key);
+            }
+
+            cacheResolver.setResultKeyList(clz, conditionObj, keyList);
+
+            return list;
+        }
+
+        list = cacheResolver.list(clz, keyList);
+
+        if (keyList.size() == list.size())
+            return list;
+
+        replenishAndRefreshCache(keyList, list, clz, parsed);
+
+        List<T> sortedList = sort(keyList, list, parsed);
+
+        return sortedList;
+    }
+
+    @Override
+    public <T> T getOne(T conditionObj) {
+        testAvailable();
+        Class<T> clz = (Class<T>) conditionObj.getClass();
+        Parsed parsed = Parser.get(clz);
 
-		if (isNoCache() || parsed.isNoCache()) {
-			T t = syncDao.getOne(conditionObj);
-			return t;
-		}
-
-		String condition = JsonX.toJson(conditionObj);
-		T obj = cacheResolver.get(clz, condition);
-
-		if (obj == null) {
-			obj = syncDao.getOne(conditionObj);
-			cacheResolver.set(clz, condition, obj);
-			return obj;
-		}
-
-		return obj;
-	}
+        if (isNoCache() || parsed.isNoCache()) {
+            T t = syncDao.getOne(conditionObj);
+            return t;
+        }
 
-	@Override
-	public <T> T getOne(T conditionObj, String orderBy, Direction sc) {
-		testAvailable();
-		Class<T> clz = (Class<T>) conditionObj.getClass();
-		Parsed parsed = Parser.get(clz);
+        String condition = JsonX.toJson(conditionObj);
+        T obj = cacheResolver.get(clz, condition);
+
+        if (obj == null) {
+            obj = syncDao.getOne(conditionObj);
+            cacheResolver.set(clz, condition, obj);
+            return obj;
+        }
+
+        return obj;
+    }
 
-		if (isNoCache() || parsed.isNoCache()) {
-			return (T) syncDao.getOne(conditionObj, orderBy, sc);
-		}
+    @Override
+    public <T> T getOne(T conditionObj, String orderBy, Direction sc) {
+        testAvailable();
+        Class<T> clz = (Class<T>) conditionObj.getClass();
+        Parsed parsed = Parser.get(clz);
 
-		String condition = JsonX.toJson(conditionObj) + orderBy + sc;
+        if (isNoCache() || parsed.isNoCache()) {
+            return (T) syncDao.getOne(conditionObj, orderBy, sc);
+        }
 
-		T obj = cacheResolver.get(clz, condition);
+        String condition = JsonX.toJson(conditionObj) + orderBy + sc;
 
-		if (obj == null) {
-			T t = syncDao.getOne(conditionObj, orderBy, sc);
+        T obj = cacheResolver.get(clz, condition);
 
-			cacheResolver.set(clz, condition, obj);
+        if (obj == null) {
+            T t = syncDao.getOne(conditionObj, orderBy, sc);
 
-			return t;
-		}
+            cacheResolver.set(clz, condition, obj);
 
-		return obj;
-	}
+            return t;
+        }
 
-	@Override
-	public <T> Page<T> find(Criteria criteria) {
-		testAvailable();
-		Class clz = criteria.getClz();
-		Parsed parsed = Parser.get(clz);
-		
+        return obj;
+    }
 
-		if (isNoCache()) {
-			return syncDao.find(criteria);
-		}
+    @Override
+    public <T> Page<T> find(Criteria criteria) {
+        testAvailable();
+        Class clz = criteria.getClz();
+        Parsed parsed = Parser.get(clz);
 
-		List<T> list = null;
 
-		Page<T> p = cacheResolver.getResultKeyListPaginated(clz, criteria);// FIXME
+        if (isNoCache()) {
+            return syncDao.find(criteria);
+        }
 
-		if (p == null) {
-			syncDao.find(criteria);
+        List<T> list = null;
 
-			list = p.getList(); // 结果
+        Page<T> p = cacheResolver.getResultKeyListPaginated(clz, criteria);// FIXME
 
-			List<String> keyList = p.getKeyList();
+        if (p == null) {
+            syncDao.find(criteria);
 
-			for (T t : list) {
+            list = p.getList(); // 结果
 
-				String key = getCacheKey(t, parsed);
-				keyList.add(key);
-			}
+            List<String> keyList = p.getKeyList();
 
-			p.reSetList(null);
+            for (T t : list) {
 
-			cacheResolver.setResultKeyListPaginated(clz, criteria, p);
+                String key = getCacheKey(t, parsed);
+                keyList.add(key);
+            }
 
-			p.setKeyList(null);
-			p.reSetList(list);
+            p.reSetList(null);
 
-			return p;
-		}
+            cacheResolver.setResultKeyListPaginated(clz, criteria, p);
 
-		List<String> keyList = p.getKeyList();
+            p.setKeyList(null);
+            p.reSetList(list);
 
-		if (keyList == null || keyList.isEmpty()) {
-			return p;
-		}
+            return p;
+        }
 
-		list = cacheResolver.list(clz, keyList);
+        List<String> keyList = p.getKeyList();
 
-		if (keyList.size() == list.size()) {
-			p.reSetList(list);
-			return p;
-		}
+        if (keyList == null || keyList.isEmpty()) {
+            return p;
+        }
 
-		replenishAndRefreshCache(keyList, list, clz, parsed);
+        list = cacheResolver.list(clz, keyList);
 
-		List<T> sortedList = sort(keyList, list, parsed);
+        if (keyList.size() == list.size()) {
+            p.reSetList(list);
+            return p;
+        }
 
-		p.reSetList(sortedList);
+        replenishAndRefreshCache(keyList, list, clz, parsed);
 
-		return p;
-	}
+        List<T> sortedList = sort(keyList, list, parsed);
 
-	@Override
-	public <T> List<T> list(Criteria criteria) {
-		testAvailable();
-		Class clz = criteria.getClz();
-		Parsed parsed = Parser.get(clz);
+        p.reSetList(sortedList);
 
-		if (isNoCache()) {
-			return syncDao.list(criteria);
-		}
+        return p;
+    }
 
-		List<T> list = null;
+    @Override
+    public <T> List<T> list(Criteria criteria) {
+        testAvailable();
+        Class clz = criteria.getClz();
+        Parsed parsed = Parser.get(clz);
 
-		List<String> keyList = cacheResolver.getResultKeyList(clz, criteria);
+        if (isNoCache()) {
+            return syncDao.list(criteria);
+        }
 
-		if (keyList == null || keyList.isEmpty()) {
-			list = syncDao.list(criteria);
+        List<T> list = null;
 
-			keyList = new ArrayList<>();
+        List<String> keyList = cacheResolver.getResultKeyList(clz, criteria);
 
-			for (T t : list) {
-				String key = getCacheKey(t, parsed);
-				keyList.add(key);
-			}
+        if (keyList == null || keyList.isEmpty()) {
+            list = syncDao.list(criteria);
 
-			cacheResolver.setResultKeyList(clz, criteria, keyList);
+            keyList = new ArrayList<>();
 
-			return list;
-		}
+            for (T t : list) {
+                String key = getCacheKey(t, parsed);
+                keyList.add(key);
+            }
 
-		list = cacheResolver.list(clz, keyList);
+            cacheResolver.setResultKeyList(clz, criteria, keyList);
 
-		if (keyList.size() == list.size())
-			return list;
+            return list;
+        }
 
-		replenishAndRefreshCache(keyList, list, clz, parsed);
+        list = cacheResolver.list(clz, keyList);
 
-		List<T> sortedList = sort(keyList, list, parsed);
+        if (keyList.size() == list.size())
+            return list;
 
-		return sortedList;
+        replenishAndRefreshCache(keyList, list, clz, parsed);
 
-	}
+        List<T> sortedList = sort(keyList, list, parsed);
 
-	@Override
-	public <T> List<T> list(Class<T> clz) {
-		testAvailable();
-		Parsed parsed = Parser.get(clz);
+        return sortedList;
 
-		if (isNoCache() || parsed.isNoCache()) {
-			return syncDao.list(clz);
-		}
+    }
 
-		List<T> list = null;
+    @Override
+    public <T> List<T> list(Class<T> clz) {
+        testAvailable();
+        Parsed parsed = Parser.get(clz);
 
-		String condition = "loadAll";
+        if (isNoCache() || parsed.isNoCache()) {
+            return syncDao.list(clz);
+        }
 
-		List<String> keyList = cacheResolver.getResultKeyList(clz, condition);
+        List<T> list = null;
 
-		if (keyList == null || keyList.isEmpty()) {
-			list = syncDao.list(clz);
+        String condition = "loadAll";
 
-			keyList = new ArrayList<String>();
+        List<String> keyList = cacheResolver.getResultKeyList(clz, condition);
 
-			for (T t : list) {
-				String key = getCacheKey(t, parsed);
-				keyList.add(key);
-			}
+        if (keyList == null || keyList.isEmpty()) {
+            list = syncDao.list(clz);
 
-			cacheResolver.setResultKeyList(clz, condition, keyList);
+            keyList = new ArrayList<String>();
 
-			return list;
-		}
+            for (T t : list) {
+                String key = getCacheKey(t, parsed);
+                keyList.add(key);
+            }
 
-		list = cacheResolver.list(clz, keyList);// FIXME 可能要先转Object
+            cacheResolver.setResultKeyList(clz, condition, keyList);
 
-		if (keyList.size() == list.size())
-			return list;
+            return list;
+        }
 
-		replenishAndRefreshCache(keyList, list, clz, parsed);
+        list = cacheResolver.list(clz, keyList);// FIXME 可能要先转Object
 
-		List<T> sortedList = sort(keyList, list, parsed);
+        if (keyList.size() == list.size())
+            return list;
 
-		return sortedList;
-	}
+        replenishAndRefreshCache(keyList, list, clz, parsed);
 
-	@Override
-	public Object reduce(ReduceCondition reduceCondition) {
-		testAvailable();
-		return syncDao.reduce(reduceCondition);
+        List<T> sortedList = sort(keyList, list, parsed);
 
-	}
+        return sortedList;
+    }
 
-	protected <T> boolean execute(T obj, String sql) {
-		testAvailable();
-		boolean b;
-		Parsed parsed = Parser.get(obj.getClass());
-		b = syncDao.execute(obj, sql);
+    @Override
+    public Object reduce(ReduceCondition reduceCondition) {
+        testAvailable();
+        return syncDao.reduce(reduceCondition);
 
-		if (b) {
-			String key = getCacheKey(obj, parsed);
-			if (!isNoCache() && !parsed.isNoCache()) {
-				if (key != null) {
-					cacheResolver.remove(obj.getClass(), key);
-				}
-			}
-		}
+    }
 
-		return b;
-	}
+    protected <T> boolean execute(T obj, String sql) {
+        testAvailable();
+        boolean b;
+        Parsed parsed = Parser.get(obj.getClass());
+        b = syncDao.execute(obj, sql);
 
+        if (b) {
+            String key = getCacheKey(obj, parsed);
+            if (!isNoCache() && !parsed.isNoCache()) {
+                if (key != null) {
+                    cacheResolver.remove(obj.getClass(), key);
+                }
+            }
+        }
 
-	@Override
-	public <T> List<T> in(InCondition inCondition) {
-		testAvailable();
+        return b;
+    }
 
-		Class clz = inCondition.getClz();
-		String inProperty = inCondition.getProperty();
 
-		Parsed parsed = Parser.get(clz);
+    protected <T> List<T> in0(InCondition inCondition) {
 
-		List<? extends Object> inList = inCondition.getInList();
+        Class clz = inCondition.getClz();
+        String inProperty = inCondition.getProperty();
 
-		if (isNoCache()|| parsed.isNoCache()) {
-			return syncDao.in(inCondition);
-		}
+        Parsed parsed = Parser.get(clz);
 
-		StringBuilder sb = new StringBuilder();
-		sb.append(inProperty).append(":");
-		for (Object obj : inList) {
-			sb.append(obj.toString()).append("_");
-		}
-		String condition = sb.toString();
+        List<? extends Object> inList = inCondition.getInList();
 
-		List<String> keyList = cacheResolver.getResultKeyList(clz, condition);
+        if (isNoCache() || parsed.isNoCache()) {
+            return syncDao.in(inCondition);
+        }
 
-		List<T> list = null;
+        StringBuilder sb = new StringBuilder();
+        sb.append(inProperty).append(":");
+        for (Object obj : inList) {
+            sb.append(obj.toString()).append("_");
+        }
+        String condition = sb.toString();
 
-		if (keyList == null || keyList.isEmpty()) {
+        List<String> keyList = cacheResolver.getResultKeyList(clz, condition);
 
-			list = syncDao.in(inCondition);
+        List<T> list = null;
 
-			keyList = new ArrayList<String>();
+        if (keyList == null || keyList.isEmpty()) {
 
-			for (T t : list) {
-				String key = getCacheKey(t, parsed);
-				keyList.add(key);
-			}
+            list = syncDao.in(inCondition);
 
-			cacheResolver.setResultKeyList(clz, condition, keyList);
+            keyList = new ArrayList<String>();
 
-			return list;
-		}
+            for (T t : list) {
+                String key = getCacheKey(t, parsed);
+                keyList.add(key);
+            }
 
-		list = cacheResolver.list(clz, keyList);// FIXME 可能要先转Object
+            cacheResolver.setResultKeyList(clz, condition, keyList);
 
-		if (keyList.size() == list.size())
-			return list;
+            return list;
+        }
 
-		replenishAndRefreshCache(keyList, list, clz, parsed);
+        list = cacheResolver.list(clz, keyList);// FIXME 可能要先转Object
 
-		List<T> sortedList = sort(keyList, list, parsed);
+        if (keyList.size() == list.size())
+            return list;
 
-		return sortedList;
-	}
+        replenishAndRefreshCache(keyList, list, clz, parsed);
 
-	@Override
-	public Page<Map<String, Object>> find(Criteria.ResultMappedCriteria resultMapped) {
-		testAvailable();
-		return syncDao.find(resultMapped);
-	}
+        List<T> sortedList = sort(keyList, list, parsed);
 
-	@Override
-	public List<Map<String, Object>> list(Criteria.ResultMappedCriteria resultMapped) {
-		testAvailable();
-		return syncDao.list(resultMapped);
-	}
+        return sortedList;
 
-	@Override
-	public boolean createBatch(List<? extends Object> objList) {
-		testAvailable();
-		if (objList.isEmpty())
-			return false;
-		Class clz = objList.get(0).getClass();
-		Parsed parsed = Parser.get(clz);
-		boolean flag = this.syncDao.createBatch(objList);
-		if (!isNoCache() && !parsed.isNoCache())
-			cacheResolver.markForRefresh(clz);
+    }
 
-		return flag;
-	}
 
-	protected List<Map<String, Object>> list(Class clz, String sql, List<Object> conditionList) {
-		
-		Parsed parsed = Parser.get(clz);
-		if (isNoCache() || parsed.isNoCache()) {
-			return syncDao.list(clz, sql, conditionList);
-		}
+    @Override
+    public <T> List<T> in(InCondition inCondition) {
 
-		String condition = sql + conditionList.toString();
+        testAvailable();
+        if (inCondition.getInList().isEmpty())
+            return new ArrayList<T>();
 
-		List<Map<String, Object>> mapList = cacheResolver.getMapList(clz, condition);
+        List<Object> inList = new ArrayList<Object>();
 
-		if (mapList == null) {
-			mapList = syncDao.list(clz, sql, conditionList);
+        for (Object obj : inCondition.getInList()) {
+            if (Objects.isNull(obj))
+                continue;
+            if (!inList.contains(obj)) {
+                inList.add(obj);
+            }
+        }
 
-			if (mapList != null) {
-				cacheResolver.setMapList(clz, condition, mapList);
-			}
-		}
+        if (inList.isEmpty())
+            return new ArrayList<T>();
 
-		return mapList;
+        int size = inList.size();
 
-	}
-	
-	private void testAvailable(){
-		if (Objects.isNull(this.syncDao))
-			throw new PersistenceException("X7-Repository does not started");
-	}
+        if (size <= IN_MAX) {
+            inCondition.setInList(inList);
+            return in0(inCondition);
+        }
+
+        List<T> list = new ArrayList<>(size);
+        int i = 0;
+        while (size > 0) {
+            int segSize = (size > IN_MAX ? IN_MAX : size);
+            size -= segSize;
+            int fromIndex = i++ * IN_MAX;
+            int toIndex = fromIndex + segSize;
+            List<? extends Object> segInList = inList.subList(fromIndex, toIndex);
+
+            InCondition ic = new InCondition(inCondition.getProperty(), segInList);
+            ic.setClz(inCondition.getClz());
+            List<T> segList = in0(ic);
+            list.addAll(segList);
+        }
+
+        return list;
+    }
+
+
+    @Override
+    public Page<Map<String, Object>> find(Criteria.ResultMappedCriteria resultMapped) {
+        testAvailable();
+        return syncDao.find(resultMapped);
+    }
+
+    @Override
+    public List<Map<String, Object>> list(Criteria.ResultMappedCriteria resultMapped) {
+        testAvailable();
+        return syncDao.list(resultMapped);
+    }
+
+    @Override
+    public boolean createBatch(List<? extends Object> objList) {
+        testAvailable();
+        if (objList.isEmpty())
+            return false;
+        Class clz = objList.get(0).getClass();
+        Parsed parsed = Parser.get(clz);
+        boolean flag = this.syncDao.createBatch(objList);
+        if (!isNoCache() && !parsed.isNoCache())
+            cacheResolver.markForRefresh(clz);
+
+        return flag;
+    }
+
+    protected List<Map<String, Object>> list(Class clz, String sql, List<Object> conditionList) {
+
+        Parsed parsed = Parser.get(clz);
+        if (isNoCache() || parsed.isNoCache()) {
+            return syncDao.list(clz, sql, conditionList);
+        }
+
+        String condition = sql + conditionList.toString();
+
+        List<Map<String, Object>> mapList = cacheResolver.getMapList(clz, condition);
+
+        if (mapList == null) {
+            mapList = syncDao.list(clz, sql, conditionList);
+
+            if (mapList != null) {
+                cacheResolver.setMapList(clz, condition, mapList);
+            }
+        }
+
+        return mapList;
+
+    }
+
+    private void testAvailable() {
+        if (Objects.isNull(this.syncDao))
+            throw new PersistenceException("X7-Repository does not started");
+    }
 
 }

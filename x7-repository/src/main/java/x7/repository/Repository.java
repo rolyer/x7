@@ -34,7 +34,9 @@ import java.util.Map;
  *
  */
 public interface Repository {
-	
+
+
+	int IN_MAX = 500;
 	/**
 	 * 更新缓存
 	 * @param clz
