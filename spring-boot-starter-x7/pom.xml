@@ -12,7 +12,7 @@
 	<parent>
 		<groupId>io.xream.x7</groupId>
 		<artifactId>x7-parent</artifactId>
-		<version>1.7.0.RELEASE</version>
+		<version>1.7.1.RELEASE</version>
 	</parent>
 
 	<dependencies>
@@ -24,12 +24,14 @@
 		<dependency>
 			<groupId>io.xream.x7</groupId>
 			<artifactId>x7-config</artifactId>
-			<version>1.7.0.RELEASE</version>
+			<version>1.7.1.RELEASE</version>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>io.xream.x7</groupId>
 			<artifactId>x7-repository</artifactId>
-			<version>1.7.0.RELEASE</version>
+			<version>1.7.1.RELEASE</version>
+			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 
