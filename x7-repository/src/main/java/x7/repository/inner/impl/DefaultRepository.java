@@ -35,7 +35,6 @@ import x7.repository.redis.JedisConnector_Persistence;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -260,8 +259,8 @@ public abstract class DefaultRepository<T> implements BaseRepository<T> {
     @Override
     public T getOne(T conditionObj) {
 
-        T t = SqlRepository.getInstance().getOne(conditionObj);
-        return t;
+        return SqlRepository.getInstance().getOne(conditionObj);
+
     }
 
     @Override
@@ -278,9 +277,7 @@ public abstract class DefaultRepository<T> implements BaseRepository<T> {
 
     @Override
     public List<T> in(InCondition inCondition) {
-
         inCondition.setClz(this.clz);
-
         return SqlRepository.getInstance().in(inCondition);
     }
 
