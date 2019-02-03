@@ -35,7 +35,8 @@ import java.util.Map;
  */
 public interface BaseRepository<T> {
 
-	public Class<T> getClz();
+	Class<T> getClz();
+
 	long createId();
 
 	boolean createBatch(List<T> objList);
