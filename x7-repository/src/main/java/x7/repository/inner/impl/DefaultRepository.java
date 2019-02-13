@@ -133,7 +133,7 @@ public abstract class DefaultRepository<T> implements BaseRepository<T> {
         /*
          * FIXME
          */
-        System.out.println("BaesRepository.create: " + obj);
+        logger.info("BaesRepository.create: " + obj);
 
         long id = SqlRepository.getInstance().create(obj);
 

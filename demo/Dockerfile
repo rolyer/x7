@@ -1,11 +1,13 @@
-FROM centos7-java1.8
+FROM java:openjdk-8-jre-alpine
+
+LABEL version="1.7.1.RELEASE"
 
 MAINTAINER Sim Wang <8966188@qq.com>
 
-ADD ./target/x7-demo-1.7.1.RELEASE.jar /data/deploy/demo/app.jar
+ADD target/x7-demo-1.7.1.RELEASE.jar /data/deploy/demo/app.jar
 
-RUN bash -c "touch /data/deploy/demo/app.jar"
+#RUN bash -c "touch /data/deploy/demo/app.jar"
 
-EXPOSE 22 8080 6661
+EXPOSE 6661
 
 ENTRYPOINT ["java","-Dspring.profiles.active=test","-jar", "/data/deploy/demo/app.jar"]
