@@ -1,10 +1,10 @@
 FROM java:openjdk-8-jre-alpine
 
-LABEL version="1.7.1.RELEASE"
+LABEL version="1.7.2.RELEASE"
 
 MAINTAINER Sim Wang <8966188@qq.com>
 
-ADD target/x7-demo-1.7.1.RELEASE.jar /data/deploy/demo/app.jar
+ADD target/x7-demo-1.7.2.RELEASE.jar /data/deploy/demo/app.jar
 
 #RUN bash -c "touch /data/deploy/demo/app.jar"
 
