@@ -75,7 +75,6 @@ public class XxxController {
 	public ViewEntity refreshByCondition(@RequestBody Cat cat){
 
 
-
 //		System.out.println("______: "  + test);
 //		CriteriaBuilder builder = CriteriaBuilder.buildCondition();
 //		builder.and().eq("type","NL");
@@ -168,7 +167,6 @@ public class XxxController {
 				"id",
 				"type"
 		};
-
 //		ro.setOrderBy("cat.dogId");
 
 		ro.setResultKeys(resultKeys);
