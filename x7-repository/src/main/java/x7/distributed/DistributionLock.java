@@ -33,16 +33,14 @@ public class DistributionLock {
             logger.info("Get distributed lock failed, lockKey: " + key);
             throw new RuntimeException("service busy");
         }
-        System.out.println("Get distribution lock");
     }
 
     private static void unLock( String key){
         JedisConnector_Persistence.getInstance().unLock(key);
-        System.out.println("Release distribution lock");
     }
 
     private static void unLockAsync( String key){
-        System.out.println("Release distribution lock");
+
     }
 
     public static Lock by(String key){
