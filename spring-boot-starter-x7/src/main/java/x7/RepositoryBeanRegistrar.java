@@ -24,7 +24,7 @@ import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.stereotype.Repository;
 import x7.core.util.ClassFileReader;
 import x7.repository.BaseRepository;
-import x7.repository.inner.impl.RepositoryProxy;
+import x7.repository.internal.RepositoryProxy;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Set;
 
 
-public class RepositoryBeanStarter implements ImportBeanDefinitionRegistrar {
+public class RepositoryBeanRegistrar implements ImportBeanDefinitionRegistrar {
 
 
     @Override

@@ -24,7 +24,7 @@ import x7.repository.redis.LevelTwoCacheResolver;
 
 import java.util.Map;
 
-public class L2CacheStarter  implements ImportBeanDefinitionRegistrar {
+public class L2CacheStarter implements ImportBeanDefinitionRegistrar {
 
 
     @Override

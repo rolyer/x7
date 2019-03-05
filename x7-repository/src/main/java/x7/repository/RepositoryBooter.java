@@ -20,7 +20,7 @@ import x7.core.async.CasualWorker;
 import x7.core.async.IAsyncTask;
 import x7.core.config.Configs;
 import x7.repository.dao.DaoImpl;
-import x7.repository.inner.impl.DefaultRepository;
+import x7.repository.internal.DefaultRepository;
 import x7.repository.mapper.Mapper;
 import x7.repository.mapper.MapperFactory;
 import x7.repository.redis.JedisConnector_Persistence;

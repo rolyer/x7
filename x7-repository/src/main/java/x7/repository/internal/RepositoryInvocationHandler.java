@@ -14,24 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package x7;
+package x7.repository.internal;
 
-import org.springframework.context.annotation.Import;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
-import java.lang.annotation.*;
+public class RepositoryInvocationHandler implements InvocationHandler {
 
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-@Documented
-@Import({ParserStarter.class, RepositoryBeanRegistrar.class, RepositoryStarter.class})
-public @interface EnableX7Repository {
+    private RepositoryProxy repository;
 
-    /**
-     * t_
-     */
-    String mappingPrefix() default "";
-    /**
-     * _
-     */
-    String mappingSpec() default "";
+
+    public RepositoryInvocationHandler(RepositoryProxy repository){
+        this.repository = repository;
+    }
+
+    @Override
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        try{
+            return method.invoke(repository,args);
+        } catch (InvocationTargetException e){
+            throw e.getCause();
+        }
+    }
 }

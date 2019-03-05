@@ -14,27 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package x7.repository.inner.impl;
+package io.xream.x7;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import io.xream.x7.reyc.ReyClientBeanRegistrar;
+import io.xream.x7.reyc.ReyClientConfig;
+import org.springframework.context.annotation.Import;
 
-public class RepositoryInvocationHandler implements InvocationHandler {
+import java.lang.annotation.*;
 
-    private RepositoryProxy repository;
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+@Documented
+@Import({ReyClientConfig.class,ReyClientBeanRegistrar.class})
+public @interface EnableReyClient {
 
-
-    public RepositoryInvocationHandler(RepositoryProxy repository){
-        this.repository = repository;
-    }
-
-    @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        try{
-            return method.invoke(repository,args);
-        } catch (InvocationTargetException e){
-            throw e.getCause();
-        }
-    }
 }

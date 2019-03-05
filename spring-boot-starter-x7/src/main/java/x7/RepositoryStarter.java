@@ -126,7 +126,9 @@ public class RepositoryStarter  {
         if (Configs.isTrue("x7.repository.show-sql")
                 || Configs.isTrue("x7.repository.showSql")
                 || Configs.isTrue("spring.jpa.show-sql")
-                || "debug".equals(Configs.getString("log4j.logger.org.springframework.jdbc.core.JdbcTemplate"))) {
+                || "debug".equals(Configs.getString("log4j.logger.org.springframework.jdbc.core.JdbcTemplate"))
+                || "info".equals(Configs.getString("log4j.logger.org.springframework.jdbc.core.JdbcTemplate"))
+        ) {
             ConfigAdapter.setIsShowSql(true);
         }else{
             logger.info("X7 Repsository will not show SQL, for no config like one of: x7.repository.show-sql=true,spring.jpa.show-sql=true,log4j.logger.org....." );

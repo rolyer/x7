@@ -8,14 +8,13 @@ import io.xream.x7.demo.bean.CatMouse;
 import io.xream.x7.demo.bean.CatTest;
 import io.xream.x7.demo.bean.Mouse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import x7.core.bean.*;
 import x7.core.bean.condition.RefreshCondition;
 import x7.core.util.JsonX;
+import x7.core.web.Direction;
 import x7.core.web.Page;
 import x7.core.web.ViewEntity;
 
@@ -23,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/xxx")
@@ -37,10 +37,6 @@ public class XxxController {
 
 
 
-//	@Resource(name = "redisTemplate")
-//	private RedisTemplate template;
-//	@Resource(name = "stringRedisTemplate")
-//	private StringRedisTemplate stringRedisTemplate;
 
 	@RequestMapping("/create")
 //	@Transactional
@@ -96,6 +92,25 @@ public class XxxController {
 //		}
 
 		return ViewEntity.ok();
+	}
+
+
+	@RequestMapping("/distinct")
+	public ViewEntity distinct(@RequestBody CatRO ro) {
+
+		CriteriaBuilder.ResultMappedBuilder builder = CriteriaBuilder.buildResultMapped(CatTest.class);
+		builder.distinct("catTest.dogId").distinct("catTest.catFriendName")
+				.reduce(Reduce.ReduceType.COUNT,"catTest.id")
+				.reduce(Reduce.ReduceType.SUM, "catTest.id")
+				.groupBy("catTest.dogId")
+				.groupBy("catTest.catFriendName")
+		.paged().page(1).rows(2).orderBy("catTest.dogId").on(Direction.DESC);
+		String sourceScript = "catTest ";
+		Criteria.ResultMappedCriteria resultMapped = builder.get();
+		resultMapped.setSourceScript(sourceScript);
+		Page<Map<String,Object>> page = repository.find(resultMapped);
+
+		return ViewEntity.ok(page);
 	}
 
 	@RequestMapping("/test")
@@ -245,5 +260,13 @@ public class XxxController {
 
 	    return ViewEntity.ok(list);
     }
+
+
+
+	@RequestMapping("/reyc/test")
+	public Boolean testRecClient(@RequestBody CatRO ro) {
+
+		return true;
+	}
 
 }

@@ -238,7 +238,13 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 		}
 
 		public void setGroupBy(String groupBy) {
-			this.groupBy = groupBy;
+			if (StringUtil.isNullOrEmpty(this.groupBy)){
+				this.groupBy = groupBy;
+				return;
+			}
+			if (this.groupBy.contains(groupBy))
+				return;
+			this.groupBy = this.groupBy + ", " + groupBy;
 		}
 
 		public void setReduceList(List<Reduce> reduceList) {

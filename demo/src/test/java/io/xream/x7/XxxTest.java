@@ -3,6 +3,7 @@ package io.xream.x7;
 import io.xream.x7.demo.bean.Cat;
 import io.xream.x7.demo.CatRO;
 import io.xream.x7.demo.controller.XxxController;
+import io.xream.x7.demo.remote.TestServiceRemote;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import x7.core.web.ViewEntity;
@@ -11,7 +12,8 @@ import x7.core.web.ViewEntity;
 @Component
 public class XxxTest {
 
-
+    @Autowired
+    private TestServiceRemote testServiceRemote;
     @Autowired
     private XxxController controller;
 
@@ -67,5 +69,17 @@ public class XxxTest {
 
     public void domain(){
         this.controller.domain();
+    }
+
+    public void distinct(){
+
+        ViewEntity ve = this.controller.distinct(null);
+        System.out.println(ve);
+    }
+
+    public void testReyClient(){
+
+        testServiceRemote.test(new CatRO());
+
     }
 }

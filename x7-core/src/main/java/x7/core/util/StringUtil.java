@@ -17,6 +17,9 @@
 package x7.core.util;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
@@ -67,5 +70,24 @@ public class StringUtil {
 		if (isNullOrEmpty(str))
 			return "";
 		return str;
+	}
+
+	/**
+	 *
+	 * @param Pattern(str)  like:   \\$\\{[\\w]*\\}      \{[\\w]*\\}
+	 * @param pattern
+	 * @return
+	 */
+	public static List<String> listByRegEx(String str, Pattern pattern){//"$\\{[\\w]*\\}"
+
+		Matcher matcher = pattern.matcher(str);
+
+		List<String> list = new ArrayList<>();
+		while(matcher.find()){
+			CharSequence subSequence = str.subSequence(matcher.start(0), matcher.end(0));
+			list.add(subSequence.toString());
+		}
+
+		return list;
 	}
 }

@@ -8,7 +8,12 @@ public class ExceptionUtil {
         int length = eleArr.length;
         if (eleArr != null && length > 0){
             msg = eleArr[0].toString();
-            if (length > 1){
+            if (length > 2){
+                msg += "\n";
+                msg += eleArr[1].toString();
+                msg += "\n";
+                msg += eleArr[2].toString();
+            }else if (length > 1){
                 msg += "\n";
                 msg += eleArr[1].toString();
             }

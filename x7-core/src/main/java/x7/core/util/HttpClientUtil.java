@@ -17,14 +17,16 @@
 package x7.core.util;
 
 import org.apache.http.HttpEntity;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -34,234 +36,244 @@ import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.Map;
 
+
 public class HttpClientUtil {
 
+    private final static Logger logger = LoggerFactory.getLogger(HttpClientUtil.class);
 
+    public static String post(String url, Object param) {
+        return post(url, param, 15000, 15000);
+    }
 
-	public static String post(String url, Object param){
-		return post(url,param,15000,15000);
-	}
+    public static String post(String url, Object param, int connectTimeoutMS, int socketTimeoutMS) {
 
-	public static String post(String url, Object param, int connectTimeoutMS, int readTimeoutMS) {
+        CloseableHttpClient httpclient = HttpClients.createDefault();
 
-		System.out.println("HttpClientUtil post, url: " + url);
+        HttpPost httpPost = new HttpPost(url);
 
-		CloseableHttpClient httpclient = HttpClients.createDefault();
+        RequestConfig requestConfig = RequestConfig.custom()
+                .setSocketTimeout(socketTimeoutMS)
+                .setConnectTimeout(connectTimeoutMS)
+                .setConnectionRequestTimeout(1000)
+                .build();//设置请求和传输超时时间
 
-		HttpPost httpPost = new HttpPost(url);
+        httpPost.setConfig(requestConfig);
 
-		RequestConfig requestConfig = RequestConfig.custom()
-				.setSocketTimeout(readTimeoutMS)
-				.setConnectTimeout(connectTimeoutMS)
-				.build();//设置请求和传输超时时间
+        String json = "";
+        if (param != null) {
+            json = JsonX.toJson(param);
+        }
+        HttpEntity entity = null;
+        String result = null;
+        try {
+            entity = new ByteArrayEntity(json.getBytes("UTF-8"));
+            httpPost.setHeader("Content-type", "application/json;charset=UTF-8");
+            httpPost.setEntity(entity);
+            logger.info("executing request " + httpPost.getURI());
+            CloseableHttpResponse response = httpclient.execute(httpPost);
+            try {
+                entity = response.getEntity();
+                if (entity != null) {
+                    result = EntityUtils.toString(entity, "UTF-8");
+                    logger.info("Response content: " + result);
 
-		httpPost.setConfig(requestConfig);
+                }
+            } finally {
+                response.close();
+            }
+        } catch (HttpHostConnectException hce) {
+            hce.printStackTrace();
+            String str = "org.apache.http.conn.HttpHostConnectException: Connect to " + url + " failed: Connection refused: connect";
+            throw new RuntimeException(str);
+        }catch (IOException ioe){
+            ioe.printStackTrace();
+            throw new RuntimeException(ExceptionUtil.getMessage(ioe));
+        } catch (Exception e) {
+            throw e;
+        } finally {
+            try {
+                httpclient.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
-		String json = "";
-		if (param != null) {
-			json = JsonX.toJson(param);
-		}
-		HttpEntity entity = null;
-		String result = null;
-		try {
-			entity = new ByteArrayEntity(json.getBytes("UTF-8"));
-			httpPost.setHeader("Content-type", "application/json;charset=UTF-8");
-			httpPost.setEntity(entity);
-			System.out.println("executing request " + httpPost.getURI());
-			CloseableHttpResponse response = httpclient.execute(httpPost);
-			try {
-				entity = response.getEntity();
-				if (entity != null) {
-					result = EntityUtils.toString(entity, "UTF-8");
-					System.out.println("--------------------------------------");
-					System.out.println("Response content: " + result);
-					System.out.println("--------------------------------------");
-				}
-			} finally {
-				response.close();
-			}
-		} catch (ClientProtocolException e) {
-			e.printStackTrace();
-		} catch (UnsupportedEncodingException e1) {
-			e1.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			// 关闭连接,释放资源
-			try {
-				httpclient.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
+        return result;
+    }
 
-		return result;
-	}
+    public static String getUrl(String urlString) {
+        return getUrl(urlString, 15000, 15000);
+    }
 
-	public static String getUrl(String urlString) {
-		return getUrl(urlString, 15000, 15000);
-	}
+    public static String getUrl(String urlString, int connectTimeoutMS, int readTimeoutMS) {
+        StringBuffer sb = new StringBuffer();
+        BufferedReader reader = null;
+        try {
+            URL url = new URL(urlString);
 
-	public static String getUrl(String urlString, int connectTimeoutMS, int readTimeoutMS) {
-		StringBuffer sb = new StringBuffer();
-		try {
-			URL url = new URL(urlString);
+            URLConnection conn = url.openConnection();
 
-			URLConnection conn = url.openConnection();
+            conn.setConnectTimeout(connectTimeoutMS);
+            conn.setReadTimeout(readTimeoutMS);
+            reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 
-			conn.setConnectTimeout(15000);
-			conn.setReadTimeout(15000);
-			BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            for (String line = null; (line = reader.readLine()) != null; ) {
+                sb.append(line + "\n");
+            }
 
-			for (String line = null; (line = reader.readLine()) != null;) {
-				sb.append(line + "\n");
-			}
-			reader.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		String result = "";
-		try {
-			result = URLDecoder.decode(sb.toString(), "UTF-8");
-			System.out.println("getUrl: " + result);
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(ExceptionUtil.getMessage(e));
+        }finally {
+            try {
+                reader.close();
+            } catch (IOException e) {
+            }
+        }
+        String result = "";
+        try {
+            result = URLDecoder.decode(sb.toString(), "UTF-8");
+            logger.info("get: " + result);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            throw new RuntimeException(ExceptionUtil.getMessage(e));
+        }
 
-		return result;
-	}
+        return result;
+    }
 
-	public final static String EQ = "=";
-	public final static String AND = "&";
+    public final static String EQ = "=";
+    public final static String AND = "&";
 
-	public static String getUrl(String url, Map<String, String> map) {
+    public static String getUrl(String url, Map<String, String> map) {
 
-		if (StringUtil.isNullOrEmpty(url))
-			return null;
+        if (StringUtil.isNullOrEmpty(url))
+            return null;
 
-		StringBuilder sb = new StringBuilder();
-		sb.append(url);
-		sb.append("?");
+        StringBuilder sb = new StringBuilder();
+        sb.append(url);
+        sb.append("?");
 
-		int size = map.size();
-		int i = 0;
-		for (String key : map.keySet()) {
-			i++;
-			String value = map.get(key);
-			sb.append(key).append(EQ).append(value);
-			if (i < size) {
-				sb.append(AND);
-			}
-		}
+        int size = map.size();
+        int i = 0;
+        for (String key : map.keySet()) {
+            i++;
+            String value = map.get(key);
+            sb.append(key).append(EQ).append(value);
+            if (i < size) {
+                sb.append(AND);
+            }
+        }
 
-		String requestStr = sb.toString();
+        String requestStr = sb.toString();
 
-		System.out.println("request getUrl: " + requestStr);
+        logger.info("get url: " + requestStr);
 
-		String result = getUrl(requestStr);
+        String result = getUrl(requestStr);
 
-		return result;
-	}
+        return result;
+    }
 
-	public static void upload(String url, String filepath) {
+    public static void upload(String url, String filepath) {
 
-	}
+    }
 
-	public static FileWrapper getFile(String url) {
+    public static FileWrapper getFile(String url) {
 
-		FileWrapper file = new FileWrapper();
-		InputStream is = null;
-		ByteArrayOutputStream baos = null;
-		try {
-			URL urlGet = new URL(url);
-			HttpURLConnection http = (HttpURLConnection) urlGet.openConnection();
-			http.setRequestMethod("GET"); // 必须是get方式请求
-			http.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-			http.setDoOutput(true);
-			http.setDoInput(true);
-			System.setProperty("sun.net.client.defaultConnectTimeout", "30000");// 连接超时30秒
-			System.setProperty("sun.net.client.defaultReadTimeout", "30000"); // 读取超时30秒
-			http.connect();
+        FileWrapper file = new FileWrapper();
+        InputStream is = null;
+        ByteArrayOutputStream baos = null;
+        try {
+            URL urlGet = new URL(url);
+            HttpURLConnection http = (HttpURLConnection) urlGet.openConnection();
+            http.setRequestMethod("GET"); // 必须是get方式请求
+            http.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            http.setDoOutput(true);
+            http.setDoInput(true);
+            System.setProperty("sun.net.client.defaultConnectTimeout", "30000");// 连接超时30秒
+            System.setProperty("sun.net.client.defaultReadTimeout", "30000"); // 读取超时30秒
+            http.connect();
 
-			String extName = getFileExpandedName(http.getHeaderField("Content-Type"));
-			file.setExtName(extName);
-			// 获取文件转化为byte流
-			is = http.getInputStream();
+            String extName = getFileExpandedName(http.getHeaderField("Content-Type"));
+            file.setExtName(extName);
+            // 获取文件转化为byte流
+            is = http.getInputStream();
 
-			byte[] data = new byte[10240];
-			int len = 0;
+            byte[] data = new byte[10240];
+            int len = 0;
 
-			baos = new ByteArrayOutputStream();
+            baos = new ByteArrayOutputStream();
 
-			while ((len = is.read(data)) != -1) {
-				baos.write(data, 0, len);
-			}
+            while ((len = is.read(data)) != -1) {
+                baos.write(data, 0, len);
+            }
 
-			file.setBytes(baos.toByteArray());
+            file.setBytes(baos.toByteArray());
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			if (is != null) {
-				try {
-					is.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-			if (baos != null) {
-				try {
-					baos.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(ExceptionUtil.getMessage(e));
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (baos != null) {
+                try {
+                    baos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
 
-		return file;
+        return file;
 
-	}
+    }
 
-	private static String getFileExpandedName(String contentType) {
-		String fileEndWitsh = "";
-		if ("image/jpeg".equals(contentType))
-			fileEndWitsh = ".jpg";
-		if ("image/png".equals(contentType))
-			fileEndWitsh = ".png";
-		else if ("audio/mpeg".equals(contentType))
-			fileEndWitsh = ".mp3";
-		else if ("audio/amr".equals(contentType))
-			fileEndWitsh = ".amr";
-		else if ("video/mp4".equals(contentType))
-			fileEndWitsh = ".mp4";
-		else if ("video/mpeg4".equals(contentType))
-			fileEndWitsh = ".mp4";
-		return fileEndWitsh;
-	}
+    private static String getFileExpandedName(String contentType) {
+        String fileEndWitsh = "";
+        if ("image/jpeg".equals(contentType))
+            fileEndWitsh = ".jpg";
+        if ("image/png".equals(contentType))
+            fileEndWitsh = ".png";
+        else if ("audio/mpeg".equals(contentType))
+            fileEndWitsh = ".mp3";
+        else if ("audio/amr".equals(contentType))
+            fileEndWitsh = ".amr";
+        else if ("video/mp4".equals(contentType))
+            fileEndWitsh = ".mp4";
+        else if ("video/mpeg4".equals(contentType))
+            fileEndWitsh = ".mp4";
+        return fileEndWitsh;
+    }
 
-	public static class FileWrapper {
-		private String extName;
-		private byte[] bytes;
+    public static class FileWrapper {
+        private String extName;
+        private byte[] bytes;
 
-		public String getExtName() {
-			return extName;
-		}
+        public String getExtName() {
+            return extName;
+        }
 
-		public void setExtName(String extName) {
-			this.extName = extName;
-		}
+        public void setExtName(String extName) {
+            this.extName = extName;
+        }
 
-		public byte[] getBytes() {
-			return bytes;
-		}
+        public byte[] getBytes() {
+            return bytes;
+        }
 
-		public void setBytes(byte[] bytes) {
-			this.bytes = bytes;
-		}
+        public void setBytes(byte[] bytes) {
+            this.bytes = bytes;
+        }
 
-		@Override
-		public String toString() {
-			return "FileWrapper [extName=" + extName + ", bytes=" + Arrays.toString(bytes) + "]";
-		}
-	}
+        @Override
+        public String toString() {
+            return "FileWrapper [extName=" + extName + ", bytes=" + Arrays.toString(bytes) + "]";
+        }
+    }
 }
