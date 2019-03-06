@@ -40,7 +40,7 @@ public class CompensationHandler {
                     return;
                 }
             }
-            service.compensate(logBean);
+            service.onConnectFailedOrBusy(logBean);
         }
     }
 

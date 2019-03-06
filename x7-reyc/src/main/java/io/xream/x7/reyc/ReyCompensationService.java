@@ -18,6 +18,6 @@ package io.xream.x7.reyc;
 
 public interface ReyCompensationService {
 
-    boolean compensate(LogBean logBean);
+    boolean onConnectFailedOrBusy(LogBean logBean);
 
 }

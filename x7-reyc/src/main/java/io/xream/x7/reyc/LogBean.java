@@ -27,6 +27,7 @@ public class LogBean implements Serializable {
     private String tag;
     private Object obj;
     private Class<?> clz;
+    private String exception;
 
     public String getId() {
         return id;
@@ -76,6 +77,14 @@ public class LogBean implements Serializable {
         this.clz = clz;
     }
 
+    public String getException() {
+        return exception;
+    }
+
+    public void setException(String exception) {
+        this.exception = exception;
+    }
+
     @Override
     public String toString() {
         return "LogBean{" +
@@ -85,6 +94,7 @@ public class LogBean implements Serializable {
                 ", tag='" + tag + '\'' +
                 ", obj=" + obj +
                 ", clz=" + clz +
+                ", exception='" + exception + '\'' +
                 '}';
     }
 }

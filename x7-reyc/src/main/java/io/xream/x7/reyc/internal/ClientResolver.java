@@ -112,7 +112,7 @@ public class ClientResolver {
         if (StringUtil.isNullOrEmpty(result))
             return null;
 
-        hanleException(result);
+        hanleRemoteException(result);
 
         Class<?> returnType = methodParsed.getReturnType();
         if (returnType == null || returnType == void.class) {
@@ -167,6 +167,7 @@ public class ClientResolver {
         }
         if (e instanceof CircuitBreakerOpenException) {
 
+            logBean.setException(CircuitBreakerOpenException.class.getName());
             CompensationHandler.handle(logBean);
             if (logger.isErrorEnabled()){
                 logger.error(tag + ": " + e.getMessage());
@@ -174,8 +175,9 @@ public class ClientResolver {
             throw new BusyException();
         }
 
-        if (e.toString().contains("HttpHostConnectException") || e.toString().contains("ConnectTimeoutException")) {
+        if (e.toString().contains("HttpHostConnectException")) {
 
+            logBean.setException("HttpHostConnectException");
             CompensationHandler.handle(logBean);
             if (logger.isErrorEnabled()){
                 logger.error(tag + ": " + e.getMessage());
@@ -183,6 +185,17 @@ public class ClientResolver {
 
             throw new RuntimeException(tag + ": " + e.getMessage());
         }
+        if (e.toString().contains("ConnectTimeoutException")) {
+
+            logBean.setException("ConnectTimeoutException");
+            CompensationHandler.handle(logBean);
+            if (logger.isErrorEnabled()){
+                logger.error(tag + ": " + e.getMessage());
+            }
+
+            throw new RuntimeException(tag + ": " + e.getMessage());
+        }
+
         if (e instanceof RuntimeException) {
 
             if (logger.isErrorEnabled()){
@@ -194,7 +207,7 @@ public class ClientResolver {
         throw new RuntimeException(tag + ": " + e.getMessage());
     }
 
-    private static void hanleException(String result) {
+    private static void hanleRemoteException(String result) {
 
         if (result.contains("RemoteServiceException")
                 || result.contains("RuntimeException")
