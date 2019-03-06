@@ -20,6 +20,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -93,7 +94,11 @@ public class HttpClientUtil {
             hce.printStackTrace();
             String str = "org.apache.http.conn.HttpHostConnectException: Connect to " + url + " failed: Connection refused: connect";
             throw new RuntimeException(str);
-        }catch (IOException ioe){
+        } catch (ConnectTimeoutException cte){
+            cte.printStackTrace();
+            String str = "org.apache.http.conn.ConnectTimeoutException: Connect to " + url + " failed: Connection timeout: connect";
+            throw new RuntimeException(str);
+        } catch(IOException ioe){
             ioe.printStackTrace();
             throw new RuntimeException(ExceptionUtil.getMessage(ioe));
         } catch (Exception e) {

@@ -17,6 +17,7 @@
 package io.xream.x7.reyc;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
+import io.github.resilience4j.retry.RetryRegistry;
 import io.xream.x7.reyc.internal.ClientResolver;
 import io.xream.x7.reyc.internal.HttpClientProperies;
 import org.springframework.context.annotation.Import;
@@ -25,8 +26,9 @@ import org.springframework.context.annotation.Import;
 public class ReyClientConfig {
 
 
-    public ReyClientConfig(CircuitBreakerRegistry circuitBreakerRegistry, HttpClientProperies properies){
+    public ReyClientConfig(HttpClientProperies properies, CircuitBreakerRegistry circuitBreakerRegistry){
 
-        ClientResolver.init(circuitBreakerRegistry,properies);
+        RetryRegistry retryRegistry = RetryRegistry.ofDefaults();
+        ClientResolver.init(properies, circuitBreakerRegistry, retryRegistry);
     }
 }

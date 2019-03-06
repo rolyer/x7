@@ -27,4 +27,6 @@ public @interface ReyClient {
 
     String circuitBreaker() default "none";
 
+    boolean retry() default false;
+
 }

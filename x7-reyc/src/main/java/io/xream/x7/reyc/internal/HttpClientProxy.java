@@ -25,7 +25,7 @@ public class HttpClientProxy implements FactoryBean {
     private Class<?> objectType;
 
     private String backend;
-
+    private boolean retry;
 
     @Override
     public Object getObject() throws Exception {
@@ -55,4 +55,11 @@ public class HttpClientProxy implements FactoryBean {
         this.backend = backend;
     }
 
+    public boolean isRetry() {
+        return retry;
+    }
+
+    public void setRetry(boolean retry) {
+        this.retry = retry;
+    }
 }

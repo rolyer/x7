@@ -57,12 +57,15 @@ public class ReyClientBeanRegistrar implements ImportBeanDefinitionRegistrar {
                 backend = null;
             }
 
+            boolean retry = annotation.retry();
+
             if (!registry.containsBeanDefinition(beanName)) {
 
                 BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(clz);
                 GenericBeanDefinition definition = (GenericBeanDefinition) builder.getRawBeanDefinition();
                 definition.getPropertyValues().add("objectType", clz);
                 definition.getPropertyValues().add("backend",backend);
+                definition.getPropertyValues().add("retry",retry);
                 definition.setBeanClass(HttpClientProxy.class);
                 definition.setAutowireMode(GenericBeanDefinition.AUTOWIRE_BY_TYPE);
 
