@@ -22,6 +22,8 @@ import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.github.resilience4j.retry.Retry;
 import io.github.resilience4j.retry.RetryRegistry;
 import io.vavr.control.Try;
+import io.xream.x7.reyc.LogBean;
+import io.xream.x7.reyc.ReyClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -31,7 +33,6 @@ import x7.core.util.HttpClientUtil;
 import x7.core.util.JsonX;
 import x7.core.util.StringUtil;
 
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
@@ -39,7 +40,7 @@ import java.util.regex.Pattern;
 public class ClientResolver {
 
 
-    private static Logger logger = LoggerFactory.getLogger(ClientResolver.class);
+    private static Logger logger = LoggerFactory.getLogger(ReyClient.class);
 
     private static CircuitBreakerRegistry circuitBreakerRegistry;
     private static RetryRegistry retryRegistry;
@@ -55,6 +56,23 @@ public class ClientResolver {
 
     private static Pattern pattern = Pattern.compile("\\{[\\w]*\\}");
 
+    protected static void mapping(LogBean logBean, String remoteIntfName, String methodName){
+        ClientParsed parsed = ClientParser.get(remoteIntfName);
+        String url = parsed.getUrl();
+
+        MethodParsed methodParsed = parsed.getMap().get(methodName);
+
+        if (methodParsed == null)
+            throw new RuntimeException("RequestMapping NONE: " + remoteIntfName + "." + methodName);
+
+        String mapping = methodParsed.getRequestMapping();
+
+        logBean.setUrl(url);
+        logBean.setMapping(mapping);
+        logBean.setTag(remoteIntfName + "." + methodName + "(" + url+mapping + ")");
+
+    }
+
     protected static Object resolve(String remoteIntfName, String methodName, Object[] args) {
 
         ClientParsed parsed = ClientParser.get(remoteIntfName);
@@ -68,11 +86,12 @@ public class ClientResolver {
             throw new RuntimeException("RequestMapping NONE: " + remoteIntfName + "." + methodName);
 
         String mapping = methodParsed.getRequestMapping();
-        RequestMethod requestMethod = methodParsed.getRequestMethod();
 
         url = url + mapping;
 
         String result = null;
+
+        RequestMethod requestMethod = methodParsed.getRequestMethod();
 
         if (requestMethod == RequestMethod.POST) {
 
@@ -105,12 +124,7 @@ public class ClientResolver {
         return obj;
     }
 
-
-    public interface BackendService {
-        Object decorate();
-    }
-
-    protected static Object wrap(HttpClientProxy proxy, Method method, BackendService backendService) {
+    protected static Object wrap(HttpClientProxy proxy, BackendService backendService) {
 
         String backend = proxy.getBackend();
         CircuitBreaker circuitBreaker = circuitBreakerRegistry.circuitBreaker(backend);
@@ -124,8 +138,8 @@ public class ClientResolver {
 
                 retry.getEventPublisher()
                         .onRetry(event ->
-                                logger.info(event.getEventType().toString() +": "
-                                + proxy.getObjectType().getName() + "." + method.getName()
+                                logger.info(event.getEventType().toString() +"_"+ event.getNumberOfRetryAttempts() + ": "
+                                + backendService.logBean().getTag()
                                 ));
 
                 decoratedSupplier = Retry
@@ -135,7 +149,7 @@ public class ClientResolver {
 
         Object result = Try.ofSupplier(decoratedSupplier)
                 .recover(e ->
-                        hanleException(e)
+                        hanleException(e,backendService.logBean())
                 ).get();
 
         return result;
@@ -145,37 +159,39 @@ public class ClientResolver {
      * @param e
      * @return
      */
-    private static Object hanleException(Throwable e) {
+    private static Object hanleException(Throwable e, LogBean logBean) {
 
+        String tag = logBean.getTag();
         if (e instanceof RemoteServiceException){
-            throw (RemoteServiceException)e;
+            throw new RemoteServiceException(tag + ": " + e.getMessage());
         }
         if (e instanceof CircuitBreakerOpenException) {
 
+            CompensationHandler.handle(logBean);
             if (logger.isErrorEnabled()){
-                logger.error(e.getMessage());
+                logger.error(tag + ": " + e.getMessage());
             }
             throw new BusyException();
         }
 
         if (e.toString().contains("HttpHostConnectException") || e.toString().contains("ConnectTimeoutException")) {
 
+            CompensationHandler.handle(logBean);
             if (logger.isErrorEnabled()){
-                logger.error(e.getMessage());
+                logger.error(tag + ": " + e.getMessage());
             }
 
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(tag + ": " + e.getMessage());
         }
         if (e instanceof RuntimeException) {
 
             if (logger.isErrorEnabled()){
-                logger.error(e.getMessage());
+                logger.error(tag + ": " + e.getMessage());
             }
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(tag + ": " + e.getMessage());
         }
 
-
-        return e.toString();
+        throw new RuntimeException(tag + ": " + e.getMessage());
     }
 
     private static void hanleException(String result) {
@@ -194,4 +210,10 @@ public class ClientResolver {
 
     }
 
+
+
+    public interface BackendService {
+        Object decorate();
+        LogBean logBean();
+    }
 }

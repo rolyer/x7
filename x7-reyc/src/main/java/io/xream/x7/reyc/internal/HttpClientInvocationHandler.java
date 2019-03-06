@@ -16,6 +16,7 @@
  */
 package io.xream.x7.reyc.internal;
 
+import io.xream.x7.reyc.LogBean;
 import x7.core.util.ExceptionUtil;
 
 import java.lang.reflect.InvocationHandler;
@@ -36,13 +37,25 @@ public class HttpClientInvocationHandler implements InvocationHandler {
             if (httpClientProxy.getBackend() == null)
                 return ClientResolver.resolve(httpClientProxy.getObjectType().getName(),method.getName(),args);
 
-            return ClientResolver.wrap(httpClientProxy, method, new ClientResolver.BackendService() {
+            return ClientResolver.wrap(httpClientProxy,  new ClientResolver.BackendService() {
                 @Override
                 public Object decorate() {
                     return ClientResolver.resolve(httpClientProxy.getObjectType().getName(),method.getName(),args);
                 }
+
+                @Override
+                public LogBean logBean() {
+                    Object obj = (args == null || args.length == 0) ? null : args[0];
+                    LogBean logBean = new LogBean();
+                    logBean.setObj(obj);
+                    logBean.setClz(obj == null ? null : obj.getClass());
+                    ClientResolver.mapping(logBean,httpClientProxy.getObjectType().getName(),method.getName());
+                    return logBean;
+                }
             });
 
+        } catch (RuntimeException re){
+            throw re;
         } catch (Exception e){
             throw new RuntimeException(ExceptionUtil.getMessage(e));
         }

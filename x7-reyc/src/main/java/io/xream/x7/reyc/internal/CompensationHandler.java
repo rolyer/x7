@@ -14,20 +14,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.xream.x7.reyc;
+package io.xream.x7.reyc.internal;
 
-import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
-import io.github.resilience4j.retry.RetryRegistry;
-import io.xream.x7.reyc.internal.ClientResolver;
-import io.xream.x7.reyc.internal.HttpClientProperies;
-import org.springframework.context.annotation.Import;
 
-@Import(HttpClientProperies.class)
-public class ReyClientConfig {
+import io.xream.x7.reyc.LogBean;
+import io.xream.x7.reyc.ReyCompensationService;
+import x7.config.SpringHelper;
 
-    public ReyClientConfig(HttpClientProperies properies, CircuitBreakerRegistry circuitBreakerRegistry){
+public class CompensationHandler {
 
-        RetryRegistry retryRegistry = RetryRegistry.ofDefaults();
-        ClientResolver.init(properies, circuitBreakerRegistry, retryRegistry);
+    private static boolean isNotNeed = false;
+    private static ReyCompensationService service = null;
+
+    protected static void handle(LogBean logBean) {
+
+        if (isNotNeed == false) {
+            if (service == null){
+                try {
+                    service = SpringHelper.getObject(ReyCompensationService.class);
+                }catch (Exception e){
+
+                }
+                if (service == null) {
+                    isNotNeed = true;
+                    return;
+                }
+            }
+            service.compensate(logBean);
+        }
     }
+
 }
