@@ -89,8 +89,10 @@ public class ClientParser {
             if (headers != null && headers.length > 0){
                 hearderList = new ArrayList<>();
                 for (String header : headers){
-                    String[] headerArr = header.split("=");
-                    KV kv = new KV(headerArr[0],headerArr[1]);
+                    int i = header.indexOf("=");
+                    String key = header.substring(0,i);
+                    String value = header.substring(i+1);
+                    KV kv = new KV(key,value);
                     hearderList.add(kv);
                 }
             }
