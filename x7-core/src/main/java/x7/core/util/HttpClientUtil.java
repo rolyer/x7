@@ -27,6 +27,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import x7.core.bean.KV;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -34,6 +35,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 
@@ -42,10 +44,10 @@ public class HttpClientUtil {
     private final static Logger logger = LoggerFactory.getLogger(HttpClientUtil.class);
 
     public static String post(String url, Object param) {
-        return post(url, param, 15000, 15000);
+        return post(url, param, null, 15000, 15000);
     }
 
-    public static String post(String url, Object param, int connectTimeoutMS, int socketTimeoutMS) {
+    public static String post(String url, Object param, List<KV> hearderList, int connectTimeoutMS, int socketTimeoutMS) {
 
         CloseableHttpClient httpclient = HttpClients.createDefault();
 
@@ -58,6 +60,12 @@ public class HttpClientUtil {
                 .build();//设置请求和传输超时时间
 
         httpPost.setConfig(requestConfig);
+
+        if (hearderList != null) {
+            for (KV kv : hearderList) {
+                httpPost.addHeader(kv.getK(), kv.getV().toString());
+            }
+        }
 
         String json = "";
         if (param != null) {
@@ -102,10 +110,10 @@ public class HttpClientUtil {
     }
 
     public static String getUrl(String urlString) {
-        return getUrl(urlString, 15000, 15000);
+        return getUrl(urlString, null,15000, 15000);
     }
 
-    public static String getUrl(String urlString, int connectTimeoutMS, int readTimeoutMS) {
+    public static String getUrl(String urlString, List<KV> hearderList, int connectTimeoutMS, int readTimeoutMS) {
         StringBuffer sb = new StringBuffer();
         BufferedReader reader = null;
         try {
@@ -115,6 +123,13 @@ public class HttpClientUtil {
 
             conn.setConnectTimeout(connectTimeoutMS);
             conn.setReadTimeout(readTimeoutMS);
+
+            if (hearderList != null) {
+                for (KV kv : hearderList) {
+                    conn.addRequestProperty(kv.getK(),kv.getV().toString());
+                }
+            }
+
             reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 
             for (String line = null; (line = reader.readLine()) != null; ) {
@@ -126,7 +141,9 @@ public class HttpClientUtil {
             throw new RuntimeException(ExceptionUtil.getMessage(e));
         }finally {
             try {
-                reader.close();
+                if (reader != null) {
+                    reader.close();
+                }
             } catch (IOException e) {
             }
         }

@@ -1,3 +1,19 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package io.xream.x7.reyc.internal;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
@@ -22,12 +38,12 @@ public class ClientResolver {
 
     private static CircuitBreakerRegistry circuitBreakerRegistry;
 
-    private static HttpClientProperies _properies;
+    private static HttpClientProperies properies;
 
 
-    public static void init(CircuitBreakerRegistry c,HttpClientProperies properies) {
+    public static void init(CircuitBreakerRegistry c,HttpClientProperies p) {
         circuitBreakerRegistry = c;
-        _properies = properies;
+        properies = p;
     }
 
     private static Pattern pattern = Pattern.compile("\\{[\\w]*\\}");
@@ -54,9 +70,9 @@ public class ClientResolver {
         if (requestMethod == RequestMethod.POST) {
 
             if (args != null && args.length > 0) {
-                result = HttpClientUtil.post(url, args[0],_properies.getConnectTimeout(),_properies.getSocketTimeout());
+                result = HttpClientUtil.post(url, args[0],methodParsed.getHeaderList(),properies.getConnectTimeout(),properies.getSocketTimeout());
             } else {
-                result = HttpClientUtil.post(url, null, _properies.getConnectTimeout(),_properies.getSocketTimeout());
+                result = HttpClientUtil.post(url, null,methodParsed.getHeaderList(), properies.getConnectTimeout(),properies.getSocketTimeout());
             }
         } else {
             List<String> regExList = StringUtil.listByRegEx(url, pattern);
@@ -64,7 +80,7 @@ public class ClientResolver {
             for (int i = 0; i < size; i++) {
                 url = url.replaceAll(regExList.get(i), args[i].toString());
             }
-            result = HttpClientUtil.getUrl(url,_properies.getConnectTimeout(),_properies.getSocketTimeout());
+            result = HttpClientUtil.getUrl(url,methodParsed.getHeaderList(),properies.getConnectTimeout(),properies.getSocketTimeout());
         }
 
         if (StringUtil.isNullOrEmpty(result))
