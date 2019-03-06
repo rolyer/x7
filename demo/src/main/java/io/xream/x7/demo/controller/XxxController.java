@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import x7.core.bean.*;
 import x7.core.bean.condition.RefreshCondition;
+import x7.core.exception.BizException;
 import x7.core.util.JsonX;
 import x7.core.web.Direction;
 import x7.core.web.Page;
@@ -266,6 +267,11 @@ public class XxxController {
 	@RequestMapping("/reyc/test")
 	public Boolean testRecClient(@RequestBody CatRO ro) {
 
+		try {
+			TimeUnit.HOURS.sleep(1);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		return true;
 	}
 

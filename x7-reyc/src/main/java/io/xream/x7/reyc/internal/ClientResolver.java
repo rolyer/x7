@@ -163,7 +163,7 @@ public class ClientResolver {
 
         String tag = logBean.getTag();
         if (e instanceof RemoteServiceException){
-            throw new RemoteServiceException(tag + ": " + e.getMessage());
+            throw (RemoteServiceException) e;
         }
         if (e instanceof CircuitBreakerOpenException) {
 
