@@ -169,6 +169,7 @@ public class ClientResolver {
 
             logBean.setException(CircuitBreakerOpenException.class.getName());
             CompensationHandler.handle(logBean);
+            logger.info("JSON:"+JsonX.toJson(logBean));
             if (logger.isErrorEnabled()){
                 logger.error(tag + ": " + e.getMessage());
             }
@@ -179,6 +180,7 @@ public class ClientResolver {
 
             logBean.setException("HttpHostConnectException");
             CompensationHandler.handle(logBean);
+            logger.info("JSON:"+JsonX.toJson(logBean));
             if (logger.isErrorEnabled()){
                 logger.error(tag + ": " + e.getMessage());
             }
@@ -189,6 +191,7 @@ public class ClientResolver {
 
             logBean.setException("ConnectTimeoutException");
             CompensationHandler.handle(logBean);
+            logger.info("JSON:"+JsonX.toJson(logBean));
             if (logger.isErrorEnabled()){
                 logger.error(tag + ": " + e.getMessage());
             }
