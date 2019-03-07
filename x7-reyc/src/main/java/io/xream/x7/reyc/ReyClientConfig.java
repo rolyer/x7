@@ -30,4 +30,5 @@ public class ReyClientConfig {
         RetryRegistry retryRegistry = RetryRegistry.ofDefaults();
         ClientResolver.init(properies, circuitBreakerRegistry, retryRegistry);
     }
+
 }

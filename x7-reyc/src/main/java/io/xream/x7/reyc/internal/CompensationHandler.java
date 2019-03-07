@@ -19,19 +19,23 @@ package io.xream.x7.reyc.internal;
 
 import io.xream.x7.reyc.LogBean;
 import io.xream.x7.reyc.ReyCompensationService;
-import x7.config.SpringHelper;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
-public class CompensationHandler {
+public class CompensationHandler implements ApplicationContextAware {
 
     private static boolean isNotNeed = false;
     private static ReyCompensationService service = null;
+
+    private static ApplicationContext context;
 
     protected static void handle(LogBean logBean) {
 
         if (isNotNeed == false) {
             if (service == null){
                 try {
-                    service = SpringHelper.getObject(ReyCompensationService.class);
+                    service = context.getBean(ReyCompensationService.class);
                 }catch (Exception e){
 
                 }
@@ -44,4 +48,8 @@ public class CompensationHandler {
         }
     }
 
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        context = applicationContext;
+    }
 }
