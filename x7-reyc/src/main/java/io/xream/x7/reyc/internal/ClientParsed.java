@@ -16,6 +16,7 @@
  */
 package io.xream.x7.reyc.internal;
 
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,6 +25,8 @@ public class ClientParsed {
     private Class<?> objectType;
     private String url;
     private Map<String,MethodParsed> map = new HashMap<>();
+    private Map<String, Method> fallbackMethodMap = new HashMap<>();
+    private Object fallback;
 
     public Class<?> getObjectType() {
         return objectType;
@@ -49,12 +52,30 @@ public class ClientParsed {
         this.map = map;
     }
 
+    public Map<String, Method> getFallbackMethodMap() {
+        return fallbackMethodMap;
+    }
+
+    public void setFallbackMethodMap(Map<String, Method> fallbackMethodMap) {
+        this.fallbackMethodMap = fallbackMethodMap;
+    }
+
+    public Object getFallback() {
+        return fallback;
+    }
+
+    public void setFallback(Object fallback) {
+        this.fallback = fallback;
+    }
+
     @Override
     public String toString() {
         return "ClientParsed{" +
                 "objectType=" + objectType +
                 ", url='" + url + '\'' +
                 ", map=" + map +
+                ", fallbackMethodMap=" + fallbackMethodMap +
+                ", fallback=" + fallback +
                 '}';
     }
 }

@@ -22,7 +22,6 @@ import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.github.resilience4j.retry.Retry;
 import io.github.resilience4j.retry.RetryRegistry;
 import io.vavr.control.Try;
-import io.xream.x7.reyc.LogBean;
 import io.xream.x7.reyc.ReyClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +32,7 @@ import x7.core.util.HttpClientUtil;
 import x7.core.util.JsonX;
 import x7.core.util.StringUtil;
 
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
@@ -48,7 +48,7 @@ public class ClientResolver {
     private static HttpClientProperies properies;
 
 
-    public static void init(HttpClientProperies p, CircuitBreakerRegistry c,RetryRegistry r) {
+    public static void init(HttpClientProperies p, CircuitBreakerRegistry c, RetryRegistry r) {
         circuitBreakerRegistry = c;
         properies = p;
         retryRegistry = r;
@@ -56,22 +56,6 @@ public class ClientResolver {
 
     private static Pattern pattern = Pattern.compile("\\{[\\w]*\\}");
 
-    protected static void mapping(LogBean logBean, String remoteIntfName, String methodName){
-        ClientParsed parsed = ClientParser.get(remoteIntfName);
-        String url = parsed.getUrl();
-
-        MethodParsed methodParsed = parsed.getMap().get(methodName);
-
-        if (methodParsed == null)
-            throw new RuntimeException("RequestMapping NONE: " + remoteIntfName + "." + methodName);
-
-        String mapping = methodParsed.getRequestMapping();
-
-        logBean.setUrl(url);
-        logBean.setMapping(mapping);
-        logBean.setTag(remoteIntfName + "." + methodName + "(" + url+mapping + ")");
-
-    }
 
     protected static Object resolve(String remoteIntfName, String methodName, Object[] args) {
 
@@ -96,9 +80,9 @@ public class ClientResolver {
         if (requestMethod == RequestMethod.POST) {
 
             if (args != null && args.length > 0) {
-                result = HttpClientUtil.post(url, args[0],methodParsed.getHeaderList(),properies.getConnectTimeout(),properies.getSocketTimeout());
+                result = HttpClientUtil.post(url, args[0], methodParsed.getHeaderList(), properies.getConnectTimeout(), properies.getSocketTimeout());
             } else {
-                result = HttpClientUtil.post(url, null,methodParsed.getHeaderList(), properies.getConnectTimeout(),properies.getSocketTimeout());
+                result = HttpClientUtil.post(url, null, methodParsed.getHeaderList(), properies.getConnectTimeout(), properies.getSocketTimeout());
             }
         } else {
             List<String> regExList = StringUtil.listByRegEx(url, pattern);
@@ -106,7 +90,7 @@ public class ClientResolver {
             for (int i = 0; i < size; i++) {
                 url = url.replaceAll(regExList.get(i), args[i].toString());
             }
-            result = HttpClientUtil.getUrl(url,methodParsed.getHeaderList(),properies.getConnectTimeout(),properies.getSocketTimeout());
+            result = HttpClientUtil.getUrl(url, methodParsed.getHeaderList(), properies.getConnectTimeout(), properies.getSocketTimeout());
         }
 
         if (StringUtil.isNullOrEmpty(result))
@@ -124,7 +108,7 @@ public class ClientResolver {
         return obj;
     }
 
-    protected static Object wrap(HttpClientProxy proxy, BackendService backendService) {
+    protected static Object wrap(HttpClientProxy proxy, String methodName, BackendService backendService) {
 
         String backend = proxy.getBackend();
         CircuitBreaker circuitBreaker = circuitBreakerRegistry.circuitBreaker(backend);
@@ -132,15 +116,20 @@ public class ClientResolver {
         Supplier<Object> decoratedSupplier = CircuitBreaker
                 .decorateSupplier(circuitBreaker, backendService::decorate);
 
-        if (proxy.isRetry()){
+        final String intfName = proxy.getObjectType().getName();
+        final String tag = intfName + "." + methodName;
+
+        if (proxy.isRetry()) {
             Retry retry = retryRegistry.retry(backend);
             if (retry != null) {
 
                 retry.getEventPublisher()
-                        .onRetry(event ->
-                                logger.info(event.getEventType().toString() +"_"+ event.getNumberOfRetryAttempts() + ": "
-                                + backendService.logBean().getTag()
-                                ));
+                        .onRetry(event -> {
+                            if (logger.isDebugEnabled()) {
+                                logger.debug(event.getEventType().toString() + "_" + event.getNumberOfRetryAttempts() + ": "
+                                        + tag);
+                            }
+                        });
 
                 decoratedSupplier = Retry
                         .decorateSupplier(retry, decoratedSupplier);
@@ -149,7 +138,7 @@ public class ClientResolver {
 
         Object result = Try.ofSupplier(decoratedSupplier)
                 .recover(e ->
-                        hanleException(e,backendService.logBean())
+                        hanleException(e, tag, backendService)
                 ).get();
 
         return result;
@@ -159,40 +148,28 @@ public class ClientResolver {
      * @param e
      * @return
      */
-    private static Object hanleException(Throwable e, LogBean logBean) {
+    private static Object hanleException(Throwable e, String tag, BackendService backendService) {
 
-        String tag = logBean.getTag();
-        if (e instanceof RemoteServiceException){
+        if (e instanceof RemoteServiceException) {
             throw (RemoteServiceException) e;
         }
         if (e instanceof CircuitBreakerOpenException) {
 
-            logBean.setException(CircuitBreakerOpenException.class.getName());
-            CompensationHandler.handle(logBean);
-            logger.info("JSON:"+JsonX.toJson(logBean));
-            if (logger.isErrorEnabled()){
+            backendService.fallback();
+            if (logger.isErrorEnabled()) {
                 logger.error(tag + ": " + e.getMessage());
             }
             throw new BusyException();
         }
 
-        if (e.toString().contains("HttpHostConnectException")) {
+        String str = e.toString();
+        if (str.contains("HttpHostConnectException")
+                || str.contains("ConnectTimeoutException")
+                || str.contains("ConnectException")
+        ) {
 
-            logBean.setException("HttpHostConnectException");
-            CompensationHandler.handle(logBean);
-            logger.info("JSON:"+JsonX.toJson(logBean));
-            if (logger.isErrorEnabled()){
-                logger.error(tag + ": " + e.getMessage());
-            }
-
-            throw new RuntimeException(tag + ": " + e.getMessage());
-        }
-        if (e.toString().contains("ConnectTimeoutException")) {
-
-            logBean.setException("ConnectTimeoutException");
-            CompensationHandler.handle(logBean);
-            logger.info("JSON:"+JsonX.toJson(logBean));
-            if (logger.isErrorEnabled()){
+            backendService.fallback();
+            if (logger.isErrorEnabled()) {
                 logger.error(tag + ": " + e.getMessage());
             }
 
@@ -201,7 +178,7 @@ public class ClientResolver {
 
         if (e instanceof RuntimeException) {
 
-            if (logger.isErrorEnabled()){
+            if (logger.isErrorEnabled()) {
                 logger.error(tag + ": " + e.getMessage());
             }
             throw new RuntimeException(tag + ": " + e.getMessage());
@@ -217,7 +194,7 @@ public class ClientResolver {
                 || result.contains("BizException")
                 || result.contains("\"status\":\"FAIL\"")) {
 
-            if (logger.isErrorEnabled()){
+            if (logger.isErrorEnabled()) {
                 logger.error(result);
             }
 
@@ -226,10 +203,30 @@ public class ClientResolver {
 
     }
 
+    public static Object fallback(String intfName, String methodName, Object[] args) {
+
+
+        ClientParsed parsed = ClientParser.get(intfName);
+        if (parsed.getFallback() == null)
+            return null;
+        Method method = parsed.getFallbackMethodMap().get(methodName);
+
+        if (method == null)
+            return null;
+
+        try {
+            return method.invoke(parsed.getFallback(), args);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Exception of fallback");
+        }
+
+    }
 
 
     public interface BackendService {
         Object decorate();
-        LogBean logBean();
+
+        Object fallback();
     }
 }

@@ -18,7 +18,6 @@ package io.xream.x7;
 
 import io.xream.x7.reyc.ReyClientBeanRegistrar;
 import io.xream.x7.reyc.ReyClientConfig;
-import io.xream.x7.reyc.internal.CompensationHandler;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;
@@ -26,7 +25,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Documented
-@Import({CompensationHandler.class,ReyClientConfig.class,ReyClientBeanRegistrar.class})
+@Import({ReyClientConfig.class,ReyClientBeanRegistrar.class})
 public @interface EnableReyClient {
 
 }

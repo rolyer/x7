@@ -23,10 +23,27 @@ import java.lang.annotation.*;
 @Documented
 public @interface ReyClient {
 
+    String IGNORE_CIRCUITBREAKER = "IGNORE_CIRCUITBREAKER";
+
+    /**
+     * dns or url
+     */
     String value() default  "";
 
-    String circuitBreaker() default "none";
+    /**
+     * "" or configed backend name in application.properties
+     */
+    String circuitBreaker() default IGNORE_CIRCUITBREAKER;
 
+    /**
+     * true | false
+     */
     boolean retry() default false;
+
+    /**
+     * handle fallback for the immportant method <br>
+     * Fallback class,  the method name must same as the method of servcie. and the parameters must same
+     */
+    Class<?> fallback();
 
 }

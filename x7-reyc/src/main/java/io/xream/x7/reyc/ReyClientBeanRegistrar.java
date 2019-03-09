@@ -53,7 +53,7 @@ public class ReyClientBeanRegistrar implements ImportBeanDefinitionRegistrar {
             beanNameList.add(beanName);
 
             String backend = annotation.circuitBreaker();
-            if (backend.trim().toLowerCase().contains("none")){
+            if (backend.equals(ReyClient.IGNORE_CIRCUITBREAKER)){
                 backend = null;
             }
 

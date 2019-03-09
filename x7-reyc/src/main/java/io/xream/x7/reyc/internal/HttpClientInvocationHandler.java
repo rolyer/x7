@@ -16,7 +16,6 @@
  */
 package io.xream.x7.reyc.internal;
 
-import io.xream.x7.reyc.LogBean;
 import x7.core.util.ExceptionUtil;
 
 import java.lang.reflect.InvocationHandler;
@@ -34,23 +33,19 @@ public class HttpClientInvocationHandler implements InvocationHandler {
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         try{
 
+            final String methodName = method.getName();
             if (httpClientProxy.getBackend() == null)
-                return ClientResolver.resolve(httpClientProxy.getObjectType().getName(),method.getName(),args);
+                return ClientResolver.resolve(httpClientProxy.getObjectType().getName(),methodName,args);
 
-            return ClientResolver.wrap(httpClientProxy,  new ClientResolver.BackendService() {
+            return ClientResolver.wrap(httpClientProxy, methodName, new ClientResolver.BackendService() {
                 @Override
                 public Object decorate() {
-                    return ClientResolver.resolve(httpClientProxy.getObjectType().getName(),method.getName(),args);
+                    return ClientResolver.resolve(httpClientProxy.getObjectType().getName(),methodName,args);
                 }
 
                 @Override
-                public LogBean logBean() {
-                    Object obj = (args == null || args.length == 0) ? null : args[0];
-                    LogBean logBean = new LogBean();
-                    logBean.setObj(obj);
-                    logBean.setClz(obj == null ? null : obj.getClass());
-                    ClientResolver.mapping(logBean,httpClientProxy.getObjectType().getName(),method.getName());
-                    return logBean;
+                public Object fallback() {
+                    return ClientResolver.fallback(httpClientProxy.getObjectType().getName(),methodName,args);
                 }
             });
 

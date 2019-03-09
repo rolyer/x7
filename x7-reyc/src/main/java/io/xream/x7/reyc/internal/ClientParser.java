@@ -56,6 +56,22 @@ public class ClientParser {
         parsed.setObjectType(clz);
         parsed.setUrl(url);
 
+        /*
+         * fallback
+         */
+        Class<?> fallbackClz = reyClient.fallback();
+        if (fallbackClz != null) {
+            Method[] fallbackMethodArr = fallbackClz.getMethods();
+            for (Method fm : fallbackMethodArr) {
+                parsed.getFallbackMethodMap().put(fm.getName(), fm);
+            }
+            try {
+                parsed.setFallback(fallbackClz.newInstance());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
         Method[] arr = clz.getDeclaredMethods();
 
         for (Method method : arr) {
