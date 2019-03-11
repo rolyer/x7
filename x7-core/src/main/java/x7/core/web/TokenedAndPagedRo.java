@@ -16,7 +16,10 @@
  */
 package x7.core.web;
 
+import x7.core.bean.Sort;
 import x7.core.util.StringUtil;
+
+import java.util.List;
 
 public class TokenedAndPagedRo implements Paged, Tokened{
 
@@ -28,6 +31,7 @@ public class TokenedAndPagedRo implements Paged, Tokened{
 	private int rows;
 	private String orderBy;
 	private Direction direction;
+	private List<Sort> sortList;
 	public long getPassportId() {
 		if (StringUtil.isNullOrEmpty(passportId))
 			return 0;
@@ -78,9 +82,28 @@ public class TokenedAndPagedRo implements Paged, Tokened{
 	public void setScroll(boolean isScroll) {
 		this.isScroll = isScroll;
 	}
+
+	@Override
+	public List<Sort> getSortList() {
+		return sortList;
+	}
+
+	public void setSortList(List<Sort> sortList) {
+		this.sortList = sortList;
+	}
+
 	@Override
 	public String toString() {
-		return "BaseRo [passportId=" + passportId + ", token=" + token + ", passportType=" + passportType + ", page=" + page
-				+ ", rows=" + rows + ", isScroll=" + isScroll +", orderBy=" + orderBy + ", direction=" + direction + "]";
+		return "TokenedAndPagedRo{" +
+				"passportId='" + passportId + '\'' +
+				", token='" + token + '\'' +
+				", passportType='" + passportType + '\'' +
+				", isScroll=" + isScroll +
+				", page=" + page +
+				", rows=" + rows +
+				", orderBy='" + orderBy + '\'' +
+				", direction=" + direction +
+				", sortList=" + sortList +
+				'}';
 	}
 }
