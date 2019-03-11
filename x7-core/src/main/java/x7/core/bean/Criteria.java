@@ -40,6 +40,7 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 	private int rows;
 	private Direction direction = Direction.DESC;
 	private List<String> orderByList = new ArrayList<>();
+	private List<Sort> sortList;
 	private List<KV> fixedSortList = new ArrayList();
 	private List<X> listX = new ArrayList<X>();
 	private DataPermission dataPermission;//String,Or List<String>   LikeRight | In
@@ -99,6 +100,23 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 	}
 	public String getCountDistinct(){
 		return this.countDistinct;
+	}
+
+	public List<Sort> getSortList() {
+		if (sortList == null || sortList.isEmpty())
+			return null;
+		Iterator<Sort> ite = sortList.iterator();
+		while (ite.hasNext()){
+			Sort sort = ite.next();
+			if (StringUtil.isNullOrEmpty(sort.getOrderBy())) {
+				ite.remove();
+			}
+		}
+		return sortList;
+	}
+
+	public void setSortList(List<Sort> sortList) {
+		this.sortList = sortList;
 	}
 
 	public void setCustomedResultKey(String str){
@@ -192,6 +210,7 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 		this.isScroll = paged.isScroll();
 		this.page = paged.getPage();
 		this.rows = paged.getRows();
+		this.sortList = paged.getSortList();
 	}
 
 	@Override
@@ -201,6 +220,7 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 				", page=" + page +
 				", rows=" + rows +
 				", orderByList='" + orderByList + '\'' +
+				", sortList='" + sortList + '\'' +
 				", direction=" + direction +
 				", valueList=" + valueList +
 				", listX=" + listX +

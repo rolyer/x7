@@ -296,6 +296,31 @@ public class SqlCriteriaParser implements CriteriaParser {
         if (criteria.isFixedSort())
             return;
 
+        List<Sort> sortList = criteria.getSortList();
+        if (sortList !=null && !sortList.isEmpty()){
+
+            sb.append(Conjunction.ORDER_BY.sql());
+            int size = sortList.size();
+            int i = 0;
+            for (Sort sort : sortList) {
+                String orderBy = sort.getOrderBy();
+                String mapper = mapping(orderBy, criteria);
+                sb.append(mapper).append(SqlScript.SPACE);
+                Direction direction = sort.getDirection();
+                if (direction == null) {
+                    sb.append(Direction.DESC);
+                }else{
+                    sb.append(direction);
+                }
+                sb.append(SqlScript.SPACE);
+                i++;
+                if (i < size) {
+                    sb.append(SqlScript.COMMA).append(SqlScript.SPACE);
+                }
+            }
+            return;
+        }
+
         List<String> orderByList = criteria.getOrderByList();
         if (!orderByList.isEmpty()) {
 

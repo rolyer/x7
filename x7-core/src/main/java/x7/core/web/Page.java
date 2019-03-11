@@ -18,6 +18,7 @@ package x7.core.web;
 
 
 import com.alibaba.fastjson.JSONObject;
+import x7.core.bean.Sort;
 import x7.core.search.Tag;
 import x7.core.util.JsonX;
 
@@ -48,6 +49,7 @@ public class Page<T> implements Paged, Serializable{
 	private List<String> keyList = new ArrayList<String>();
 	private boolean isScroll;
 	private String orderBy;
+	private List<Sort> sortList;
 	private Direction direction = Direction.DESC;
 	
 	private Tag tag;
@@ -207,6 +209,14 @@ public class Page<T> implements Paged, Serializable{
 		this.tag = tag;
 	}
 
+	@Override
+	public List<Sort> getSortList() {
+		return sortList;
+	}
+
+	public void setSortList(List<Sort> sortList) {
+		this.sortList = sortList;
+	}
 
 	public int getTotalPages() {
 		int totalPages = (int) (totalRows / getRows());
@@ -240,6 +250,7 @@ public class Page<T> implements Paged, Serializable{
 				"page=" + page + ", " +
 				"rows=" + rows + ", " +
 				"orderBy=" + orderBy + ", " +
+				"sortList=" + sortList + ", " +
 				"sc=" + direction + ", " +
 				"\n		list=" + list + ", " +
 				"\n		keyList=" + keyList  + ", " +

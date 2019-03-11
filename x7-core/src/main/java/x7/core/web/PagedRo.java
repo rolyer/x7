@@ -16,6 +16,10 @@
  */
 package x7.core.web;
 
+import x7.core.bean.Sort;
+
+import java.util.List;
+
 public class PagedRo implements Paged{
 
 	private boolean isScroll;
@@ -23,6 +27,7 @@ public class PagedRo implements Paged{
 	private int rows;
 	private String orderBy;
 	private Direction direction;
+	private List<Sort> sortList;
 	public boolean isScroll() {
 		return isScroll;
 	}
@@ -53,9 +58,24 @@ public class PagedRo implements Paged{
 	public void setDirection(Direction sc) {
 		this.direction = sc;
 	}
+
+	public List<Sort> getSortList() {
+		return sortList;
+	}
+
+	public void setSortList(List<Sort> sortList) {
+		this.sortList = sortList;
+	}
+
 	@Override
 	public String toString() {
-		return "PagedRo [isScroll=" + isScroll + ", page=" + page + ", rows=" + rows + ", orderBy=" + orderBy + ", direction="
-				+ direction + "]";
+		return "PagedRo{" +
+				"isScroll=" + isScroll +
+				", page=" + page +
+				", rows=" + rows +
+				", orderBy='" + orderBy + '\'' +
+				", direction=" + direction +
+				", sortList=" + sortList +
+				'}';
 	}
 }

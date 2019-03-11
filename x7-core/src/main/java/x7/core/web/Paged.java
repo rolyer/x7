@@ -16,6 +16,10 @@
  */
 package x7.core.web;
 
+import x7.core.bean.Sort;
+
+import java.util.List;
+
 /**
  * @author Sim Wang
  */
@@ -25,4 +29,5 @@ public interface Paged {
 	int getRows();
 	String getOrderBy();
 	Direction getDirection();
+	List<Sort> getSortList();
 }
