@@ -147,11 +147,12 @@ public class XxxController {
 		List<Object> inList = new ArrayList<>();
 		inList.add("gggg");
 		inList.add("xxxxx");
+		ro.setOrderBy("catTest.catFriendName,catTest.id");
 
 		CriteriaBuilder.ResultMappedBuilder builder = CriteriaBuilder.buildResultMapped(CatTest.class,ro);
 		//builder.distinct("catTest.id").reduce(Reduce.ReduceType.COUNT,"catTest.id").groupBy("catTest.id");
 		builder.and().in("catTest.catFriendName", inList);
-		builder.paged().orderIn("catTest.catFriendName",inList);//按IN查询条件排序，有值，就过滤掉orderBy
+//		builder.paged().orderIn("catTest.catFriendName",inList);//按IN查询条件排序，有值，就过滤掉orderBy
 		String sourceScript = "catTest LEFT JOIN dogTest on catTest.dogId = dogTest.id";
 		Criteria.ResultMappedCriteria resultMapped = builder.get();
 		resultMapped.setSourceScript(sourceScript);

@@ -6,6 +6,9 @@ public class TestFallback {
 
     public void test(CatRO ro){
 
-        System.out.println("FALL BACK tested");
+
+        throw new RuntimeException("");
     }
+
+
 }

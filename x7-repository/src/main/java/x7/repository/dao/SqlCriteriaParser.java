@@ -305,17 +305,19 @@ public class SqlCriteriaParser implements CriteriaParser {
             for (String ob : orderByList) {
                 String mapper = mapping(ob, criteria);
                 sb.append(mapper).append(SqlScript.SPACE);
+                Direction direction = criteria.getDirection();
+                if (direction == null) {
+                    sb.append(Direction.DESC);
+                }else{
+                    sb.append(direction);
+                }
+                sb.append(SqlScript.SPACE);
                 i++;
                 if (i < size) {
                     sb.append(SqlScript.COMMA).append(SqlScript.SPACE);
                 }
             }
-            Direction direction = criteria.getDirection();
-            if (direction == null) {
-                sb.append(Direction.DESC);
-            }else{
-                sb.append(direction);
-            }
+
         }
 
     }

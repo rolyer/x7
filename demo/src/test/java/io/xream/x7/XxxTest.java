@@ -34,7 +34,7 @@ public class XxxTest {
 
         CatRO cat = new CatRO();
 
-        ViewEntity ve = this.controller.create();
+        ViewEntity ve = this.controller.test(cat);
 
         System.out.println("\n______Result: " + ve);
 
