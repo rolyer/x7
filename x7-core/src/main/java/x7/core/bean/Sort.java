@@ -10,6 +10,13 @@ public class Sort implements Serializable {
     private Direction direction = Direction.DESC;
     private String orderBy;
 
+    public Sort(){}
+
+    public Sort(String orderBy, Direction direction){
+        this.orderBy = orderBy;
+        this.direction = direction;
+    }
+
     public Direction getDirection() {
         return direction;
     }

@@ -11,10 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import x7.core.bean.Criteria;
-import x7.core.bean.CriteriaBuilder;
-import x7.core.bean.DomainObject;
-import x7.core.bean.Reduce;
+import x7.core.bean.*;
 import x7.core.bean.condition.RefreshCondition;
 import x7.core.util.JsonX;
 import x7.core.web.Direction;
@@ -150,6 +147,18 @@ public class XxxController {
 		inList.add("gggg");
 		inList.add("xxxxx");
 		ro.setOrderBy("catTest.catFriendName,catTest.id");
+
+		Sort sort1 = new Sort();
+		sort1.setOrderBy("catTest.catFriendName");
+		sort1.setDirection(Direction.ASC);
+		Sort sort2 = new Sort();
+		sort2.setOrderBy("catTest.id");
+		sort2.setDirection(Direction.DESC);
+		List<Sort> sortList = new ArrayList<Sort>();
+		sortList.add(sort1);
+		sortList.add(sort2);
+
+		ro.setSortList(sortList);
 
 		CriteriaBuilder.ResultMappedBuilder builder = CriteriaBuilder.buildResultMapped(CatTest.class,ro);
 		//builder.distinct("catTest.id").reduce(Reduce.ReduceType.COUNT,"catTest.id").groupBy("catTest.id");

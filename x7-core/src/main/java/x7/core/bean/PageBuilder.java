@@ -28,4 +28,5 @@ public interface PageBuilder {
     PageBuilder orderIn(String property, List<? extends Object> inList);
     PageBuilder orderBy(String property);
     void on(Direction direction);
+    PageBuilder sort(String orderBy, Direction direction);
 }

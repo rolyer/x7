@@ -163,6 +163,20 @@ public class CriteriaBuilder {
         public void on(Direction direction) {
             criteria.setDirection(direction);
         }
+
+        @Override
+        public PageBuilder sort(String orderBy, Direction direction) {
+            if (StringUtil.isNullOrEmpty(orderBy))
+                return this;
+            List<Sort> sortList = criteria.getSortList();
+            if (sortList == null){
+                sortList = new ArrayList<>();
+                criteria.setSortList(sortList);
+            }
+            Sort sort = new Sort(orderBy,direction);
+            sortList.add(sort);
+            return this;
+        }
     };
 
     private ConditionBuilder conditionBuilder = new ConditionBuilder() {
