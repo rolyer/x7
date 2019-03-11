@@ -6,7 +6,7 @@ import io.xream.x7.reyc.ReyClient;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 
-@ReyClient(value = "127.0.0.1:8868", circuitBreaker = "", fallback = TestFallback.class)
+@ReyClient(value = "127.0.0.1:8868", circuitBreaker = "", retry = true, fallback = TestFallback.class)
 public interface TestServiceRemote {
 
 

@@ -31,7 +31,7 @@ public class TextParser{
 	
 	private static TextParser instance = null;
 
-	private static String[] configFileSuffixArr = {".txt",".cfg",".properties",".cnf"};
+	private static String[] configFileSuffixArr = {".txt",".cfg",".properties",".cnf",".js",".json"};
 	
 	public static TextParser getInstance(){
 		if (instance == null){
