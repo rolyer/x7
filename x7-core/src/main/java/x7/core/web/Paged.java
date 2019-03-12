@@ -27,7 +27,5 @@ public interface Paged {
 	boolean isScroll();
 	int getPage();
 	int getRows();
-	String getOrderBy();
-	Direction getDirection();
 	List<Sort> getSortList();
 }

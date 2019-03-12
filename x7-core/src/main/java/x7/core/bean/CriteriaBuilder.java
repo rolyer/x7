@@ -153,16 +153,6 @@ public class CriteriaBuilder {
             return this;
         }
 
-        @Override
-        public PageBuilder orderBy(String property) {
-            criteria.getOrderByList().add(property);
-            return this;
-        }
-
-        @Override
-        public void on(Direction direction) {
-            criteria.setDirection(direction);
-        }
 
         @Override
         public PageBuilder sort(String orderBy, Direction direction) {

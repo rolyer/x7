@@ -38,8 +38,6 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 	private boolean isScroll = true;
 	private int page;
 	private int rows;
-	private Direction direction = Direction.DESC;
-	private List<String> orderByList = new ArrayList<>();
 	private List<Sort> sortList;
 	private List<KV> fixedSortList = new ArrayList();
 	private List<X> listX = new ArrayList<X>();
@@ -67,13 +65,6 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 		this.valueList = valueList;
 	}
 
-	public Direction getDirection() {
-		return direction;
-	}
-
-	public void setDirection(Direction sc) {
-		this.direction = sc;
-	}
 
 	public Class<?> getClz() {
 		return clz;
@@ -127,23 +118,12 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 		return customedResultKey;
 	}
 
-	public String getOrderBy() {
+	public List<Sort> getOrderBy() {
 		if (isFixedSort())
 			return null;
-		StringBuilder sb = new StringBuilder();
-		for (String s : orderByList){
-			sb.append(s);
-		}
-		return sb.toString();
+		return sortList;
 	}
 
-	public List<String> getOrderByList() {
-		return orderByList;
-	}
-
-	public void setOrderByList(List<String> orderByList) {
-		this.orderByList = orderByList;
-	}
 
 	public List<KV> getFixedSortList() {
 		return fixedSortList;
@@ -199,14 +179,7 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 	}
 
 	public void paged(Paged paged) {
-		String orderBy = paged.getOrderBy();
-		if (StringUtil.isNotNull(orderBy)){
-			String[] arr = orderBy.split(",");
-			for (String s : arr){
-				this.orderByList.add(s.trim());
-			}
-		}
-		this.direction = paged.getDirection();
+
 		this.isScroll = paged.isScroll();
 		this.page = paged.getPage();
 		this.rows = paged.getRows();
@@ -219,9 +192,7 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 				"isScroll=" + isScroll +
 				", page=" + page +
 				", rows=" + rows +
-				", orderByList='" + orderByList + '\'' +
 				", sortList='" + sortList + '\'' +
-				", direction=" + direction +
 				", valueList=" + valueList +
 				", listX=" + listX +
 				", dataPermission=" + dataPermission +

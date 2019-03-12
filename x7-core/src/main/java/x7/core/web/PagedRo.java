@@ -17,7 +17,9 @@
 package x7.core.web;
 
 import x7.core.bean.Sort;
+import x7.core.util.StringUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PagedRo implements Paged{
@@ -60,6 +62,19 @@ public class PagedRo implements Paged{
 	}
 
 	public List<Sort> getSortList() {
+		if (sortList != null && !sortList.isEmpty())
+			return sortList;
+		if (StringUtil.isNotNull(orderBy)){
+			if(sortList == null){
+				sortList = new ArrayList<>();
+			}
+			Direction d = this.direction == null ? Direction.DESC : this.direction;
+			String[] arr = orderBy.split(",");
+			for (String str : arr) {
+				Sort sort = new Sort(str.trim(), d);
+				sortList.add(sort);
+			}
+		}
 		return sortList;
 	}
 

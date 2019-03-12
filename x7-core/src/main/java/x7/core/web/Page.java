@@ -48,27 +48,14 @@ public class Page<T> implements Paged, Serializable{
 	private List<T> list = new ArrayList<T>();
 	private List<String> keyList = new ArrayList<String>();
 	private boolean isScroll;
-	private String orderBy;
 	private List<Sort> sortList;
-	private Direction direction = Direction.DESC;
 	
 	private Tag tag;
 
 	public Page(){
 	}
 	
-	public Page(int page, int rows, String orderBy){
-		setPage(page);
-		setRows(rows);
-		this.orderBy = orderBy;
-	}
-	
-	public Page(int page, int rows, String orderBy, Direction direction){
-		setPage(page);
-		setRows(rows);
-		this.orderBy = orderBy;
-		this.direction = direction;
-	}
+
 	
 	public Page(Paged paged){
 		setScroll(paged.isScroll());
@@ -76,12 +63,7 @@ public class Page<T> implements Paged, Serializable{
 			setPage(paged.getPage());
 		if (paged.getRows() > 0)
 			setRows(paged.getRows());
-		if (paged.getOrderBy() != null){
-			this.orderBy = paged.getOrderBy();
-		}
-		if (paged.getDirection() != null){
-			this.direction = paged.getDirection();
-		}
+		setSortList(paged.getSortList());
 	}
 
 	public Class<T> getClz() {
@@ -102,21 +84,6 @@ public class Page<T> implements Paged, Serializable{
 		}
 	}
 
-	public String getOrderBy() {
-		return orderBy;
-	}
-
-	public void setOrderBy(String orderBy) {
-		this.orderBy = orderBy;
-	}
-
-	public Direction getDirection() {
-		return direction;
-	}
-
-	public void setDirection(Direction sc) {
-		this.direction = sc;
-	}
 
 	public int getRows() {
 		if (rows == 0)
@@ -249,9 +216,7 @@ public class Page<T> implements Paged, Serializable{
 				"totalRows=" + totalRows + ", " +
 				"page=" + page + ", " +
 				"rows=" + rows + ", " +
-				"orderBy=" + orderBy + ", " +
 				"sortList=" + sortList + ", " +
-				"sc=" + direction + ", " +
 				"\n		list=" + list + ", " +
 				"\n		keyList=" + keyList  + ", " +
 				"\n		tag="+ tag + "\n]\n";

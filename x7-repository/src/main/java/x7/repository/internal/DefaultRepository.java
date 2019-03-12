@@ -244,7 +244,7 @@ public abstract class DefaultRepository<T> implements BaseRepository<T> {
 
         if (conditionObj instanceof Criteria.ResultMappedCriteria) {
             throw new RuntimeException(
-                    "Exception supported, no pagination not to invoke SqlRepository.getInstance().list(criteriaJoinalbe);");
+                    "Exception supported, no page not to invoke SqlRepository.getInstance().list(criteriaJoinalbe);");
         }
 
         return SqlRepository.getInstance().list(conditionObj);

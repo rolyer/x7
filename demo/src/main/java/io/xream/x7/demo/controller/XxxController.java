@@ -104,7 +104,7 @@ public class XxxController {
 				.reduce(Reduce.ReduceType.SUM, "catTest.id")
 				.groupBy("catTest.dogId")
 				.groupBy("catTest.catFriendName")
-		.paged().page(1).rows(2).orderBy("catTest.dogId").on(Direction.DESC);
+		.paged().page(1).rows(2).sort("catTest.dogId",Direction.DESC);
 		String sourceScript = "catTest ";
 		Criteria.ResultMappedCriteria resultMapped = builder.get();
 		resultMapped.setSourceScript(sourceScript);
@@ -158,7 +158,9 @@ public class XxxController {
 		sortList.add(sort1);
 		sortList.add(sort2);
 
-		ro.setSortList(sortList);
+		ro.setOrderBy("catTest.catFriendName,catTest.id");
+		ro.setDirection(Direction.DESC);
+//		ro.setSortList(sortList);
 
 		CriteriaBuilder.ResultMappedBuilder builder = CriteriaBuilder.buildResultMapped(CatTest.class,ro);
 		//builder.distinct("catTest.id").reduce(Reduce.ReduceType.COUNT,"catTest.id").groupBy("catTest.id");

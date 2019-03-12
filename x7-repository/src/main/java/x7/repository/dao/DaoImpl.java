@@ -674,8 +674,7 @@ public class DaoImpl implements Dao {
         pagination.setClz(clz);
         pagination.setPage(page == 0 ? 1 : page);
         pagination.setRows(rows == 0 ? Integer.MAX_VALUE : rows);
-        pagination.setOrderBy(criteria.getOrderBy());
-        pagination.setDirection(criteria.getDirection());
+        pagination.setSortList(criteria.getSortList());
         pagination.setScroll(criteria.isScroll());
 
         List<T> list = pagination.getList();
@@ -1152,8 +1151,7 @@ public class DaoImpl implements Dao {
         pagination.setClz(Map.class);
         pagination.setPage(page == 0 ? 1 : page);
         pagination.setRows(rows == 0 ? Integer.MAX_VALUE : rows);
-        pagination.setOrderBy(resultMapped.getOrderBy());
-        pagination.setDirection(resultMapped.getDirection());
+        pagination.setSortList(resultMapped.getSortList());
         pagination.setScroll(resultMapped.isScroll());
 
         List<Map<String,Object>> list = pagination.getList();
