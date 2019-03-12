@@ -19,6 +19,7 @@ package x7.distributed;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import x7.core.exception.DistributionLockException;
 import x7.repository.redis.JedisConnector_Persistence;
 
 
@@ -31,7 +32,7 @@ public class DistributionLock {
         boolean locked = JedisConnector_Persistence.getInstance().lock(key);
         if (!locked) {
             logger.info("Get distributed lock failed, lockKey: " + key);
-            throw new RuntimeException("service busy");
+            throw new DistributionLockException();
         }
     }
 

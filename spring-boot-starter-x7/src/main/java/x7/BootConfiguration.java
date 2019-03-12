@@ -18,12 +18,16 @@ package x7;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+import x7.config.DateToLongSerializer;
 import x7.config.SpringHelper;
 
+import java.util.Date;
 import java.util.Objects;
 
 
@@ -54,5 +58,6 @@ public class BootConfiguration {
 
         return new X7Config();
     }
+
 
 }

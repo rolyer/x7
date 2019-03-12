@@ -1,5 +1,6 @@
 package io.xream.x7;
 
+import io.xream.x7.demo.TimeJack;
 import io.xream.x7.demo.bean.Cat;
 import io.xream.x7.demo.CatRO;
 import io.xream.x7.demo.controller.XxxController;
@@ -81,5 +82,11 @@ public class XxxTest {
 
         testServiceRemote.test(new CatRO());
 
+    }
+
+
+    public void testTime(){
+        TimeJack timeJack = controller.testTime();
+        System.out.println(timeJack);
     }
 }

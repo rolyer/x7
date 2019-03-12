@@ -3,6 +3,7 @@ package io.xream.x7.demo.controller;
 import io.xream.x7.demo.CatRO;
 import io.xream.x7.demo.CatRepository;
 import io.xream.x7.demo.CatTestRepository;
+import io.xream.x7.demo.TimeJack;
 import io.xream.x7.demo.bean.Cat;
 import io.xream.x7.demo.bean.CatMouse;
 import io.xream.x7.demo.bean.CatTest;
@@ -10,6 +11,7 @@ import io.xream.x7.demo.bean.Mouse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import x7.core.bean.*;
 import x7.core.bean.condition.RefreshCondition;
@@ -18,10 +20,7 @@ import x7.core.web.Direction;
 import x7.core.web.Page;
 import x7.core.web.ViewEntity;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @RestController
@@ -287,6 +286,15 @@ public class XxxController {
 			e.printStackTrace();
 		}
 		return true;
+	}
+
+	@RequestMapping(value = "/time/test", method = RequestMethod.GET)
+	public TimeJack testTime() {
+
+		TimeJack tj = new TimeJack();
+		tj.setName("XXXXXX");
+		tj.setDate(new Date());
+		return tj;
 	}
 
 }
