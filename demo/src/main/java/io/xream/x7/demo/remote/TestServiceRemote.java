@@ -14,4 +14,7 @@ public interface TestServiceRemote {
     @RequestMapping(value = "/xxx/reyc/test")
     Boolean test(CatRO ro, DynamicUrl dynamicUrl);
 
+    @RequestMapping(value = "/xxx/reyc/test")
+    Boolean testFallBack(CatRO ro);
+
 }

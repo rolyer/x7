@@ -4,10 +4,13 @@ import io.xream.x7.demo.CatRO;
 
 public class TestFallback {
 
-    public void test(CatRO ro){
+    public void testFallBack(CatRO ro){
 
+        /*
+         * send to kafka
+         */
 
-        throw new RuntimeException("");
+        System.out.println("fallBack");
     }
 
 
