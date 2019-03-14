@@ -93,7 +93,7 @@ public class ClientParser {
 
             RequestMethod[] rmArr = requestMapping.method();
             if (rmArr == null || rmArr.length == 0) {
-                if (mapping.contains("{")&&mapping.contains("}")){
+                if (mapping != null && mapping.contains("{")&&mapping.contains("}")){
                     rm = RequestMethod.GET;
                 }
             }else{

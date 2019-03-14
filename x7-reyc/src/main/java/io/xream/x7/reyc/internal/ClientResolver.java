@@ -22,6 +22,7 @@ import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.github.resilience4j.retry.Retry;
 import io.github.resilience4j.retry.RetryRegistry;
 import io.vavr.control.Try;
+import io.xream.x7.reyc.DynamicUrl;
 import io.xream.x7.reyc.ReyClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +34,7 @@ import x7.core.util.JsonX;
 import x7.core.util.StringUtil;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
@@ -61,9 +63,6 @@ public class ClientResolver {
 
         ClientParsed parsed = ClientParser.get(remoteIntfName);
         String url = parsed.getUrl();
-        if (!url.startsWith("http")) {
-            url = "http://" + url;
-        }
         MethodParsed methodParsed = parsed.getMap().get(methodName);
 
         if (methodParsed == null)
@@ -72,6 +71,25 @@ public class ClientResolver {
         String mapping = methodParsed.getRequestMapping();
 
         url = url + mapping;
+
+        List<Object> objectList = new ArrayList<>();
+        boolean flag = false;
+        for (Object arg : args){
+            if (arg != null && arg instanceof DynamicUrl){
+                DynamicUrl dynamicUrl = (DynamicUrl)arg;
+                url = dynamicUrl.url();
+                flag = true;
+            }else{
+                objectList.add(arg);
+            }
+        }
+        if (flag) {
+            args = objectList.toArray();
+        }
+
+        if (!url.startsWith("http")) {
+            url = "http://" + url;
+        }
 
         String result = null;
 
@@ -154,7 +172,6 @@ public class ClientResolver {
             throw (RemoteServiceException) e;
         }
         if (e instanceof CircuitBreakerOpenException) {
-
             backendService.fallback();
             if (logger.isErrorEnabled()) {
                 logger.error(tag + ": " + e.getMessage());
@@ -167,17 +184,14 @@ public class ClientResolver {
                 || str.contains("ConnectTimeoutException")
                 || str.contains("ConnectException")
         ) {
-
             backendService.fallback();
             if (logger.isErrorEnabled()) {
                 logger.error(tag + ": " + e.getMessage());
             }
-
             throw new RuntimeException(tag + ": " + e.getMessage());
         }
 
         if (e instanceof RuntimeException) {
-
             if (logger.isErrorEnabled()) {
                 logger.error(tag + ": " + e.getMessage());
             }
@@ -205,7 +219,6 @@ public class ClientResolver {
 
     public static Object fallback(String intfName, String methodName, Object[] args) {
 
-
         ClientParsed parsed = ClientParser.get(intfName);
         if (parsed.getFallback() == null)
             return null;
@@ -223,10 +236,10 @@ public class ClientResolver {
 
     }
 
-
     public interface BackendService {
         Object decorate();
 
         Object fallback();
     }
+
 }

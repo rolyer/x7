@@ -3,10 +3,14 @@ package io.xream.x7;
 import io.xream.x7.demo.TimeJack;
 import io.xream.x7.demo.bean.Cat;
 import io.xream.x7.demo.CatRO;
+import io.xream.x7.demo.bean.Pig;
 import io.xream.x7.demo.controller.XxxController;
 import io.xream.x7.demo.remote.TestServiceRemote;
+import io.xream.x7.reyc.DynamicUrl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import x7.core.util.HttpClientUtil;
+import x7.core.util.JsonX;
 import x7.core.web.ViewEntity;
 
 
@@ -80,13 +84,23 @@ public class XxxTest {
 
     public void testReyClient(){
 
-        testServiceRemote.test(new CatRO());
+//        testServiceRemote.test(new CatRO(), new DynamicUrl() {
+//            @Override
+//            public String url() {
+//                return "127.0.0.1:8868/xxx/reyc/test";
+//            }
+//        });
+
+        testServiceRemote.test(new CatRO(),null);
 
     }
 
 
     public void testTime(){
-        TimeJack timeJack = controller.testTime();
-        System.out.println(timeJack);
+
+        String str = HttpClientUtil.getUrl("http://127.0.0.1:8868/xxx/pig/get/1");
+
+        Pig pig = JsonX.toObject(str, Pig.class);
+        System.out.println(pig);
     }
 }

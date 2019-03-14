@@ -1,18 +1,9 @@
 package io.xream.x7.demo.controller;
 
-import io.xream.x7.demo.CatRO;
-import io.xream.x7.demo.CatRepository;
-import io.xream.x7.demo.CatTestRepository;
-import io.xream.x7.demo.TimeJack;
-import io.xream.x7.demo.bean.Cat;
-import io.xream.x7.demo.bean.CatMouse;
-import io.xream.x7.demo.bean.CatTest;
-import io.xream.x7.demo.bean.Mouse;
+import io.xream.x7.demo.*;
+import io.xream.x7.demo.bean.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import x7.core.bean.*;
 import x7.core.bean.condition.RefreshCondition;
 import x7.core.util.JsonX;
@@ -34,7 +25,8 @@ public class XxxController {
 	@Autowired
 	private CatRepository catRepository;// sample
 
-
+	@Autowired
+	private PigRepository pigRepository;
 
 
 	@RequestMapping("/create")
@@ -291,10 +283,23 @@ public class XxxController {
 	@RequestMapping(value = "/time/test", method = RequestMethod.GET)
 	public TimeJack testTime() {
 
+		Date date = new Date();
+		System.out.println(date);
+
 		TimeJack tj = new TimeJack();
 		tj.setName("XXXXXX");
 		tj.setDate(new Date());
 		return tj;
+	}
+
+
+	@RequestMapping(value = "/pig/get/{id}", method = RequestMethod.GET)
+	public Pig getPig(@PathVariable long id) {
+
+		Pig pig = this.pigRepository.get(id);
+
+		System.out.println(pig);
+		return pig;
 	}
 
 }
