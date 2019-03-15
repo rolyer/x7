@@ -22,7 +22,7 @@ import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.github.resilience4j.retry.Retry;
 import io.github.resilience4j.retry.RetryRegistry;
 import io.vavr.control.Try;
-import io.xream.x7.reyc.DynamicUrl;
+import io.xream.x7.reyc.Url;
 import io.xream.x7.reyc.ReyClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,9 +75,9 @@ public class ClientResolver {
         List<Object> objectList = new ArrayList<>();
         boolean flag = false;
         for (Object arg : args){
-            if (arg != null && arg instanceof DynamicUrl){
-                DynamicUrl dynamicUrl = (DynamicUrl)arg;
-                url = dynamicUrl.url();
+            if (arg != null && arg instanceof Url){
+                Url dynamicUrl = (Url)arg;
+                url = dynamicUrl.value();
                 flag = true;
             }else{
                 objectList.add(arg);

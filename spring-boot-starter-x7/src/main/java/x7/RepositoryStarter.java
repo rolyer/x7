@@ -83,7 +83,7 @@ public class RepositoryStarter  {
 
 
         if (Objects.isNull(dataSourceProperties_r.getUrl())) {
-            logger.info("Readable DataSource Config Key: spring.datasource.read.url");
+            logger.info("Readable DataSource Config Key: spring.datasource.read.value");
             logger.info("Readable DataSource Config Value: null");
             logger.info("Readable DataSource Ignored");
 
@@ -113,7 +113,7 @@ public class RepositoryStarter  {
         dsR.setDriverClassName(driverClassName);
 
 
-        logger.info("Readable DataSource Created, url:"+dataSourceProperties_r.getUrl());
+        logger.info("Readable DataSource Created, value:"+dataSourceProperties_r.getUrl());
         return dsR;
     }
 

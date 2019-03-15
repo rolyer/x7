@@ -16,34 +16,7 @@
  */
 package io.xream.x7.reyc;
 
-import java.lang.annotation.*;
+public interface Url {
 
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-@Documented
-public @interface ReyClient {
-
-    String IGNORE_CIRCUITBREAKER = "IGNORE_CIRCUITBREAKER";
-
-    /**
-     * dns or value
-     */
-    String value() default  "";
-
-    /**
-     * "" or configed backend name in application.properties
-     */
-    String circuitBreaker() default IGNORE_CIRCUITBREAKER;
-
-    /**
-     * true | false
-     */
-    boolean retry() default false;
-
-    /**
-     * handle fallback for the immportant method <br>
-     * Fallback class,  the method name must same as the method of servcie. and the parameters must same
-     */
-    Class<?> fallback();
-
+    String value();
 }

@@ -62,7 +62,7 @@ public class DataSourceProperties_R {
     @Override
     public String toString() {
         return "DataSourceProperties_R{" +
-                "url='" + url + '\'' +
+                "value='" + url + '\'' +
                 ", driverClassName='" + driverClassName + '\'' +
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +

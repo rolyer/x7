@@ -14,9 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.xream.x7.reyc;
+package x7;
 
-public interface DynamicUrl {
+import org.springframework.context.annotation.Import;
+import x7.config.JacksonConfig;
 
-    String url();
+import java.lang.annotation.*;
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+@Documented
+@Import({JacksonConfig.class})
+public @interface EnableDateToLongForJackson {
+
 }

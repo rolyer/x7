@@ -72,7 +72,7 @@ public class ClientParsed {
     public String toString() {
         return "ClientParsed{" +
                 "objectType=" + objectType +
-                ", url='" + url + '\'' +
+                ", value='" + url + '\'' +
                 ", map=" + map +
                 ", fallbackMethodMap=" + fallbackMethodMap +
                 ", fallback=" + fallback +

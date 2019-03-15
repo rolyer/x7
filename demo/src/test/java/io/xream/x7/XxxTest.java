@@ -1,12 +1,11 @@
 package io.xream.x7;
 
-import io.xream.x7.demo.TimeJack;
 import io.xream.x7.demo.bean.Cat;
 import io.xream.x7.demo.CatRO;
 import io.xream.x7.demo.bean.Pig;
 import io.xream.x7.demo.controller.XxxController;
 import io.xream.x7.demo.remote.TestServiceRemote;
-import io.xream.x7.reyc.DynamicUrl;
+import io.xream.x7.reyc.Url;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import x7.core.util.HttpClientUtil;
@@ -84,14 +83,14 @@ public class XxxTest {
 
     public void testReyClient(){
 
-//        testServiceRemote.test(new CatRO(), new DynamicUrl() {
-//            @Override
-//            public String url() {
-//                return "127.0.0.1:8868/xxx/reyc/test";
-//            }
-//        });
+        testServiceRemote.test(new CatRO(), new Url() {
+            @Override
+            public String value() {
+                return "127.0.0.1:8868/xxx/reyc/test";
+            }
+        });
 
-        testServiceRemote.test(new CatRO(),null);
+//        testServiceRemote.test(new CatRO(),null);
 
     }
 

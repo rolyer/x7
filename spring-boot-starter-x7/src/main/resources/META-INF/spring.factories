@@ -1,3 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
- x7.BootConfiguration,\
- x7.config.JacksonConfig
+ x7.BootConfiguration
