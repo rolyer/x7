@@ -74,13 +74,15 @@ public class ClientResolver {
 
         List<Object> objectList = new ArrayList<>();
         boolean flag = false;
-        for (Object arg : args){
-            if (arg != null && arg instanceof Url){
-                Url dynamicUrl = (Url)arg;
-                url = dynamicUrl.value();
-                flag = true;
-            }else{
-                objectList.add(arg);
+        if (args != null) {
+            for (Object arg : args) {
+                if (arg != null && arg instanceof Url) {
+                    Url dynamicUrl = (Url) arg;
+                    url = dynamicUrl.value();
+                    flag = true;
+                } else {
+                    objectList.add(arg);
+                }
             }
         }
         if (flag) {

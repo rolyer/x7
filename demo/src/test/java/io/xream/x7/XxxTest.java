@@ -97,7 +97,7 @@ public class XxxTest {
 
     public void testTime(){
 
-        String str = HttpClientUtil.getUrl("http://127.0.0.1:8868/xxx/time/test");
+        boolean flag = testServiceRemote.testTimeJack();
 
     }
 }
