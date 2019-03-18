@@ -28,6 +28,9 @@ public class XxxController {
 	@Autowired
 	private PigRepository pigRepository;
 
+	@Autowired
+	private TimeJackRepository timeJackRepository;
+
 
 	@RequestMapping("/create")
 //	@Transactional
@@ -281,15 +284,22 @@ public class XxxController {
 	}
 
 	@RequestMapping(value = "/time/test", method = RequestMethod.GET)
-	public TimeJack testTime() {
+	public ViewEntity testTime() {
 
 		Date date = new Date();
 		System.out.println(date);
 
 		TimeJack tj = new TimeJack();
+
+		tj.setId(this.timeJackRepository.createId());
 		tj.setName("XXXXXX");
 		tj.setDate(new Date());
-		return tj;
+
+		this.timeJackRepository.create(tj);
+
+		List<TimeJack> list = this.timeJackRepository.list();
+
+		return ViewEntity.ok(tj);
 	}
 
 

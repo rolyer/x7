@@ -1,10 +1,23 @@
 package io.xream.x7.demo;
 
+import x7.core.repository.X;
+
 import java.util.Date;
 
 public class TimeJack {
+
+    @X.Key
+    private long id;
     private String name;
     private Date date;
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -25,7 +38,8 @@ public class TimeJack {
     @Override
     public String toString() {
         return "TimeJack{" +
-                "name='" + name + '\'' +
+                "id=" + id +
+                ", name='" + name + '\'' +
                 ", date=" + date +
                 '}';
     }

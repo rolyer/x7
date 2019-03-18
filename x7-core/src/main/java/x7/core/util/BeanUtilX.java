@@ -36,7 +36,7 @@ import java.util.*;
 public class BeanUtilX extends BeanUtil {
 
 	public final static String SPACE = " ";
-	public final static String SQL_REF = "`";
+	public final static String SQL_KEYWORD_MARK = "`";
 	public final static String COMMA = ",";
 	@SuppressWarnings("rawtypes")
 	public static List<BeanElement> getElementList(Class clz) {
@@ -672,16 +672,22 @@ public class BeanUtilX extends BeanUtil {
 
 		sql = mapperName(sql, parsed);
 
-		boolean flag = sql.contains(SQL_REF);
+		boolean flag = sql.contains(SQL_KEYWORD_MARK);
 		for (String property : parsed.getPropertyMapperMap().keySet()){//FIXME 解析之后, 替换,拼接
-			String key = SPACE+property+SPACE;
-			String value = SPACE+parsed.getMapper(property)+SPACE;
-			sql = sql.replaceAll(key, value);
 			if (flag){
-				key = SQL_REF+property+SQL_REF;
-				value = SQL_REF+parsed.getMapper(property)+SQL_REF;
-				sql = sql.replace(key,value);
+				String key = SQL_KEYWORD_MARK+property+SQL_KEYWORD_MARK;
+				if (sql.contains(key)) {
+					String value = parsed.getMapper(property);
+					if (!value.startsWith(SQL_KEYWORD_MARK)) {
+						value = SQL_KEYWORD_MARK + parsed.getMapper(property) + SQL_KEYWORD_MARK;
+					}
+					sql = sql.replace(key, value);
+					continue;
+				}
 			}
+			String key = SPACE + property + SPACE;
+			String value = SPACE + parsed.getMapper(property) + SPACE;
+			sql = sql.replaceAll(key, value);
 		}
 		return sql;
 	}
@@ -702,8 +708,8 @@ public class BeanUtilX extends BeanUtil {
 			sql += SPACE;
 		}
 		sql = sql.replace(SPACE +clzName+SPACE, SPACE+tableName+SPACE);
-		if (sql.contains(SQL_REF)) {
-			sql = sql.replace(SQL_REF +clzName+SQL_REF, SQL_REF+tableName+SQL_REF);
+		if (sql.contains(SQL_KEYWORD_MARK)) {
+			sql = sql.replace(SQL_KEYWORD_MARK +clzName+SQL_KEYWORD_MARK, SQL_KEYWORD_MARK+tableName+SQL_KEYWORD_MARK);
 		}
 		
 		return sql;
@@ -800,7 +806,7 @@ public class BeanUtilX extends BeanUtil {
 	public static String filterSQLKeyword(String mapper){
 		for (String keyWord : keyWordArr){
 			if (keyWord.equals(mapper.toLowerCase())){
-				return SQL_REF+mapper+SQL_REF;
+				return SQL_KEYWORD_MARK+mapper+SQL_KEYWORD_MARK;
 			}
 		}
 		return mapper;
@@ -878,11 +884,11 @@ public class BeanUtilX extends BeanUtil {
 		int l = arr.length;
 		for (int i = 0; i < l; i++) {
 			String key = arr[i];
-			if (key.contains(SQL_REF)) {
+			if (key.contains(SQL_KEYWORD_MARK)) {
 				key = key.substring(1, key.length() - 1);
 				String mapper = mapperMap.get(key);
 				if (StringUtil.isNotNull(mapper)) {
-					arr[i] = SQL_REF + mapper + SQL_REF;
+					arr[i] = SQL_KEYWORD_MARK + mapper + SQL_KEYWORD_MARK;
 				}
 			} else {
 				String mapper = mapperMap.get(key);

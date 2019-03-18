@@ -97,9 +97,7 @@ public class XxxTest {
 
     public void testTime(){
 
-        String str = HttpClientUtil.getUrl("http://127.0.0.1:8868/xxx/pig/get/1");
+        String str = HttpClientUtil.getUrl("http://127.0.0.1:8868/xxx/time/test");
 
-        Pig pig = JsonX.toObject(str, Pig.class);
-        System.out.println(pig);
     }
 }
