@@ -161,7 +161,7 @@ public class DaoImpl implements Dao {
         } catch (Exception e) {
             e.printStackTrace();
 
-            throw new RollbackException("RollbackException: " + ExceptionUtil.getMessage(e) + ", while create: " + obj);
+            throw new RollbackException("RollbackException: " + e.getMessage() + ", while create: " + obj);
 
         } finally {
             close(pstmt);
@@ -285,7 +285,7 @@ public class DaoImpl implements Dao {
             System.out.println("Exception occured, while create: " + obj);
             e.printStackTrace();
 
-            throw new RollbackException("RollbackException occoured: " + ExceptionUtil.getMessage(e) + ", while create " + obj);
+            throw new RollbackException("RollbackException occoured: " + e.getMessage() + ", while create " + obj);
 
         } finally {
             close(pstmt);
