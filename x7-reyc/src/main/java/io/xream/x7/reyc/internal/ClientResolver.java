@@ -188,19 +188,19 @@ public class ClientResolver {
         ) {
             Object obj =  backendService.fallback();
             if (logger.isErrorEnabled()) {
-                logger.error(tag + ": " + e.getMessage());
+                logger.error(tag + " : " + e.getMessage());
             }
             throw new RuntimeException(tag + " : " + e.getMessage()  + (obj == null ? "": (" : " + obj.toString())));
         }
 
         if (e instanceof RuntimeException) {
             if (logger.isErrorEnabled()) {
-                logger.error(tag + ": " + e.getMessage());
+                logger.error(tag + " : " + e.getMessage());
             }
-            throw new RuntimeException(tag + ": " + e.getMessage());
+            throw new RuntimeException(tag + " : " + e.getMessage());
         }
 
-        throw new RuntimeException(tag + ": " + e.getMessage());
+        throw new RuntimeException(tag + " : " + e.getMessage());
     }
 
     private static void hanleRemoteException(String result) {
