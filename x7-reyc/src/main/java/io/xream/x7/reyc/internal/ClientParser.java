@@ -60,7 +60,7 @@ public class ClientParser {
          * fallback
          */
         Class<?> fallbackClz = reyClient.fallback();
-        if (fallbackClz != null) {
+        if (fallbackClz != null && fallbackClz != Object.class) {
             Method[] fallbackMethodArr = fallbackClz.getMethods();
             for (Method fm : fallbackMethodArr) {
                 parsed.getFallbackMethodMap().put(fm.getName(), fm);

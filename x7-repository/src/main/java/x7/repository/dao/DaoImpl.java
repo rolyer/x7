@@ -283,7 +283,6 @@ public class DaoImpl implements Dao {
 
         } catch (Exception e) {
             System.out.println("Exception occured, while create: " + obj);
-            e.printStackTrace();
 
             throw new RollbackException("RollbackException occoured: " + e.getMessage() + ", while create " + obj);
 
@@ -420,7 +419,7 @@ public class DaoImpl implements Dao {
         } catch (Exception e) {
             e.printStackTrace();
             throw new RollbackException(
-                    "Exception occured by class = " + clz.getName() + ",column："+ tempEle!=null?(tempEle.property+"|"+tempEle.getMapper()):"" + ", message: " + ExceptionUtil.getMessage(e));
+                    "Exception occured by class = " + clz.getName() + ",column："+ tempEle!=null?(tempEle.property+"|"+tempEle.getMapper()):"" + ", message: " + e.getMessage());
 
         } finally {
             close(pstmt);
@@ -531,7 +530,7 @@ public class DaoImpl implements Dao {
         } catch (Exception e) {
             e.printStackTrace();
             throw new RollbackException(
-                    "Exception occured by class = " + clz.getName() + ",column："+ tempEle!=null?(tempEle.property+"|"+tempEle.getMapper()):"" + ", message: " + ExceptionUtil.getMessage(e));
+                    "Exception occured by class = " + clz.getName() + ",column："+ tempEle!=null?(tempEle.property+"|"+tempEle.getMapper()):"" + ", message: " + e.getMessage());
         } finally {
             close(pstmt);
             close(conn);
@@ -581,7 +580,7 @@ public class DaoImpl implements Dao {
         } catch (Exception e) {
             e.printStackTrace();
             throw new RollbackException(
-                    "Exception occured by class = " + clz.getName() + ",column："+ tempEle!=null?(tempEle.property+"|"+tempEle.getMapper()):"" +", message: " + ExceptionUtil.getMessage(e));
+                    "Exception occured by class = " + clz.getName() + ",column："+ tempEle!=null?(tempEle.property+"|"+tempEle.getMapper()):"" +", message: " + e.getMessage());
         } finally {
             close(pstmt);
             close(conn);
@@ -645,7 +644,7 @@ public class DaoImpl implements Dao {
         } catch (Exception e) {
             e.printStackTrace();
             throw new RollbackException(
-                    "Exception occured by class = " + clz.getName() + ",column："+ tempEle!=null?(tempEle.property+"|"+tempEle.getMapper()):"" + ", message: " + ExceptionUtil.getMessage(e));
+                    "Exception occured by class = " + clz.getName() + ",column："+ tempEle!=null?(tempEle.property+"|"+tempEle.getMapper()):"" + ", message: " + e.getMessage());
         } finally {
             close(pstmt);
             close(conn);
@@ -669,6 +668,8 @@ public class DaoImpl implements Dao {
         int start = (page - 1) * rows;
 
         sql = dialect.match(sql, start, rows);
+        if (ConfigAdapter.isIsShowSql())
+            System.out.println(sql);
 
         Page<T> pagination = new Page<T>();
         pagination.setClz(clz);
@@ -726,7 +727,7 @@ public class DaoImpl implements Dao {
         } catch (Exception e) {
             e.printStackTrace();
             throw new RollbackException(
-                    "Exception occured by class = " + clz.getName() + ", message: " + ExceptionUtil.getMessage(e));
+                    "Exception occured by class = " + clz.getName() + ", message: " + e.getMessage());
         } finally {
             close(pstmt);
             close(conn);
@@ -907,7 +908,7 @@ public class DaoImpl implements Dao {
         } catch (Exception e) {
             e.printStackTrace();
             throw new RollbackException(
-                    "Exception occured by class = " + clz.getName() + ", message: " + ExceptionUtil.getMessage(e));
+                    "Exception occured by class = " + clz.getName() + ", message: " + e.getMessage());
         } finally {
             close(pstmt);
             close(conn);
@@ -1112,7 +1113,7 @@ public class DaoImpl implements Dao {
         } catch (Exception e) {
             e.printStackTrace();
             throw new RollbackException(
-                    "Exception occured by class = " + clz.getName() + ", message: " + ExceptionUtil.getMessage(e));
+                    "Exception occured by class = " + clz.getName() + ", message: " + e.getMessage());
         } finally {
             close(pstmt);
             close(conn);

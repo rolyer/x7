@@ -291,7 +291,7 @@ public class XxxController {
 
 		TimeJack tj = new TimeJack();
 
-		tj.setId(this.timeJackRepository.createId());
+		tj.setId(100);
 		tj.setName("XXXXXX");
 		tj.setDate(new Date());
 
