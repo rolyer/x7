@@ -10,7 +10,6 @@ public class TimeJack {
     private long id;
     private String name;
     private Date date;
-    private String testException;
 
     public long getId() {
         return id;
@@ -36,13 +35,6 @@ public class TimeJack {
         this.date = date;
     }
 
-    public String getTestException() {
-        return testException;
-    }
-
-    public void setTestException(String testException) {
-        this.testException = testException;
-    }
 
     @Override
     public String toString() {
@@ -50,7 +42,6 @@ public class TimeJack {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", date=" + date +
-                ", testException='" + testException + '\'' +
                 '}';
     }
 }
