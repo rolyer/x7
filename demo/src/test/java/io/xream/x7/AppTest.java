@@ -25,7 +25,7 @@ public class AppTest {
 //        xxxTest.domain();
 //        xxxTest.domain();
 
-        xxxTest.testTime();
+        xxxTest.testReyClient();
 
     }
 
