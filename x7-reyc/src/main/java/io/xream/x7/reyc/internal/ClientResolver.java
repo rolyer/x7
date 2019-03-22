@@ -174,11 +174,11 @@ public class ClientResolver {
             throw (RemoteServiceException) e;
         }
         if (e instanceof CircuitBreakerOpenException) {
-            backendService.fallback();
+            Object obj =  backendService.fallback();
             if (logger.isErrorEnabled()) {
                 logger.error(tag + ": " + e.getMessage());
             }
-            throw new BusyException();
+            throw new BusyException(obj == null ? null : obj.toString());
         }
 
         String str = e.toString();
@@ -186,11 +186,11 @@ public class ClientResolver {
                 || str.contains("ConnectTimeoutException")
                 || str.contains("ConnectException")
         ) {
-            backendService.fallback();
+            Object obj =  backendService.fallback();
             if (logger.isErrorEnabled()) {
                 logger.error(tag + ": " + e.getMessage());
             }
-            throw new RuntimeException(tag + ": " + e.getMessage());
+            throw new RuntimeException(tag + " : " + e.getMessage()  + (obj == null ? "": (" : " + obj.toString())));
         }
 
         if (e instanceof RuntimeException) {
@@ -230,10 +230,14 @@ public class ClientResolver {
             return null;
 
         try {
+            if (method.getReturnType() == void.class){
+                method.invoke(parsed.getFallback(), args);
+                return null;
+            }
             return method.invoke(parsed.getFallback(), args);
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException("Exception of fallback");
+            throw new RuntimeException("Exception of fallback: " + intfName+"."+methodName);
         }
 
     }
