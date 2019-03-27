@@ -14,19 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.xream.x7;
+package x7;
 
-import io.xream.x7.reyc.ReyClientBeanRegistrar;
-import io.xream.x7.reyc.ReyClientConfig;
-import io.xream.x7.reyc.TracingConfig;
 import org.springframework.context.annotation.Import;
+import x7.core.web.CorsConfig;
+import x7.core.web.CorsRegistrar;
 
 import java.lang.annotation.*;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Documented
-@Import({TracingConfig.class,ReyClientConfig.class,ReyClientBeanRegistrar.class})
-public @interface EnableReyClient {
+@Import({CorsRegistrar.class, CorsConfig.class})
+public @interface EnableCorsConfig {
+
+    String key() default "access.domain";
 
 }

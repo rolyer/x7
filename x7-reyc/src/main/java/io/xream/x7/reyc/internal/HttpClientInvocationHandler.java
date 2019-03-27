@@ -34,13 +34,18 @@ public class HttpClientInvocationHandler implements InvocationHandler {
         try{
 
             final String methodName = method.getName();
-            if (httpClientProxy.getBackend() == null)
-                return ClientResolver.resolve(httpClientProxy.getObjectType().getName(),methodName,args);
 
-            return ClientResolver.wrap(httpClientProxy, methodName, new ClientResolver.BackendService() {
+            R r = ClientResolver.r(httpClientProxy.getObjectType().getName(),methodName,args);
+
+            if (httpClientProxy.getBackend() == null) {
+                String result = ClientResolver.resolve(r);
+                return ClientResolver.toObject(r.getReturnType(),result);
+            }
+
+            String result = ClientResolver.wrap(httpClientProxy, methodName, new ClientResolver.BackendService() {
                 @Override
-                public Object decorate() {
-                    return ClientResolver.resolve(httpClientProxy.getObjectType().getName(),methodName,args);
+                public String decorate() {
+                    return ClientResolver.resolve(r);
                 }
 
                 @Override
@@ -48,6 +53,8 @@ public class HttpClientInvocationHandler implements InvocationHandler {
                     return ClientResolver.fallback(httpClientProxy.getObjectType().getName(),methodName,args);
                 }
             });
+
+            return ClientResolver.toObject(r.getReturnType(),result);
 
         } catch (RuntimeException re){
             throw re;

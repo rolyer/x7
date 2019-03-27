@@ -16,47 +16,32 @@
  */
 package x7;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
-import x7.config.DateToLongSerializer;
 import x7.config.SpringHelper;
-
-import java.util.Date;
-import java.util.Objects;
 
 
 @Configuration
 public class BootConfiguration {
 
-    @Autowired
-    private Environment environment;
-
-
+    @ConditionalOnMissingBean(SpringHelper.class)
     @Bean
     @Order(1)
-    @ConditionalOnMissingBean(SpringHelper.class)
     public SpringHelper enableHelper(){
         return new SpringHelper();
     }
 
+    @ConditionalOnMissingBean(X7Env.class)
     @Bean
     @Order(2)
-    public X7Config enableX7Config() {
-
-        X7Env env = SpringHelper.getObject(X7Env.class);
-
-        if (Objects.nonNull(env))
-            return new X7Config();
+    public X7Env enableX7Env(Environment environment) {
 
         new X7ConfigStarter(environment);
 
-        return new X7Config();
+        return new X7Env();
     }
 
 

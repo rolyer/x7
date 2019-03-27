@@ -19,6 +19,7 @@ package x7.core.util;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.conn.HttpHostConnectException;
@@ -48,9 +49,7 @@ public class HttpClientUtil {
         return post(url, param, null, 15000, 15000);
     }
 
-    public static String post(String url, Object param, List<KV> hearderList, int connectTimeoutMS, int socketTimeoutMS) {
-
-        CloseableHttpClient httpclient = HttpClients.createDefault();
+    public static String post(String url, Object param, List<KV> hearderList, int connectTimeoutMS, int socketTimeoutMS, CloseableHttpClient httpclient) {
 
         HttpPost httpPost = new HttpPost(url);
 
@@ -80,6 +79,85 @@ public class HttpClientUtil {
             httpPost.setEntity(entity);
             logger.info("executing request " + httpPost.getURI());
             CloseableHttpResponse response = httpclient.execute(httpPost);
+            try {
+                entity = response.getEntity();
+                if (entity != null) {
+                    result = EntityUtils.toString(entity, "UTF-8");
+                    logger.info("Response content: " + result);
+
+                }
+            } finally {
+                response.close();
+            }
+        } catch (HttpHostConnectException hce) {
+            hce.printStackTrace();
+            String str = "org.apache.http.conn.HttpHostConnectException: Connect to " + url + " failed: Connection refused: connect";
+            throw new RuntimeException(str);
+        } catch (ConnectTimeoutException cte){
+            cte.printStackTrace();
+            String str = "org.apache.http.conn.ConnectTimeoutException: Connect to " + url + " failed: Connection timeout: connect";
+            throw new RuntimeException(str);
+        } catch(IOException ioe){
+            ioe.printStackTrace();
+            throw new RuntimeException(ExceptionUtil.getMessage(ioe));
+        } catch (Exception e) {
+            throw e;
+        } finally {
+            try {
+                httpclient.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return result;
+    }
+
+    public static String post(String url, Object param, List<KV> hearderList, int connectTimeoutMS, int socketTimeoutMS) {
+
+        CloseableHttpClient httpclient = HttpClients.createDefault();
+
+        return post(url,param,hearderList,connectTimeoutMS,socketTimeoutMS,httpclient);
+    }
+
+    public static String get(String urlString) {
+        return get(urlString, null,15000, 15000);
+    }
+
+    public static String get(String url, List<KV> hearderList, int connectTimeoutMS, int socketTimeoutMS) {
+
+        CloseableHttpClient httpclient = HttpClients.createDefault();
+
+        return get(url,hearderList,connectTimeoutMS,socketTimeoutMS,httpclient);
+    }
+
+
+    public static String get(String url,  List<KV> hearderList, int connectTimeoutMS, int socketTimeoutMS, CloseableHttpClient httpclient) {
+
+        HttpGet httpGet = new HttpGet(url);
+
+        RequestConfig requestConfig = RequestConfig.custom()
+                .setSocketTimeout(socketTimeoutMS)
+                .setConnectTimeout(connectTimeoutMS)
+                .setConnectionRequestTimeout(1000)
+                .build();//设置请求和传输超时时间
+
+        httpGet.setConfig(requestConfig);
+
+        if (hearderList != null) {
+            for (KV kv : hearderList) {
+                httpGet.addHeader(kv.getK(), kv.getV().toString());
+            }
+        }
+
+
+        HttpEntity entity = null;
+        String result = null;
+        try {
+            httpGet.setHeader("Content-type", "application/json;charset=UTF-8");
+
+            logger.info("executing request " + httpGet.getURI());
+            CloseableHttpResponse response = httpclient.execute(httpGet);
             try {
                 entity = response.getEntity();
                 if (entity != null) {
@@ -167,6 +245,8 @@ public class HttpClientUtil {
     public final static String EQ = "=";
     public final static String AND = "&";
 
+
+
     public static String getUrl(String url, Map<String, String> map) {
 
         if (StringUtil.isNullOrEmpty(url))
@@ -191,7 +271,7 @@ public class HttpClientUtil {
 
         logger.info("get url: " + requestStr);
 
-        String result = getUrl(requestStr);
+        String result = get(requestStr);
 
         return result;
     }

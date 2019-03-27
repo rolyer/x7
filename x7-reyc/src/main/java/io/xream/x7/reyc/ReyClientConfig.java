@@ -16,19 +16,30 @@
  */
 package io.xream.x7.reyc;
 
+import com.github.kristofa.brave.httpclient.BraveHttpRequestInterceptor;
+import com.github.kristofa.brave.httpclient.BraveHttpResponseInterceptor;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.github.resilience4j.retry.RetryRegistry;
 import io.xream.x7.reyc.internal.ClientResolver;
 import io.xream.x7.reyc.internal.HttpClientProperies;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 
-@Import(HttpClientProperies.class)
+@Import({HttpClientProperies.class})
 public class ReyClientConfig {
 
     public ReyClientConfig(HttpClientProperies properies, CircuitBreakerRegistry circuitBreakerRegistry){
 
         RetryRegistry retryRegistry = RetryRegistry.ofDefaults();
         ClientResolver.init(properies, circuitBreakerRegistry, retryRegistry);
+
     }
 
+    @ConditionalOnBean({BraveHttpRequestInterceptor.class,BraveHttpResponseInterceptor.class})
+    @Bean
+    public ReyTracing enableReyTracing(BraveHttpRequestInterceptor req,BraveHttpResponseInterceptor rep){
+        ClientResolver.initInterceptor(req,  rep);
+        return new ReyTracing();
+    }
 }

@@ -16,5 +16,15 @@
  */
 package x7;
 
-public class X7Config {
+import org.springframework.context.annotation.Import;
+import x7.reyc.TracingServletRegistrary;
+
+import java.lang.annotation.*;
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+@Documented
+@Import({TracingServletRegistrary.class})
+public @interface EnableTracingServlet {
+
 }

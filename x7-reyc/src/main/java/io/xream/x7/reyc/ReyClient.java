@@ -42,6 +42,6 @@ public @interface ReyClient {
      * handle fallback for the important method <br>
      * Fallback class,  the method name must same as the method of service. and the parameters must same
      */
-    Class<?> fallback() default Object.class;
+    Class<?> fallback() default void.class;
 
 }

@@ -19,7 +19,7 @@ package x7;
 import com.zaxxer.hikari.HikariDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.Order;
@@ -37,32 +37,28 @@ import java.util.Objects;
 public class RepositoryStarter  {
 
     private Logger logger = LoggerFactory.getLogger(RepositoryStarter.class);
-    @Autowired
-    private DataSourceProperties_R dataSourceProperties_r;
-    @Autowired
-    private Environment environment;
-    @Autowired
-    private DataSource dataSource;
 
+    @ConditionalOnMissingBean(SpringHelper.class)
     @Bean
     @Order(1)
     public SpringHelper enableHelper(){
         return new SpringHelper();
     }
 
+    @ConditionalOnMissingBean(X7Env.class)
     @Bean
     @Order(2)
-    public X7Env enableX7Env() {
+    public X7Env enableX7Env(Environment environment) {
 
         new X7ConfigStarter(environment);
 
         return new X7Env();
     }
 
-
+    @ConditionalOnMissingBean(X7Data.class)
     @Bean
     @Order(2)
-    public X7Data enableData(){
+    public X7Data enableData(DataSource dataSource,DataSourceProperties_R dataSourceProperties_r){
 
         DataSource writeDataSource = dataSource;
 
@@ -71,7 +67,7 @@ public class RepositoryStarter  {
          * 1. 对于Sharding, 可以用动态数据源<br>
          * 2. 只读库，一个请求只需并成一个连接，可绕开事务<br>
          */
-        DataSource readDataSource = getReadDataSource();
+        DataSource readDataSource = getReadDataSource(dataSourceProperties_r);
 
         startX7Repsository(writeDataSource, readDataSource);
 
@@ -79,7 +75,7 @@ public class RepositoryStarter  {
     }
 
 
-    public HikariDataSource getReadDataSource() {
+    public HikariDataSource getReadDataSource(DataSourceProperties_R dataSourceProperties_r) {
 
 
         if (Objects.isNull(dataSourceProperties_r.getUrl())) {

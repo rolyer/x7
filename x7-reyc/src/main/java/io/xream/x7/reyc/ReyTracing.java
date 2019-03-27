@@ -14,19 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.xream.x7;
+package io.xream.x7.reyc;
 
-import io.xream.x7.reyc.ReyClientBeanRegistrar;
-import io.xream.x7.reyc.ReyClientConfig;
-import io.xream.x7.reyc.TracingConfig;
-import org.springframework.context.annotation.Import;
-
-import java.lang.annotation.*;
-
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-@Documented
-@Import({TracingConfig.class,ReyClientConfig.class,ReyClientBeanRegistrar.class})
-public @interface EnableReyClient {
-
+public class ReyTracing {
 }

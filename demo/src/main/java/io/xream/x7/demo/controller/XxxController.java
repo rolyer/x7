@@ -272,15 +272,26 @@ public class XxxController {
 
 
 
-	@RequestMapping("/reyc/test")
-	public Boolean testRecClient(@RequestBody CatRO ro) {
+	@RequestMapping(value = "/reyc/test")
+	public Boolean testRecClient() {
 
-		try {
-			TimeUnit.HOURS.sleep(1);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			TimeUnit.HOURS.sleep(1);
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		}
 		return true;
+	}
+
+	@RequestMapping(value = "/get")
+	public ViewEntity get() {
+
+//		try {
+//			TimeUnit.HOURS.sleep(1);
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		}
+		return ViewEntity.ok(true);
 	}
 
 	@RequestMapping(value = "/time/test", method = RequestMethod.GET)
