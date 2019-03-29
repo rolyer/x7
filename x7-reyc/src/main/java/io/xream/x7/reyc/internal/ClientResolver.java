@@ -36,6 +36,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import x7.core.bean.KV;
 import x7.core.exception.BusyException;
 import x7.core.exception.RemoteServiceException;
+import x7.core.exception.ReyClientConnectException;
 import x7.core.util.HttpClientUtil;
 import x7.core.util.JsonX;
 import x7.core.util.StringUtil;
@@ -43,6 +44,7 @@ import x7.core.util.StringUtil;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
@@ -218,10 +220,10 @@ public class ClientResolver {
             throw (RemoteServiceException) e;
         }
         if (e instanceof CircuitBreakerOpenException) {
-            Object obj = backendService.fallback();
             if (logger.isErrorEnabled()) {
                 logger.error(tag + ": " + e.getMessage());
             }
+            Object obj = backendService.fallback();
             throw new BusyException(obj == null ? null : obj.toString());
         }
 
@@ -230,11 +232,11 @@ public class ClientResolver {
                 || str.contains("ConnectTimeoutException")
                 || str.contains("ConnectException")
         ) {
-            Object obj = backendService.fallback();
             if (logger.isErrorEnabled()) {
                 logger.error(tag + " : " + e.getMessage());
             }
-            throw new RuntimeException(tag + " : " + e.getMessage() + (obj == null ? "" : (" : " + obj.toString())));
+            Object obj = backendService.fallback();
+            throw new ReyClientConnectException(tag + " : " + e.getMessage() + (obj == null ? "" : (" : " + obj.toString())));
         }
 
         if (e instanceof RuntimeException) {

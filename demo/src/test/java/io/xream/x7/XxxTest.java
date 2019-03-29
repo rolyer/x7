@@ -83,12 +83,14 @@ public class XxxTest {
 
     public void testReyClient(){
 
-        testServiceRemote.test(new CatRO(), new Url() {
-            @Override
-            public String value() {
-                return "127.0.0.1:8868/xxx/reyc/test";
-            }
-        });
+//        testServiceRemote.test(new CatRO(), new Url() {
+//            @Override
+//            public String value() {
+//                return "127.0.0.1:8868/xxx/reyc/test";
+//            }
+//        });
+
+        testServiceRemote.testFallBack(new CatRO());
 
 //        testServiceRemote.test(new CatRO(),null);
 

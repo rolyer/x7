@@ -18,15 +18,11 @@ public class AppTest {
     public void testAll(){
 
 //        xxxTest.testNonPaged();
-//        xxxTest.testNonPaged();
-//        xxxTest.domain();
-//        xxxTest.domain();
-//        xxxTest.domain();
-//        xxxTest.domain();
 //        xxxTest.domain();
 
+
+        xxxTest.testReyClient();
         xxxTest.testTime();
-
 
     }
 

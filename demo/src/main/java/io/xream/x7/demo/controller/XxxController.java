@@ -275,11 +275,11 @@ public class XxxController {
 	@RequestMapping(value = "/reyc/test")
 	public Boolean testRecClient() {
 
-//		try {
-//			TimeUnit.HOURS.sleep(1);
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
+		try {
+			TimeUnit.HOURS.sleep(1);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		return true;
 	}
 
