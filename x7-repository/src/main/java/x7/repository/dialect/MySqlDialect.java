@@ -20,13 +20,10 @@ import x7.core.bean.*;
 import x7.core.util.JsonX;
 import x7.repository.mapper.Mapper;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,7 +78,7 @@ public class MySqlDialect implements Mapper.Dialect {
     }
 
 
-    private Object getObject(final String mapper, ResultSet rs, BeanElement element) throws SQLException, IOException {
+    private Object getObject(final String mapper, ResultSet rs, BeanElement element) throws Exception {
 
         Class ec = element.clz;
         Object obj = rs.getObject(mapper);
@@ -110,7 +107,7 @@ public class MySqlDialect implements Mapper.Dialect {
     }
 
     @Override
-    public Object mappedResult(String property, String mapper, Map<String,String> aliaMap, ResultSet rs) throws SQLException, IOException {
+    public Object mappedResult(String property, String mapper, Map<String, String> aliaMap, ResultSet rs) throws Exception {
 
         if (mapper == null)
             throw new RuntimeException("Result key is empty?");
@@ -127,12 +124,12 @@ public class MySqlDialect implements Mapper.Dialect {
                 mapper = mapper.replace("`", "");
             }
 
-            if (element == null){
+            if (element == null) {
                 return rs.getObject(mapper);
             }
 
             return getObject(mapper, rs, element);
-        }else{
+        } else {
             if (mapper.contains("`")) {
                 mapper = mapper.replace("`", "");
             }
@@ -143,7 +140,7 @@ public class MySqlDialect implements Mapper.Dialect {
     }
 
     @Override
-    public <T> void initObj(T obj, ResultSet rs, BeanElement tempEle, List<BeanElement> eles) throws IOException, SQLException, InvocationTargetException, IllegalAccessException {
+    public <T> void initObj(T obj, ResultSet rs, BeanElement tempEle, List<BeanElement> eles) throws Exception {
 
         for (BeanElement ele : eles) {
 
@@ -159,17 +156,16 @@ public class MySqlDialect implements Mapper.Dialect {
 
         }
 
-
     }
 
 
-    public void setJSON(int i, String str, PreparedStatement pstmt) throws SQLException, IOException {
+    public void setJSON(int i, String str, PreparedStatement pstmt) throws Exception {
 
         pstmt.setString(i, str);
 
     }
 
-    public void setObject(int i, Object obj, PreparedStatement pstm) throws SQLException {
+    public void setObject(int i, Object obj, PreparedStatement pstm) throws Exception {
 
         pstm.setObject(i, obj);
 

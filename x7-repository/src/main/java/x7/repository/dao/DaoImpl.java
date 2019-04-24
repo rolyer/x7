@@ -21,22 +21,20 @@ import x7.core.bean.*;
 import x7.core.bean.condition.InCondition;
 import x7.core.bean.condition.ReduceCondition;
 import x7.core.bean.condition.RefreshCondition;
+import x7.core.config.ConfigAdapter;
 import x7.core.repository.X;
 import x7.core.util.*;
 import x7.core.web.Direction;
 import x7.core.web.Page;
 import x7.repository.CriteriaParser;
-import x7.core.config.ConfigAdapter;
-import x7.repository.util.ResultSetUtil;
 import x7.repository.exception.PersistenceException;
 import x7.repository.exception.RollbackException;
 import x7.repository.mapper.Mapper;
 import x7.repository.mapper.MapperFactory;
+import x7.repository.util.ResultSetUtil;
 import x7.repository.util.ResultSortUtil;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.*;
@@ -1305,7 +1303,7 @@ public class DaoImpl implements Dao {
     }
 
     private <T> void initObj(T obj, ResultSet rs, BeanElement tempEle, List<BeanElement> eles)
-            throws IllegalArgumentException, SecurityException, SQLException, IOException, IllegalAccessException, InvocationTargetException {
+            throws Exception {
 
         ResultSetUtil.initObj(obj, rs, tempEle, eles);
     }

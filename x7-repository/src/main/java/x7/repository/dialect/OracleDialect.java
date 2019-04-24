@@ -21,14 +21,11 @@ import x7.core.util.JsonX;
 import x7.core.util.StringUtil;
 import x7.repository.mapper.Mapper;
 
-import java.io.IOException;
 import java.io.Reader;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.*;
 
@@ -84,7 +81,7 @@ public class OracleDialect implements Mapper.Dialect {
                 .replace(INCREAMENT.trim(), increamentV).replace(ENGINE.trim(), engineV);
     }
 
-    private Object getObject(final String mapper, ResultSet rs, BeanElement element) throws SQLException, IOException {
+    private Object getObject(final String mapper, ResultSet rs, BeanElement element) throws Exception {
 
         Object obj = null;
         Class ec = element.clz;
@@ -174,7 +171,7 @@ public class OracleDialect implements Mapper.Dialect {
     }
 
     @Override
-    public Object mappedResult(String property, String mapper, Map<String,String> aliaMap, ResultSet rs) throws SQLException, IOException {
+    public Object mappedResult(String property, String mapper, Map<String,String> aliaMap, ResultSet rs) throws Exception {
 
         if (mapper == null)
             throw new RuntimeException("Result key is empty?");
@@ -208,7 +205,7 @@ public class OracleDialect implements Mapper.Dialect {
     }
 
     @Override
-    public <T> void initObj(T obj, ResultSet rs, BeanElement tempEle, List<BeanElement> eles) throws IOException, SQLException, InvocationTargetException, IllegalAccessException {
+    public <T> void initObj(T obj, ResultSet rs, BeanElement tempEle, List<BeanElement> eles) throws Exception {
 
 
         for (BeanElement ele : eles) {
@@ -235,7 +232,7 @@ public class OracleDialect implements Mapper.Dialect {
     }
 
 
-    public void setJSON(int i, String str, PreparedStatement pstmt) throws SQLException, IOException {
+    public void setJSON(int i, String str, PreparedStatement pstmt) throws Exception {
 
 //        Reader reader = new StringReader(str);
 //        pstmt.setNClob(i, reader);
@@ -245,7 +242,7 @@ public class OracleDialect implements Mapper.Dialect {
 
     }
 
-    public void setObject(int i, Object obj, PreparedStatement pstm) throws SQLException {
+    public void setObject(int i, Object obj, PreparedStatement pstm) throws Exception {
         if (obj instanceof Reader) {
             Reader reader = (Reader) obj;
             pstm.setNClob(i, reader);

@@ -19,12 +19,9 @@ package x7.repository.mapper;
 import x7.core.bean.BeanElement;
 import x7.core.bean.Criteria;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -103,14 +100,14 @@ public interface Mapper {
         String match(String sql, String sqlType);
 
 
-        <T> void initObj(T obj, ResultSet rs, BeanElement tempEle, List<BeanElement> eles) throws IOException, SQLException, InvocationTargetException, IllegalAccessException;
+        <T> void initObj(T obj, ResultSet rs, BeanElement tempEle, List<BeanElement> eles) throws Exception;
 
-        void setObject(int i, Object obj, PreparedStatement pstm) throws SQLException ;
+        void setObject(int i, Object obj, PreparedStatement pstm) throws Exception ;
 
 
-        void setJSON(int i, String str, PreparedStatement pstmt) throws SQLException, IOException ;
+        void setJSON(int i, String str, PreparedStatement pstmt) throws Exception ;
 
-        Object mappedResult(String property, String mapper, Map<String,String> aliaMap, ResultSet rs) throws SQLException, IOException;
+        Object mappedResult(String property, String mapper, Map<String,String> aliaMap, ResultSet rs) throws Exception;
 
         Object filterValue(Object value);
 
