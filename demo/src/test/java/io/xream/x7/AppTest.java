@@ -17,12 +17,12 @@ public class AppTest {
     @Test
     public void testAll(){
 
-//        xxxTest.testNonPaged();
+        xxxTest.testNonPaged();
 //        xxxTest.domain();
 
 
-        xxxTest.testReyClient();
-        xxxTest.testTime();
+//        xxxTest.testReyClient();
+//        xxxTest.testTime();
 
     }
 

@@ -92,7 +92,7 @@ public class XxxController {
 	@RequestMapping("/distinct")
 	public ViewEntity distinct(@RequestBody CatRO ro) {
 
-		CriteriaBuilder.ResultMappedBuilder builder = CriteriaBuilder.buildResultMapped(CatTest.class);
+		CriteriaBuilder.ResultMappedBuilder builder = CriteriaBuilder.buildResultMapped(CatTest.class,ro);
 		builder.distinct("catTest.dogId").distinct("catTest.catFriendName")
 				.reduce(Reduce.ReduceType.COUNT,"catTest.id")
 				.reduce(Reduce.ReduceType.SUM, "catTest.id")
