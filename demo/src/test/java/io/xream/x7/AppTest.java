@@ -17,7 +17,8 @@ public class AppTest {
     @Test
     public void testAll(){
 
-        xxxTest.testNonPaged();
+        xxxTest.distinct();
+//        xxxTest.testNonPaged();
 //        xxxTest.domain();
 
 

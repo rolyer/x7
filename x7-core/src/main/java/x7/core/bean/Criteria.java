@@ -19,7 +19,6 @@ package x7.core.bean;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import x7.core.util.BeanUtil;
 import x7.core.util.StringUtil;
-import x7.core.web.Direction;
 import x7.core.web.Paged;
 
 import java.io.Serializable;
@@ -117,13 +116,6 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 	public String resultAllScript() {
 		return customedResultKey;
 	}
-
-	public List<Sort> getOrderBy() {
-		if (isFixedSort())
-			return null;
-		return sortList;
-	}
-
 
 	public List<KV> getFixedSortList() {
 		return fixedSortList;
