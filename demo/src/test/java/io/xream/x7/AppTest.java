@@ -17,13 +17,14 @@ public class AppTest {
     @Test
     public void testAll(){
 
-        xxxTest.distinct();
+//        xxxTest.distinct();
 //        xxxTest.testNonPaged();
 //        xxxTest.domain();
 
 
 //        xxxTest.testReyClient();
 //        xxxTest.testTime();
+        xxxTest.getBase();
 
     }
 

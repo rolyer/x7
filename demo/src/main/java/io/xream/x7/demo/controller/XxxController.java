@@ -323,4 +323,10 @@ public class XxxController {
 		return pig;
 	}
 
+	@RequestMapping("/reyc/base")
+	public int getBase(){
+//		return "x7-demo/xxx/reyc/str";
+		return 10;
+	}
+
 }

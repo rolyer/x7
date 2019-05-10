@@ -21,4 +21,7 @@ public interface TestServiceRemote {
     @RequestMapping(value = "/xxx/time/test", method = RequestMethod.GET)
     Boolean testTimeJack();
 
+    @RequestMapping(value = "/xxx/reyc/base", method = RequestMethod.GET)
+    int getBase();
+
 }

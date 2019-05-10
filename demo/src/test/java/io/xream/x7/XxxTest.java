@@ -102,4 +102,9 @@ public class XxxTest {
         boolean flag = testServiceRemote.testTimeJack();
 
     }
+
+    public int getBase(){
+
+        return testServiceRemote.getBase();
+    }
 }

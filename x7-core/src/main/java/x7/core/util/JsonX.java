@@ -70,6 +70,8 @@ public class JsonX {
 	public static <T> T toObject(String json, Class<T> clz){
 		if (json == null || json.equals(""))
 			return null;
+		if (clz == String.class)
+			return (T)json;
 		return JSON.parseObject(json, clz);
 	}
 	
