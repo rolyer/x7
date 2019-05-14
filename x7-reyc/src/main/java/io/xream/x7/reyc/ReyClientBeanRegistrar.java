@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Set;
 
 
-public class ReyClientBeanRegistrar implements ImportBeanDefinitionRegistrar {
+public class ReyClientBeanRegistrar implements ImportBeanDefinitionRegistrar  {
 
     @Override
     public void registerBeanDefinitions(AnnotationMetadata annotationMetadata, BeanDefinitionRegistry registry) {

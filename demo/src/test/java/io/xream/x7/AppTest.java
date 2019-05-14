@@ -24,8 +24,13 @@ public class AppTest {
 
 //        xxxTest.testReyClient();
 //        xxxTest.testTime();
-        xxxTest.getBase();
+//        xxxTest.getBase();
 
+//        xxxTest.testCriteria();
+//        xxxTest.testResultMapped();
+//        xxxTest.testDomain();
+
+        xxxTest.testRefreshCondition();
     }
 
 }

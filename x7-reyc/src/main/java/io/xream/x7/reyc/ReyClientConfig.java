@@ -25,14 +25,15 @@ import io.xream.x7.reyc.internal.HttpClientProperies;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.env.Environment;
 
 @Import({HttpClientProperies.class})
 public class ReyClientConfig {
 
-    public ReyClientConfig(HttpClientProperies properies, CircuitBreakerRegistry circuitBreakerRegistry){
+    public ReyClientConfig(HttpClientProperies properies, CircuitBreakerRegistry circuitBreakerRegistry, Environment env){
 
         RetryRegistry retryRegistry = RetryRegistry.ofDefaults();
-        ClientResolver.init(properies, circuitBreakerRegistry, retryRegistry);
+        ClientResolver.init(properies, circuitBreakerRegistry, retryRegistry,env);
 
     }
 

@@ -2,14 +2,20 @@ package io.xream.x7;
 
 import io.xream.x7.demo.bean.Cat;
 import io.xream.x7.demo.CatRO;
+import io.xream.x7.demo.bean.CatTest;
+import io.xream.x7.demo.bean.DogTest;
 import io.xream.x7.demo.bean.Pig;
 import io.xream.x7.demo.controller.XxxController;
 import io.xream.x7.demo.remote.TestServiceRemote;
 import io.xream.x7.reyc.Url;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import x7.core.bean.Criteria;
+import x7.core.bean.CriteriaBuilder;
+import x7.core.bean.condition.RefreshCondition;
 import x7.core.util.HttpClientUtil;
 import x7.core.util.JsonX;
+import x7.core.web.Direction;
 import x7.core.web.ViewEntity;
 
 
@@ -107,4 +113,37 @@ public class XxxTest {
 
         return testServiceRemote.getBase();
     }
+
+    public ViewEntity testCriteria(){
+
+        CriteriaBuilder builder = CriteriaBuilder.build(CatTest.class);
+        builder.paged().sort("id", Direction.DESC).page(1).rows(10);
+        Criteria criteria = builder.get();
+        return testServiceRemote.testCriteria(criteria);
+    }
+
+    public ViewEntity testResultMapped(){
+
+        CriteriaBuilder.ResultMappedBuilder builder = CriteriaBuilder.buildResultMapped(CatTest.class);
+        builder.paged().sort("catTest.id", Direction.DESC).page(1).rows(10);
+        Criteria.ResultMappedCriteria criteria = builder.get();
+        return testServiceRemote.testResultMap(criteria);
+    }
+
+    public ViewEntity testDomain(){
+
+        CriteriaBuilder.DomainObjectBuilder builder = CriteriaBuilder.buildDomainObject(CatTest.class, DogTest.class);
+//        builder.paged().sort("catTest.id", Direction.DESC).page(1).rows(10);
+        Criteria.DomainObjectCriteria criteria = builder.get();
+        return testServiceRemote.testDomain(criteria);
+    }
+
+    public ViewEntity testRefreshCondition(){
+        RefreshCondition<CatTest> refreshCondition = new RefreshCondition<>();
+        refreshCondition.and().eq("id",10);
+        refreshCondition.refresh("id",100);
+
+        return testServiceRemote.testRefreshConditionn(refreshCondition);
+    }
+
 }

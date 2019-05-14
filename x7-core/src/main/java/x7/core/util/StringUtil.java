@@ -74,7 +74,7 @@ public class StringUtil {
 
 	/**
 	 *
-	 * @param Pattern(str)  like:   \\$\\{[\\w]*\\}      \{[\\w]*\\}
+	 * @param str  like:   \\$\\{[\\w]*\\}      \{[\\w]*\\}
 	 * @param pattern
 	 * @return
 	 */

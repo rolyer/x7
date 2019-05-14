@@ -16,7 +16,10 @@
  */
 package x7.core.bean.condition;
 
-import x7.core.bean.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import x7.core.bean.Criteria;
+import x7.core.bean.CriteriaBuilder;
+import x7.core.bean.Predicate;
 import x7.core.util.JsonX;
 
 import java.util.ArrayList;
@@ -27,11 +30,13 @@ import java.util.Objects;
 public class RefreshCondition<T> {
 
     private T obj;
-    private CriteriaCondition condition;
+    private Criteria condition;
     private List<Criteria.X> refreshList = new ArrayList<>();
     private String sourceStript;//FIXME fetch
 
+    @JsonIgnore
     private transient Class clz;
+    @JsonIgnore
     private transient  CriteriaBuilder builder;
 
     public Class getClz() {
@@ -69,7 +74,7 @@ public class RefreshCondition<T> {
         this.sourceStript = sourceStript;
     }
 
-    public CriteriaCondition getCondition() {
+    public Criteria getCondition() {
 
         if (Objects.nonNull(this.builder)) {
             this.condition = builder.get();
@@ -78,7 +83,7 @@ public class RefreshCondition<T> {
         return this.condition;
     }
 
-    public void setCondition(CriteriaCondition condition) {
+    public void setCondition(Criteria condition) {
         this.condition = condition;
     }
 

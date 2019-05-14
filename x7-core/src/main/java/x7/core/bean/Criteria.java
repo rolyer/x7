@@ -195,7 +195,7 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 				'}';
 	}
 
-	public class ResultMappedCriteria extends Criteria implements Serializable{
+	public static class ResultMappedCriteria extends Criteria implements Serializable{
 
 		private static final long serialVersionUID = -2365612538012282380L;
 		private List<String> resultKeyList = new ArrayList<String>();
@@ -214,6 +214,10 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 
 		public List<Reduce> getReduceList() {
 			return reduceList;
+		}
+
+		public ResultMappedCriteria(){
+			super();
 		}
 
 		public String getGroupBy() {
@@ -415,7 +419,7 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 	 * 不需要Fetched查询<br>
 	 * 支持L2Cache<br>
 	 */
-	public class DomainObjectCriteria<T,WITH> extends Criteria implements Serializable {
+	public static class DomainObjectCriteria<T,WITH> extends Criteria implements Serializable {
 
 		private static final long serialVersionUID = -886967622448599208L;
 		private Class withClz;
@@ -423,6 +427,11 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 		private String mainPropperty;
 		private String withProperty;
 		private List<? extends  Object> knownMainIdList;
+
+
+		public DomainObjectCriteria(){
+			super();
+		}
 
 		public Class getWithClz() {
 			return withClz;

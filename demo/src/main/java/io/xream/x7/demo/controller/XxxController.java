@@ -329,4 +329,24 @@ public class XxxController {
 		return 10;
 	}
 
+	@RequestMapping("/criteria/test")
+	public ViewEntity testCtriteria(@RequestBody Criteria criteria){
+		return ViewEntity.ok(criteria);
+	}
+
+	@RequestMapping("/resultmap/test")
+	public ViewEntity testResultMap(@RequestBody Criteria.ResultMappedCriteria criteria){
+		return ViewEntity.ok(criteria);
+	}
+
+	@RequestMapping("/domain/test")
+	public ViewEntity testDomain(@RequestBody Criteria.DomainObjectCriteria criteria){
+		return ViewEntity.ok(criteria);
+	}
+
+	@RequestMapping("/refreshCondition/test")
+	public ViewEntity testRefreshConditionn(@RequestBody RefreshCondition refreshCondition){
+		return ViewEntity.ok(refreshCondition);
+	}
+
 }

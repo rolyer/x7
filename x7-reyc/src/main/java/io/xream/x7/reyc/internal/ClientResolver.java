@@ -32,6 +32,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.RequestMethod;
 import x7.core.bean.KV;
 import x7.core.exception.BusyException;
@@ -62,11 +63,14 @@ public class ClientResolver {
 
     private static HttpClientProperies properies;
 
+    private static Environment environment;
 
-    public static void init(HttpClientProperies p, CircuitBreakerRegistry c, RetryRegistry r) {
+
+    public static void init(HttpClientProperies p, CircuitBreakerRegistry c, RetryRegistry r, Environment env) {
         circuitBreakerRegistry = c;
         properies = p;
         retryRegistry = r;
+        environment = env;
     }
 
     public static void initInterceptor(BraveHttpRequestInterceptor req, BraveHttpResponseInterceptor rep) {
@@ -75,12 +79,27 @@ public class ClientResolver {
     }
 
     private static Pattern pattern = Pattern.compile("\\{[\\w]*\\}");
-
+    private static Pattern pattern1 = Pattern.compile("\\$\\{[\\s\\S]*\\}");
 
     protected static R r(String remoteIntfName, String methodName, Object[] args) {
 
         ClientParsed parsed = ClientParser.get(remoteIntfName);
         String url = parsed.getUrl();
+
+        {
+            if (StringUtil.isNotNull(url)) {
+                if (url.contains("$")) {
+                    List<String> regxList = StringUtil.listByRegEx(url, pattern1);
+                    if (regxList != null && !regxList.isEmpty()) {
+                        String regx = regxList.get(0);
+                        String key = regx.replace("${", "").replace("}", "");
+                        String value = environment.getProperty(key);
+                        url = url.replace(regx, value);
+                    }
+                }
+            }
+        }
+
         MethodParsed methodParsed = parsed.getMap().get(methodName);
 
         if (methodParsed == null)

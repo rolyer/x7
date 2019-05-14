@@ -731,8 +731,8 @@ public class CriteriaBuilder {
 
         private void init() {
             super.instance = this;
-            Criteria c = new Criteria();
-            Criteria.ResultMappedCriteria resultMapped = c.new ResultMappedCriteria();
+//            Criteria c = new Criteria();
+            Criteria.ResultMappedCriteria resultMapped = new Criteria.ResultMappedCriteria();
             super.criteria = resultMapped;
         }
 
@@ -845,8 +845,8 @@ public class CriteriaBuilder {
 
         private void init() {
             super.instance = this;
-            Criteria c = new Criteria();
-            Criteria.DomainObjectCriteria domainObjectCriteria = c.new DomainObjectCriteria();
+//            Criteria c = new Criteria();
+            Criteria.DomainObjectCriteria domainObjectCriteria = new Criteria.DomainObjectCriteria();
             super.criteria = domainObjectCriteria;
         }
 

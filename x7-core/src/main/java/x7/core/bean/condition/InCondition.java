@@ -16,6 +16,8 @@
  */
 package x7.core.bean.condition;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.List;
 
 
@@ -24,6 +26,7 @@ public class InCondition {
     private String property;
     private List<? extends Object> inList;
 
+    @JsonIgnore
     private transient Class clz;
 
     public String getProperty() {

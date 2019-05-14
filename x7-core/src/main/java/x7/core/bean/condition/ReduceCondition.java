@@ -16,8 +16,9 @@
  */
 package x7.core.bean.condition;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import x7.core.bean.Criteria;
 import x7.core.bean.CriteriaBuilder;
-import x7.core.bean.CriteriaCondition;
 import x7.core.bean.Reduce;
 
 import java.util.Objects;
@@ -27,9 +28,11 @@ public class ReduceCondition {
 
     private Reduce.ReduceType type;
     private String reduceProperty;
-    private CriteriaCondition condition;
+    private Criteria condition;
 
+    @JsonIgnore
     private transient Class clz;
+    @JsonIgnore
     private transient CriteriaBuilder builder;
 
     public Reduce.ReduceType getType() {
@@ -48,14 +51,14 @@ public class ReduceCondition {
         this.reduceProperty = reduceProperty;
     }
 
-    public CriteriaCondition getCondition() {
+    public Criteria getCondition() {
         if (Objects.nonNull(this.builder)) {
             this.condition = builder.get();
         }
         return this.condition;
     }
 
-    public void setCondition(CriteriaCondition condition) {
+    public void setCondition(Criteria condition) {
         this.condition = condition;
     }
 
