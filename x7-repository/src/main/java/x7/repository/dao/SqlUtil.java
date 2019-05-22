@@ -217,7 +217,7 @@ public class SqlUtil {
 
 		boolean flag = true;
 		for (Criteria.X x : xList){
-			if (x.getKey().equals(keyOne)){//allready
+			if (keyOne.equals(x.getKey())){//allready
 				flag = false;
 				break;
 			}
