@@ -25,6 +25,8 @@ import org.springframework.stereotype.Repository;
 import x7.core.util.ClassFileReader;
 import x7.repository.BaseRepository;
 import x7.repository.internal.RepositoryProxy;
+import x7.repository.schema.SchemaConfig;
+import x7.repository.schema.SchemaTransformRepository;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
@@ -47,6 +49,7 @@ public class RepositoryBeanRegistrar implements ImportBeanDefinitionRegistrar {
 
         List<String> beanNameList = new ArrayList<>();
 
+        List<Class> list = new ArrayList<>();
         for (Class clz : set) {
             Annotation annotation = clz.getAnnotation(Repository.class);
             if (annotation == null)
@@ -56,6 +59,17 @@ public class RepositoryBeanRegistrar implements ImportBeanDefinitionRegistrar {
 
             if (! (types[0].getTypeName().startsWith(BaseRepository.class.getName())))
                 continue;
+
+            list.add(clz);
+        }
+
+        if (SchemaConfig.isSchemaTransformEnabled){
+            list.add(SchemaTransformRepository.class);
+        }
+
+        for (Class clz : list) {
+
+            Type[] types = clz.getGenericInterfaces();
 
             ParameterizedType parameterized = (ParameterizedType) types[0];
             Class clazz = (Class) parameterized.getActualTypeArguments()[0];

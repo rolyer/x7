@@ -160,6 +160,10 @@ public class Parser {
 		 * parseCacheable
 		 */
 		BeanUtilX.parseCacheableAnno(clz, parsed);
+		/*
+		 * parseTransformable
+		 */
+		BeanUtilX.parseTransformableAnno(clz,parsed);
 
 		put(clz, parsed);
 

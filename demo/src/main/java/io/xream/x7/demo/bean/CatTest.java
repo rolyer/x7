@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 
 import x7.core.repository.X;
 
+@X.Transformable("CT")
 public class CatTest {
 
 	@X.Key

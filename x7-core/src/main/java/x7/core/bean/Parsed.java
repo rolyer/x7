@@ -30,7 +30,9 @@ import java.util.Map;
 public class Parsed {	
 	
 	private boolean isChecked = false;
-	
+	private boolean isTransformable = false;
+	private String originType;
+
 	private Class clz;
 	private String tableName;
 	private boolean isNoSpec = true;
@@ -143,6 +145,22 @@ public class Parsed {
 		this.isNoCache = isNoCache;
 	}
 
+	public boolean isTransformable() {
+		return isTransformable;
+	}
+
+	public void setTransformable(boolean transformable) {
+		isTransformable = transformable;
+	}
+
+	public String getOriginType() {
+		return originType;
+	}
+
+	public void setOriginType(String originType) {
+		this.originType = originType;
+	}
+
 	public List<String> getKeywordsList() {
 		return keywordsList;
 	}
@@ -175,7 +193,6 @@ public class Parsed {
 		this.tagMap = tagMap;
 	}
 
-
 	public String getMapper(String property) {
 		return propertyMapperMap.get(property);
 	}
@@ -198,14 +215,16 @@ public class Parsed {
 
 	public void setNoSpec(boolean isNoSpec2) {
 		this.isNoSpec = isNoSpec2;
-		
 	}
 
 	@Override
 	public String toString() {
 		return "Parsed [clz=" + clz + ", tableName=" + tableName + ", keyMap=" + keyMap + ", keyFieldMap=" + keyFieldMap
-				+ ", beanElementList=" + beanElementList + ", elementMap=" + elementMap +
-				", isNoCache=" + isNoCache + ", keywordsList=" + keywordsList
+				+ ", beanElementList=" + beanElementList + ", elementMap=" + elementMap
+				+ ", isNoCache=" + isNoCache
+				+ ", isTransformable=" + isTransformable
+				+ ", originType=" + originType
+				+ ", keywordsList=" + keywordsList
 				+ ", isSearchable=" + isSearchable + ", tagMap=" + tagMap +  "]";
 	}
 

@@ -17,12 +17,10 @@
 package x7;
 
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.type.AnnotationMetadata;
-import org.springframework.stereotype.Repository;
 import x7.core.bean.Parser;
+import x7.repository.schema.SchemaConfig;
 
 import java.util.Map;
 
@@ -31,13 +29,15 @@ public class ParserStarter implements ImportBeanDefinitionRegistrar {
 
 	@Override
 	public void registerBeanDefinitions(AnnotationMetadata annotationMetadata, BeanDefinitionRegistry beanDefinitionRegistry) {
-		Map<String, Object> attributes = annotationMetadata.getAnnotationAttributes(EnableX7Repository.class.getName());
+		Map<String, Object> attributesX7Repository = annotationMetadata.getAnnotationAttributes(EnableX7Repository.class.getName());
 
-		Object prefix = attributes.get("mappingPrefix");
-		Object spec = attributes.get("mappingSpec");
+		Object prefix = attributesX7Repository.get("mappingPrefix");
+		Object spec = attributesX7Repository.get("mappingSpec");
 
 		Parser.mappingPrefix = prefix.toString();
 		Parser.mappingSpec = spec.toString();
+
+		SchemaConfig.isSchemaTransformEnabled = annotationMetadata.hasAnnotation(EnableSchemaTransform.class.getName());
 
 	}
 

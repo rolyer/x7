@@ -14,20 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package x7.repository;
+package x7.core.bean;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
+/**
+ * Schema转换的目标类需要实现此接口，验证表是否包含名为 originType的列
+ */
+public interface Transformed {
 
-@ConfigurationProperties("x7.repository")
-public class RepositoryProperties {
-
-	private Boolean isRemote;
-
-	public Boolean getIsRemote() {
-		return isRemote;
-	}
-
-	public void setIsRemote(Boolean isRemote) {
-		this.isRemote = isRemote;
-	}
+    /**
+     * Target table must has the column named "originType" identified the orgin table type,
+     * the value suggest 1,2,3...., or A,B,C,D....
+     */
+    String getOriginType();
 }

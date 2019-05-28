@@ -230,6 +230,13 @@ public class BeanUtilX extends BeanUtil {
 		}
 	}
 
+	public static void parseTransformableAnno(Class clz, Parsed parsed) {
+		X.Transformable p = (X.Transformable) clz.getAnnotation(X.Transformable.class);
+		if (p != null) {
+			parsed.setTransformable(true);
+		}
+	}
+
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static String parseAnno(Class clz, BeanElement ele, Field f) {
 		String type = null;

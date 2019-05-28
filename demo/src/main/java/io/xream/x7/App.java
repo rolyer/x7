@@ -19,6 +19,7 @@ import x7.*;
 @EnableTracingServlet
 @EnableCorsConfig
 @EnableDateToLongForJackson
+@EnableSchemaTransform
 public class App {
     public static void main( String[] args )
     {
