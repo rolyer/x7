@@ -25,7 +25,7 @@ public interface Transformed {
      * Target table must has the column named "originType" identified the orgin table type,
      * the value suggest 1,2,3...., or A,B,C,D....
      */
-    String getOriginType();
+    String getAlia();
     String getOriginTable();
     String getTargetTable();
     String getOriginColumn();

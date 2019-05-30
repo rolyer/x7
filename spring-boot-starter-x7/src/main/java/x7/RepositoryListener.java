@@ -107,7 +107,7 @@ public class RepositoryListener implements
             List<Transformed> transformedList = entry.getValue();
             for (Transformed transformed : transformedList) {
                 parsed.setTableName(transformed.getTargetTable());
-                parsed.setOriginType(transformed.getOriginType());
+                parsed.setTransforemedAlia(transformed.getAlia());
 
                 for (BeanElement be : parsed.getBeanElementList()){
                     if (be.getMapper().equals(transformed.getOriginColumn())){
@@ -116,6 +116,8 @@ public class RepositoryListener implements
                     }
                 }
             }
+
+            parsed.reset(parsed.getBeanElementList());
 
         }
     }

@@ -94,7 +94,7 @@ public class Parser {
 			e.printStackTrace();
 		}
 		parsed.setNoSpec(isNoSpec);
-		parsed.setBeanElementList(elementList);
+		parsed.reset(elementList);
 		BeanUtilX.parseKey(parsed, clz);
 
 		/*

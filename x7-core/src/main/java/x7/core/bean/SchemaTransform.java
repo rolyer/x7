@@ -25,7 +25,7 @@ public class SchemaTransform implements Transformed, Serializable {
 
     @X.Key
     private String id;
-    private String originType;
+    private String alia;
     private String originTable;
     private String targetTable;
     private String originColumn;
@@ -39,12 +39,12 @@ public class SchemaTransform implements Transformed, Serializable {
         this.id = id;
     }
 
-    public String getOriginType() {
-        return originType;
+    public String getAlia() {
+        return alia;
     }
 
-    public void setOriginType(String originType) {
-        this.originType = originType;
+    public void setAlia(String alia) {
+        this.alia = alia;
     }
 
     public String getOriginTable() {
@@ -83,7 +83,7 @@ public class SchemaTransform implements Transformed, Serializable {
     public String toString() {
         return "SchemaTransform{" +
                 "id='" + id + '\'' +
-                ", originType='" + originType + '\'' +
+                ", alia='" + alia + '\'' +
                 ", originTable='" + originTable + '\'' +
                 ", targetTable='" + targetTable + '\'' +
                 ", originColumn='" + originColumn + '\'' +

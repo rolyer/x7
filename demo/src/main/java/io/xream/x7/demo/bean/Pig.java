@@ -56,7 +56,7 @@ public class Pig implements Transformed {
     }
 
     @Override
-    public String getOriginType() {
+    public String getAlia() {
         return null;
     }
 

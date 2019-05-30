@@ -28,10 +28,12 @@ import java.util.Map;
 
 
 public class Parsed {	
-	
-	private boolean isChecked = false;
+
 	private boolean isTransformable = false;
-	private String originType;
+	private String transformedAlia;
+	private Parsed parsedTransformed;
+
+	private boolean isChecked = false;
 
 	private Class clz;
 	private String tableName;
@@ -53,8 +55,15 @@ public class Parsed {
 	private boolean isSearchable;
 	
 	private Map<String, TagParsed> tagMap = new HashMap();
-	
-	
+
+	public Parsed getParsedTransformed() {
+		return parsedTransformed;
+	}
+
+	public void setParsedTransformed(Parsed parsedTransformed) {
+		this.parsedTransformed = parsedTransformed;
+	}
+
 	public Class getClz() {
 		return clz;
 	}
@@ -107,6 +116,13 @@ public class Parsed {
 
 	public void setBeanElementList(List<BeanElement> beanElementList) {
 		this.beanElementList = beanElementList;
+	}
+
+	public void reset(List<BeanElement> beanElementList){
+		this.beanElementList = beanElementList;
+		this.propertyMapperMap.clear();
+		this.mapperPropertyMap.clear();
+		this.elementMap.clear();
 		for (BeanElement e : this.beanElementList){
 			String property = e.getProperty();
 			String mapper = e.getMapper();
@@ -114,7 +130,6 @@ public class Parsed {
 			this.propertyMapperMap.put(property, mapper);
 			this.mapperPropertyMap.put(mapper, property);
 		}
-		
 	}
 	
 	public boolean isChecked(){
@@ -153,12 +168,12 @@ public class Parsed {
 		isTransformable = transformable;
 	}
 
-	public String getOriginType() {
-		return originType;
+	public String getTransformedAlia() {
+		return this.transformedAlia;
 	}
 
-	public void setOriginType(String originType) {
-		this.originType = originType;
+	public void setTransforemedAlia(String alia) {
+		this.transformedAlia = alia;
 	}
 
 	public List<String> getKeywordsList() {
@@ -223,7 +238,7 @@ public class Parsed {
 				+ ", beanElementList=" + beanElementList + ", elementMap=" + elementMap
 				+ ", isNoCache=" + isNoCache
 				+ ", isTransformable=" + isTransformable
-				+ ", originType=" + originType
+				+ ", transformedAlia=" + transformedAlia
 				+ ", keywordsList=" + keywordsList
 				+ ", isSearchable=" + isSearchable + ", tagMap=" + tagMap +  "]";
 	}
