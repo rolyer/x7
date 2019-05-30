@@ -82,8 +82,12 @@ public abstract class DefaultRepository<T> implements BaseRepository<T> {
     }
 
     protected void hook() {
-        EntityHolder.listAll().add(this.clz);
-        HealthChecker.getRepositoryList().add(this);
+        if (!EntityHolder.listAll().contains(this.clz)) {
+            EntityHolder.listAll().add(this.clz);
+        }
+        if (!HealthChecker.getRepositoryList().contains(this)) {
+            HealthChecker.getRepositoryList().add(this);
+        }
     }
 
 

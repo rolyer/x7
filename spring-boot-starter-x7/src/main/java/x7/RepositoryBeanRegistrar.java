@@ -27,6 +27,7 @@ import x7.repository.BaseRepository;
 import x7.repository.internal.RepositoryProxy;
 import x7.repository.schema.SchemaConfig;
 import x7.repository.schema.SchemaTransformRepository;
+import x7.repository.schema.customizer.SchemaTransformRepositoryBuilder;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
@@ -65,6 +66,7 @@ public class RepositoryBeanRegistrar implements ImportBeanDefinitionRegistrar {
 
         if (SchemaConfig.isSchemaTransformEnabled){
             list.add(SchemaTransformRepository.class);
+            SchemaTransformRepositoryBuilder.registry = registry;
         }
 
         for (Class clz : list) {

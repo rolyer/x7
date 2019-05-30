@@ -54,23 +54,27 @@ public class RepositoryBooter {
         }
     }
 
+    public static void onStarted(){
+
+        HealthChecker.onStarted();
+        CasualWorker.accept(new IAsyncTask() {
+            @Override
+            public void execute() throws Exception {
+                try {
+                    Thread.sleep(1000);
+                    generateId();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
 
     public static void boot(DataSource ds_W, DataSource ds_R) {
         if (instance == null) {
             instance = new RepositoryBooter();
             setDataSource(ds_W, ds_R);
-            HealthChecker.onStarted();
-            CasualWorker.accept(new IAsyncTask() {
-                @Override
-                public void execute() throws Exception {
-                    try {
-                        Thread.sleep(1000);
-                        generateId();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
+
         }
     }
 

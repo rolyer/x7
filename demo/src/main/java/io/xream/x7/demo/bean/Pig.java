@@ -1,10 +1,11 @@
 package io.xream.x7.demo.bean;
 
+import x7.core.bean.Transformed;
 import x7.core.repository.X;
 
 import java.util.Date;
 
-public class Pig {
+public class Pig implements Transformed {
 
     @X.Key
     private long id;
@@ -52,5 +53,30 @@ public class Pig {
                 ", name='" + name + '\'' +
                 ", date=" + date +
                 '}';
+    }
+
+    @Override
+    public String getOriginType() {
+        return null;
+    }
+
+    @Override
+    public String getOriginTable() {
+        return null;
+    }
+
+    @Override
+    public String getTargetTable() {
+        return null;
+    }
+
+    @Override
+    public String getOriginColumn() {
+        return null;
+    }
+
+    @Override
+    public String getTargetColumn() {
+        return null;
     }
 }

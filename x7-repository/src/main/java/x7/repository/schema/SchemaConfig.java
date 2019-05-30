@@ -19,4 +19,5 @@ package x7.repository.schema;
 public class SchemaConfig {
 
     public static boolean isSchemaTransformEnabled;
+
 }

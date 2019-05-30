@@ -14,20 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package x7.core.bean;
+package x7.repository.schema.customizer;
 
-/**
- * Schema转换的目标类需要实现此接口，验证表是否包含名为 originType的列
- */
-public interface Transformed {
+import x7.repository.BaseRepository;
 
-    /**
-     * Target table must has the column named "originType" identified the orgin table type,
-     * the value suggest 1,2,3...., or A,B,C,D....
-     */
-    String getOriginType();
-    String getOriginTable();
-    String getTargetTable();
-    String getOriginColumn();
-    String getTargetColumn();
+public interface SchemaTransformCustomizer {
+
+    Class<? extends BaseRepository> customize(SchemaTransformRepositoryBuilder builder);
 }

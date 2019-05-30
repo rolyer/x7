@@ -55,6 +55,7 @@ public class RepositoryStarter  {
         return new X7Env();
     }
 
+
     @ConditionalOnMissingBean(X7Data.class)
     @Bean
     @Order(2)
