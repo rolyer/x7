@@ -29,7 +29,6 @@ import x7.core.repository.X;
 import x7.core.util.JsonX;
 import x7.core.web.Direction;
 import x7.core.web.Page;
-import x7.repository.dao.Dao;
 import x7.repository.exception.PersistenceException;
 
 import java.lang.reflect.Field;
@@ -49,11 +48,14 @@ public class DataRepository implements Repository {
         RepositoryBooter.init(this);
     }
 
-    private Dao syncDao;
+ 
 
-    public void setDao(Dao syncDao) {
+    private DataTransform dataTransform;
+    public void setDataTransform(DataTransform dataTransform) {
+
         logger.info("X7 Repository on starting....");
-        this.syncDao = syncDao;
+
+        this.dataTransform = dataTransform;
     }
 
 
@@ -105,7 +107,7 @@ public class DataRepository implements Repository {
                     }
 
                     List<T> tempList = null;
-                    tempList = syncDao.list(condition);
+                    tempList = dataTransform.list(condition);
 
                     if (!tempList.isEmpty()) {
                         obj = tempList.get(0);
@@ -113,7 +115,7 @@ public class DataRepository implements Repository {
 
                 } else {
                     long idOne = Long.valueOf(key);
-                    obj = syncDao.get(clz, idOne);
+                    obj = dataTransform.get(clz, idOne);
                 }
 
                 /*
@@ -154,7 +156,7 @@ public class DataRepository implements Repository {
         testAvailable();
         Class clz = obj.getClass();
         Parsed parsed = Parser.get(clz);
-        long id = syncDao.create(obj);
+        long id = dataTransform.create(obj);
 
         if (!isNoCache() && !parsed.isNoCache())
             cacheResolver.markForRefresh(clz);
@@ -167,7 +169,7 @@ public class DataRepository implements Repository {
         boolean flag = false;
         Class clz = obj.getClass();
         Parsed parsed = Parser.get(clz);
-        flag = syncDao.refresh(obj);
+        flag = dataTransform.refresh(obj);
 
         if (flag) {
             String key = getCacheKey(obj, parsed);
@@ -193,7 +195,7 @@ public class DataRepository implements Repository {
         }
         Parsed parsed = Parser.get(clz);
 
-        flag = syncDao.refreshByCondition(refreshCondition);
+        flag = dataTransform.refresh(refreshCondition);
 
         if (!isNoCache() && !parsed.isNoCache()) {
 
@@ -230,7 +232,7 @@ public class DataRepository implements Repository {
         Class clz = obj.getClass();
         Parsed parsed = Parser.get(clz);
         String key = getCacheKey(obj, parsed);
-        flag = syncDao.remove(obj);
+        flag = dataTransform.remove(obj);
 
         if (!isNoCache() && !parsed.isNoCache()) {
             if (key != null)
@@ -246,14 +248,14 @@ public class DataRepository implements Repository {
         Parsed parsed = Parser.get(clz);
 
         if (isNoCache() || parsed.isNoCache()) {
-            return syncDao.get(clz, idOne);
+            return dataTransform.get(clz, idOne);
         }
 
         String key = String.valueOf(idOne);
         T obj = cacheResolver.get(clz, key);
 
         if (obj == null) {
-            obj = syncDao.get(clz, idOne);
+            obj = dataTransform.get(clz, idOne);
             cacheResolver.set(clz, key, obj);
         }
 
@@ -270,7 +272,7 @@ public class DataRepository implements Repository {
         Parsed parsed = Parser.get(clz);
 
         if (isNoCache() || parsed.isNoCache()) {
-            return syncDao.list(conditionObj);
+            return dataTransform.list(conditionObj);
         }
 
         List<T> list = null;
@@ -278,7 +280,7 @@ public class DataRepository implements Repository {
         List<String> keyList = cacheResolver.getResultKeyList(clz, conditionObj);
 
         if (keyList == null || keyList.isEmpty()) {
-            list = syncDao.list(conditionObj);
+            list = dataTransform.list(conditionObj);
 
             keyList = new ArrayList<String>();
 
@@ -311,7 +313,7 @@ public class DataRepository implements Repository {
         Parsed parsed = Parser.get(clz);
 
         if (isNoCache() || parsed.isNoCache()) {
-            T t = syncDao.getOne(conditionObj);
+            T t = dataTransform.getOne(conditionObj);
             return t;
         }
 
@@ -319,7 +321,7 @@ public class DataRepository implements Repository {
         T obj = cacheResolver.get(clz, condition);
 
         if (obj == null) {
-            obj = syncDao.getOne(conditionObj);
+            obj = dataTransform.getOne(conditionObj);
             cacheResolver.set(clz, condition, obj);
             return obj;
         }
@@ -334,7 +336,7 @@ public class DataRepository implements Repository {
         Parsed parsed = Parser.get(clz);
 
         if (isNoCache() || parsed.isNoCache()) {
-            return (T) syncDao.getOne(conditionObj, orderBy, sc);
+            return (T) dataTransform.getOne(conditionObj, orderBy, sc);
         }
 
         String condition = JsonX.toJson(conditionObj) + orderBy + sc;
@@ -342,7 +344,7 @@ public class DataRepository implements Repository {
         T obj = cacheResolver.get(clz, condition);
 
         if (obj == null) {
-            T t = syncDao.getOne(conditionObj, orderBy, sc);
+            T t = dataTransform.getOne(conditionObj, orderBy, sc);
 
             cacheResolver.set(clz, condition, obj);
 
@@ -360,7 +362,7 @@ public class DataRepository implements Repository {
 
 
         if (isNoCache()) {
-            return syncDao.find(criteria);
+            return dataTransform.find(criteria);
         }
 
         List<T> list = null;
@@ -368,7 +370,7 @@ public class DataRepository implements Repository {
         Page<T> p = cacheResolver.getResultKeyListPaginated(clz, criteria);// FIXME
 
         if (p == null) {
-            syncDao.find(criteria);
+            dataTransform.find(criteria);
 
             list = p.getList(); // 结果
 
@@ -419,7 +421,7 @@ public class DataRepository implements Repository {
         Parsed parsed = Parser.get(clz);
 
         if (isNoCache()) {
-            return syncDao.list(criteria);
+            return dataTransform.list(criteria);
         }
 
         List<T> list = null;
@@ -427,7 +429,7 @@ public class DataRepository implements Repository {
         List<String> keyList = cacheResolver.getResultKeyList(clz, criteria);
 
         if (keyList == null || keyList.isEmpty()) {
-            list = syncDao.list(criteria);
+            list = dataTransform.list(criteria);
 
             keyList = new ArrayList<>();
 
@@ -460,7 +462,7 @@ public class DataRepository implements Repository {
         Parsed parsed = Parser.get(clz);
 
         if (isNoCache() || parsed.isNoCache()) {
-            return syncDao.list(clz);
+            return dataTransform.list(clz);
         }
 
         List<T> list = null;
@@ -470,7 +472,7 @@ public class DataRepository implements Repository {
         List<String> keyList = cacheResolver.getResultKeyList(clz, condition);
 
         if (keyList == null || keyList.isEmpty()) {
-            list = syncDao.list(clz);
+            list = dataTransform.list(clz);
 
             keyList = new ArrayList<String>();
 
@@ -499,7 +501,7 @@ public class DataRepository implements Repository {
     @Override
     public Object reduce(ReduceCondition reduceCondition) {
         testAvailable();
-        return syncDao.reduce(reduceCondition);
+        return dataTransform.reduce(reduceCondition);
 
     }
 
@@ -507,7 +509,7 @@ public class DataRepository implements Repository {
         testAvailable();
         boolean b;
         Parsed parsed = Parser.get(obj.getClass());
-        b = syncDao.execute(obj, sql);
+        b = dataTransform.execute(obj, sql);
 
         if (b) {
             String key = getCacheKey(obj, parsed);
@@ -532,7 +534,7 @@ public class DataRepository implements Repository {
         List<? extends Object> inList = inCondition.getInList();
 
         if (isNoCache() || parsed.isNoCache()) {
-            return syncDao.in(inCondition);
+            return dataTransform.in(inCondition);
         }
 
         StringBuilder sb = new StringBuilder();
@@ -548,7 +550,7 @@ public class DataRepository implements Repository {
 
         if (keyList == null || keyList.isEmpty()) {
 
-            list = syncDao.in(inCondition);
+            list = dataTransform.in(inCondition);
 
             keyList = new ArrayList<String>();
 
@@ -625,13 +627,13 @@ public class DataRepository implements Repository {
     @Override
     public Page<Map<String, Object>> find(Criteria.ResultMappedCriteria resultMapped) {
         testAvailable();
-        return syncDao.find(resultMapped);
+        return dataTransform.find(resultMapped);
     }
 
     @Override
     public List<Map<String, Object>> list(Criteria.ResultMappedCriteria resultMapped) {
         testAvailable();
-        return syncDao.list(resultMapped);
+        return dataTransform.list(resultMapped);
     }
 
     @Override
@@ -641,7 +643,7 @@ public class DataRepository implements Repository {
             return false;
         Class clz = objList.get(0).getClass();
         Parsed parsed = Parser.get(clz);
-        boolean flag = this.syncDao.createBatch(objList);
+        boolean flag = this.dataTransform.createBatch(objList);
         if (!isNoCache() && !parsed.isNoCache())
             cacheResolver.markForRefresh(clz);
 
@@ -652,7 +654,7 @@ public class DataRepository implements Repository {
 
         Parsed parsed = Parser.get(clz);
         if (isNoCache() || parsed.isNoCache()) {
-            return syncDao.list(clz, sql, conditionList);
+            return dataTransform.list(clz, sql, conditionList);
         }
 
         String condition = sql + conditionList.toString();
@@ -660,7 +662,7 @@ public class DataRepository implements Repository {
         List<Map<String, Object>> mapList = cacheResolver.getMapList(clz, condition);
 
         if (mapList == null) {
-            mapList = syncDao.list(clz, sql, conditionList);
+            mapList = dataTransform.list(clz, sql, conditionList);
 
             if (mapList != null) {
                 cacheResolver.setMapList(clz, condition, mapList);
@@ -672,7 +674,7 @@ public class DataRepository implements Repository {
     }
 
     private void testAvailable() {
-        if (Objects.isNull(this.syncDao))
+        if (Objects.isNull(this.dataTransform))
             throw new PersistenceException("X7-Repository does not started");
     }
 

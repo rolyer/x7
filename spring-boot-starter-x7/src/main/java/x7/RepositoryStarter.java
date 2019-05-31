@@ -123,9 +123,20 @@ public class RepositoryStarter  {
 
     @Bean
     @Order(7)
-    public DataRepository dataRepository(Dao dao, CacheResolver cacheResolver){
+    public DataRepository dataRepository(Dao dao, CacheResolver cacheResolver,Environment environment){
+
+        String driverClassName = environment.getProperty("spring.datasource.driver-class-name");
+
+        DataTransform dataTransform = null;
+
+        if (driverClassName.toLowerCase().contains("mysql")
+                || driverClassName.toLowerCase().contains("oracle")) {
+            dataTransform = new SqlDataTransform();
+            ((SqlDataTransform) dataTransform).setDao(dao);
+        }
+
         DataRepository repository = new DataRepository();
-        repository.setDao(dao);
+        repository.setDataTransform(dataTransform);
         repository.setCacheResolver(cacheResolver);
 
         return repository;
