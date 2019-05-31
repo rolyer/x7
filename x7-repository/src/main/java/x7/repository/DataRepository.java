@@ -41,14 +41,11 @@ public class DataRepository implements Repository {
 
     private final static Logger logger = LoggerFactory.getLogger(DataRepository.class);
 
-
     public DataRepository(){
         ManuRepository.init(this);
         HealthChecker.init(this);
         RepositoryBooter.init(this);
     }
-
- 
 
     private DataTransform dataTransform;
     public void setDataTransform(DataTransform dataTransform) {
@@ -58,9 +55,7 @@ public class DataRepository implements Repository {
         this.dataTransform = dataTransform;
     }
 
-
     private CacheResolver cacheResolver;
-
     public void setCacheResolver(CacheResolver cacheResolver) {
         this.cacheResolver = cacheResolver;
     }
