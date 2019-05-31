@@ -24,6 +24,7 @@ import x7.core.bean.Parser;
 import x7.core.bean.Transformed;
 import x7.repository.BaseRepository;
 import x7.repository.DataRepository;
+import x7.repository.Repository;
 import x7.repository.RepositoryBooter;
 import x7.repository.schema.SchemaConfig;
 import x7.repository.schema.SchemaTransformRepository;
@@ -53,7 +54,10 @@ public class RepositoryListener implements
         RepositoryBooter.onStarted();
 
         if (clzz != null){
-            List list = list(clzz);//查出所有配置
+
+            DataRepository dataRepository = (DataRepository) applicationStartedEvent.getApplicationContext().getBean(Repository.class);
+
+            List list = list(dataRepository,clzz);//查出所有配置
             if (!list.isEmpty()) {
                 reparse(list);
             }
@@ -125,14 +129,14 @@ public class RepositoryListener implements
         }
     }
 
-    private List list(Class<? extends BaseRepository> clzz) {
+    private List list(DataRepository dataRepository,Class<? extends BaseRepository> clzz) {
 
         Type[] types = clzz.getGenericInterfaces();
 
         ParameterizedType parameterized = (ParameterizedType) types[0];
         Class clazz = (Class) parameterized.getActualTypeArguments()[0];
 
-        return DataRepository.getInstance().list(clazz);
+        return dataRepository.list(clazz);
 
     }
 

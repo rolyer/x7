@@ -22,12 +22,23 @@ import java.util.Map;
 
 public class ManuRepository {
 
+	private static DataRepository dataRepository;
+
+	protected static void init(DataRepository repository){
+		dataRepository = repository;
+	}
+
+
 	public static <T> boolean execute(T obj, String sql){
-		return DataRepository.getInstance().execute(obj, sql);
+		return dataRepository.execute(obj, sql);
 	}
 	
 	
 	public static List<Map<String,Object>> list(Class clz, String sql, List<Object> conditionList){
-		return DataRepository.getInstance().list(clz, sql, conditionList);
+		return dataRepository.list(clz, sql, conditionList);
+	}
+
+	public static DataRepository ORM(){
+		return dataRepository;
 	}
 }

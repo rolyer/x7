@@ -27,7 +27,15 @@ import org.springframework.core.env.Environment;
 import x7.config.SpringHelper;
 import x7.core.config.ConfigAdapter;
 import x7.core.config.Configs;
-import x7.repository.RepositoryBooter;
+import x7.core.repository.CacheResolver;
+import x7.repository.*;
+import x7.repository.dao.Dao;
+import x7.repository.dao.DaoImpl;
+import x7.repository.dao.SqlCriteriaParser;
+import x7.repository.mapper.Mapper;
+import x7.repository.mapper.MapperFactory;
+import x7.repository.redis.LevelTwoCacheResolver;
+import x7.repository.util.ResultSetUtil;
 
 import javax.sql.DataSource;
 import java.util.Objects;
@@ -55,10 +63,78 @@ public class RepositoryStarter  {
         return new X7Env();
     }
 
+    @Bean
+    @Order(3)
+    public Mapper.Dialect dialect(Environment environment){
+        String driverClassName = environment.getProperty("spring.datasource.driver-class-name");
+
+        String driver = null;
+        if (Objects.isNull(driverClassName)) {
+            driver = environment.getProperty("x7.db.driver");
+        } else {
+            driver = driverClassName;
+        }
+
+        driver = driver.toLowerCase();
+        Mapper.Dialect dialect = null;
+        try {
+            if (driver.contains(DbType.MYSQL)) {
+                DbType.value = DbType.MYSQL;
+                dialect = (Mapper.Dialect) Class.forName("x7.repository.dialect.MySqlDialect").newInstance();
+                initDialect(dialect);
+            } else if (driver.contains(DbType.ORACLE)) {
+                DbType.value = DbType.ORACLE;
+                dialect = (Mapper.Dialect) Class.forName("x7.repository.dialect.OracleDialect").newInstance();
+                initDialect(dialect);
+            }
+        }catch (Exception e){
+
+        }
+
+        return dialect;
+    }
+
+    @Bean
+    @Order(4)
+    public CriteriaParser criteriaParser(Mapper.Dialect dialect) {
+        CriteriaParser criteriaParser = new SqlCriteriaParser();
+        criteriaParser.setDialect(dialect);
+
+        initDialect(dialect);
+
+        return criteriaParser;
+    }
+
+    @Bean
+    @Order(5)
+    public Dao dao(Mapper.Dialect dialect,CriteriaParser criteriaParser){
+        Dao dao = new DaoImpl();
+        ((DaoImpl) dao).setDialect(dialect);
+        ((DaoImpl) dao).setCriteriaParser(criteriaParser);
+
+        return dao;
+    }
+
+    @Bean
+    @Order(6)
+    public CacheResolver cacheResolver(){
+        return new LevelTwoCacheResolver();
+    }
+
+    @Bean
+    @Order(7)
+    public DataRepository dataRepository(Dao dao, CacheResolver cacheResolver){
+        DataRepository repository = new DataRepository();
+        repository.setDao(dao);
+        repository.setCacheResolver(cacheResolver);
+
+        return repository;
+    }
+
 
     @ConditionalOnMissingBean(X7Data.class)
     @Bean
-    @Order(2)
+    @Order(8)
     public X7Data enableData(DataSource dataSource,DataSourceProperties_R dataSourceProperties_r){
 
         DataSource writeDataSource = dataSource;
@@ -131,11 +207,17 @@ public class RepositoryStarter  {
             logger.info("X7 Repsository will not show SQL, for no config like one of: x7.repository.show-sql=true,spring.jpa.show-sql=true,log4j.logger.org....." );
         }
 
-        String driverClassName = Configs.getString("spring.datasource.driver-class-name");
-
-        RepositoryBooter.onDriver(driverClassName);
         RepositoryBooter.boot(dsW,dsR);
 
     }
 
+    /**
+     * TODO:
+     *      改成Map,可以动态获取方言
+     * @param dialect
+     */
+    private static void initDialect(Mapper.Dialect dialect) {
+        MapperFactory.Dialect = dialect;
+        ResultSetUtil.dialect = dialect;
+    }
 }

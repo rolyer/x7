@@ -28,9 +28,9 @@ public class AppTest {
 
 //        xxxTest.testCriteria();
 //        xxxTest.testResultMapped();
-//        xxxTest.testDomain();
+        xxxTest.testDomain();
 
-        xxxTest.testRefreshCondition();
+//        xxxTest.testRefreshCondition();
     }
 
 }

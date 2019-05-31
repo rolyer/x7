@@ -44,19 +44,10 @@ import java.util.*;
  */
 public class DaoImpl implements Dao {
 
-    private static DaoImpl instance;
-
-    public static DaoImpl getInstance() {
-        if (instance == null) {
-            instance = new DaoImpl();
-        }
-        return instance;
+    public DaoImpl() {
     }
 
-    private DaoImpl() {
-        this.criteriaParser = new SqlCriteriaParser();
-    }
-
+    @Autowired
     private CriteriaParser criteriaParser;
 
     @Autowired
@@ -64,7 +55,9 @@ public class DaoImpl implements Dao {
 
     public void setDialect(Mapper.Dialect dialect) {
         this.dialect = dialect;
-        this.criteriaParser.setDialect(dialect);
+    }
+    public void setCriteriaParser(CriteriaParser criteriaParser){
+        this.criteriaParser = criteriaParser;
     }
 
 

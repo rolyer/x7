@@ -20,7 +20,7 @@ import x7.core.bean.*;
 import x7.core.bean.condition.InCondition;
 import x7.core.repository.X;
 import x7.core.util.ExceptionUtil;
-import x7.repository.DataRepository;
+import x7.repository.ManuRepository;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -50,7 +50,7 @@ public class DomainObjectRepositoy {
 
             InCondition relativeInCondition = new InCondition(domainObjectCriteria.getMainPropperty(), mainInList);
             relativeInCondition.setClz(domainObjectCriteria.getRelativeClz());
-            relativeList = DataRepository.getInstance().in(relativeInCondition);
+            relativeList = ManuRepository.ORM().in(relativeInCondition);
 
             BeanElement relativeWithBe = relativeParsed.getElement(domainObjectCriteria.getWithProperty());
 
@@ -64,7 +64,7 @@ public class DomainObjectRepositoy {
 
             InCondition withInCondition = new InCondition(key, withInList);
             withInCondition.setClz(domainObjectCriteria.getWithClz());
-            withList = DataRepository.getInstance().in(withInCondition);
+            withList = ManuRepository.ORM().in(withInCondition);
 
 
             List<DomainObject<T, WITH>> list = new ArrayList<>();
@@ -134,7 +134,7 @@ public class DomainObjectRepositoy {
 
             InCondition withInCondition = new InCondition(domainObjectCriteria.getMainPropperty(), mainInList);
             withInCondition.setClz(domainObjectCriteria.getWithClz());
-            List withList = DataRepository.getInstance().in(withInCondition);
+            List withList = ManuRepository.ORM().in(withInCondition);
 
             List<DomainObject<T, WITH>> list = new ArrayList<>();
 
@@ -185,7 +185,7 @@ public class DomainObjectRepositoy {
             List<T> mainList = null;
             if (mainInList == null || mainInList.isEmpty()) {
 
-                mainList = DataRepository.getInstance().list((Criteria) domainObjectCriteria);
+                mainList = ManuRepository.ORM().list((Criteria) domainObjectCriteria);
 
                 Parsed mainParsed = Parser.get(domainObjectCriteria.getClz());
                 Field mainField = mainParsed.getKeyField(X.KEY_ONE);
@@ -210,7 +210,7 @@ public class DomainObjectRepositoy {
 
             InCondition relativeInCondition = new InCondition(domainObjectCriteria.getMainPropperty(), mainInList);
             relativeInCondition.setClz(domainObjectCriteria.getRelativeClz());
-            relativeList = DataRepository.getInstance().in(relativeInCondition);
+            relativeList = ManuRepository.ORM().in(relativeInCondition);
 
             BeanElement relativeWithBe = relativeParsed.getElement(domainObjectCriteria.getWithProperty());
 
@@ -224,7 +224,7 @@ public class DomainObjectRepositoy {
 
             InCondition withInCondition = new InCondition(key, withInList);
             withInCondition.setClz(domainObjectCriteria.getWithClz());
-            withList = DataRepository.getInstance().in(withInCondition);
+            withList = ManuRepository.ORM().in(withInCondition);
 
             List<DomainObject<T, WITH>> list = new ArrayList<>();
 
@@ -299,7 +299,7 @@ public class DomainObjectRepositoy {
 
             if (mainInList == null || mainInList.isEmpty()) {
 
-                mainList = DataRepository.getInstance().list((Criteria) domainObjectCriteria);
+                mainList = ManuRepository.ORM().list((Criteria) domainObjectCriteria);
 
 
                 for (Object t : mainList) {
@@ -318,7 +318,7 @@ public class DomainObjectRepositoy {
 
             InCondition withInCondition = new InCondition(domainObjectCriteria.getMainPropperty(), mainInList);
             withInCondition.setClz(domainObjectCriteria.getWithClz());
-            withList = DataRepository.getInstance().in(withInCondition);
+            withList = ManuRepository.ORM().in(withInCondition);
 
 
             List<DomainObject<T, WITH>> list = new ArrayList<>();

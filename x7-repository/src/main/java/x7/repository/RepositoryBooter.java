@@ -18,13 +18,8 @@ package x7.repository;
 
 import x7.core.async.CasualWorker;
 import x7.core.async.IAsyncTask;
-import x7.core.config.Configs;
-import x7.repository.dao.DaoImpl;
 import x7.repository.internal.DefaultRepository;
-import x7.repository.mapper.Mapper;
-import x7.repository.mapper.MapperFactory;
 import x7.repository.redis.JedisConnector_Persistence;
-import x7.repository.util.ResultSetUtil;
 
 import javax.sql.DataSource;
 import java.util.List;
@@ -34,6 +29,12 @@ import java.util.Objects;
 public class RepositoryBooter {
 
     private static RepositoryBooter instance = null;
+
+    private static DataRepository dataRepository;
+
+    protected static void init(DataRepository repository){
+        dataRepository = repository;
+    }
 
     public static void boot() {
         if (instance == null) {
@@ -78,9 +79,26 @@ public class RepositoryBooter {
         }
     }
 
+    private static void init() {
+        setDataSource(null, null);
+    }
+
+
+
+
+    private static void setDataSource(DataSource ds_W, DataSource ds_R) {
+
+        if (Objects.isNull(ds_W))
+            throw new RuntimeException("Primary DataSource start failed");
+
+        DataSourceSetter.set(ds_W, ds_R);
+
+    }
+
+
     public static void generateId() {
         System.out.println("\n" + "----------------------------------------");
-        List<IdGenerator> idGeneratorList = DataRepository.getInstance().list(IdGenerator.class);
+        List<IdGenerator> idGeneratorList = dataRepository.list(IdGenerator.class);
         for (IdGenerator generator : idGeneratorList) {
             String name = generator.getClzName();
             long maxId = generator.getMaxId();
@@ -101,60 +119,6 @@ public class RepositoryBooter {
 
         }
         System.out.println("----------------------------------------" + "\n");
-    }
-
-    private static void init() {
-        onDriver(null);
-        setDataSource(null, null);
-    }
-
-
-    public static void onDriver(String driverClassName) {
-
-        String driver = null;
-        if (Objects.isNull(driverClassName)) {
-            driver = Configs.getString("x7.db.driver");
-        } else {
-            driver = driverClassName;
-        }
-
-        driver = driver.toLowerCase();
-
-        try {
-            Mapper.Dialect dialect = null;
-            if (driver.contains(DbType.MYSQL)) {
-                DbType.value = DbType.MYSQL;
-                dialect = (Mapper.Dialect) Class.forName("x7.repository.dialect.MySqlDialect").newInstance();
-                initDialect(dialect);
-            } else if (driver.contains(DbType.ORACLE)) {
-                DbType.value = DbType.ORACLE;
-                dialect = (Mapper.Dialect) Class.forName("x7.repository.dialect.OracleDialect").newInstance();
-                initDialect(dialect);
-            }
-        }catch (Exception e){
-
-        }
-    }
-
-    private static void setDataSource(DataSource ds_W, DataSource ds_R) {
-
-        if (Objects.isNull(ds_W))
-            throw new RuntimeException("Primary DataSource start failed");
-
-        DataSourceSetter.set(ds_W, ds_R);
-        DataRepository.getInstance().setSyncDao(DaoImpl.getInstance());
-
-    }
-
-    /**
-     * TODO:
-     *      改成Map,可以动态获取方言
-     * @param dialect
-     */
-    private static void initDialect(Mapper.Dialect dialect) {
-        MapperFactory.Dialect = dialect;
-        DaoImpl.getInstance().setDialect(dialect);
-        ResultSetUtil.dialect = dialect;
     }
 
 }

@@ -41,19 +41,17 @@ import java.util.*;
 public class DataRepository implements Repository {
 
     private final static Logger logger = LoggerFactory.getLogger(DataRepository.class);
-    private static DataRepository instance;
 
-    public static DataRepository getInstance() {
 
-        if (instance == null) {
-            instance = new DataRepository();
-        }
-        return instance;
+    public DataRepository(){
+        ManuRepository.init(this);
+        HealthChecker.init(this);
+        RepositoryBooter.init(this);
     }
 
     private Dao syncDao;
 
-    public void setSyncDao(Dao syncDao) {
+    public void setDao(Dao syncDao) {
         logger.info("X7 Repository on starting....");
         this.syncDao = syncDao;
     }
@@ -66,7 +64,7 @@ public class DataRepository implements Repository {
     }
 
     private boolean isNoCache() {
-        return Configs.Inner.isDev || cacheResolver == null;
+        return Configs.Inner.isDev || !cacheResolver.isEnabled();
     }
 
     private String getCacheKey(Object obj, Parsed parsed) {

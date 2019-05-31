@@ -42,18 +42,19 @@ public class LevelTwoCacheResolver implements CacheResolver {
 
 	private final static Logger logger = LoggerFactory.getLogger(LevelTwoCacheResolver.class);
 	public final static String NANO_SECOND = ".ns.";
-	
-	private static LevelTwoCacheResolver instance = null;
-	public static LevelTwoCacheResolver getInstance(){
-		if (instance == null){
-			instance = new LevelTwoCacheResolver();
-		}
-		return instance;
+
+
+	private static int validSecond;
+	private static boolean isEnabled;
+	public static void enabled(){
+		isEnabled = true;
 	}
 
-	private int validSecond;
-	public void setValidSecond(int validSecond){
-		this.validSecond = validSecond;
+	public boolean isEnabled(){
+		return isEnabled;
+	}
+	public static void setValidSecond(int vs){
+		validSecond = vs;
 		System.out.println("\n");
 		logger.info("L2 Cache try to starting.... cache time = " + validSecond + "s");
 		System.out.println("\n");

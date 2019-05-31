@@ -17,6 +17,8 @@
 package x7.repository.internal;
 
 import org.springframework.beans.factory.FactoryBean;
+import x7.repository.DataRepository;
+import x7.repository.ManuRepository;
 
 import java.lang.reflect.Proxy;
 
@@ -36,6 +38,15 @@ public class RepositoryProxy<T> extends DefaultRepository<T> implements FactoryB
     public void setClz(Class<T> clz) {
         super.setClz(clz);
         super.hook();
+    }
+
+    public RepositoryProxy(){
+        setDataRepository(ManuRepository.ORM());
+    }
+
+    @Override
+    public void setDataRepository(DataRepository dataRepository){
+        super.setDataRepository(dataRepository);
     }
 
     private Class<?> objectType;

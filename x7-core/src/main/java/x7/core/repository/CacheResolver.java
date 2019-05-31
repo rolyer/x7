@@ -31,6 +31,7 @@ import java.util.Objects;
  */
 public interface CacheResolver {
 
+	boolean isEnabled();
 	/**
 	 * 标记缓存要更新
 	 * @param clz

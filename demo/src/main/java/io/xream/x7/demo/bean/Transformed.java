@@ -1,7 +1,10 @@
 package io.xream.x7.demo.bean;
 
+import x7.core.repository.X;
+
 public class Transformed  {
 
+    @X.Key
     private String id;
     private String alia;
     private long originId;
