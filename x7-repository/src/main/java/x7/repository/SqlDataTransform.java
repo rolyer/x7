@@ -34,9 +34,10 @@ public class SqlDataTransform implements DataTransform{
         this.dao = dao;
     }
 
+    @Deprecated
     @Override
     public <T> void refreshCache(Class<T> clz) {
-
+        throw new RuntimeException("Wrong Code");
     }
 
     @Override
