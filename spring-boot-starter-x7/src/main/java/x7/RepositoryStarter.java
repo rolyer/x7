@@ -81,12 +81,11 @@ public class RepositoryStarter  {
             if (driver.contains(DbType.MYSQL)) {
                 DbType.value = DbType.MYSQL;
                 dialect = (Mapper.Dialect) Class.forName("x7.repository.dialect.MySqlDialect").newInstance();
-                initDialect(dialect);
             } else if (driver.contains(DbType.ORACLE)) {
                 DbType.value = DbType.ORACLE;
                 dialect = (Mapper.Dialect) Class.forName("x7.repository.dialect.OracleDialect").newInstance();
-                initDialect(dialect);
             }
+            initDialect(dialect);
         }catch (Exception e){
 
         }
@@ -96,21 +95,35 @@ public class RepositoryStarter  {
 
     @Bean
     @Order(4)
-    public CriteriaParser criteriaParser(Mapper.Dialect dialect) {
-        CriteriaParser criteriaParser = new SqlCriteriaParser();
-        criteriaParser.setDialect(dialect);
+    public CriteriaParser criteriaParser(Mapper.Dialect dialect,Environment environment) {
 
-        initDialect(dialect);
+        String driverClassName = environment.getProperty("spring.datasource.driver-class-name");
+
+        CriteriaParser criteriaParser =  null;
+
+        if (driverClassName.toLowerCase().contains("mysql")
+                || driverClassName.toLowerCase().contains("oracle")) {
+            criteriaParser = new SqlCriteriaParser();
+            criteriaParser.setDialect(dialect);
+        }
 
         return criteriaParser;
     }
 
     @Bean
     @Order(5)
-    public Dao dao(Mapper.Dialect dialect,CriteriaParser criteriaParser){
-        Dao dao = new DaoImpl();
-        ((DaoImpl) dao).setDialect(dialect);
-        ((DaoImpl) dao).setCriteriaParser(criteriaParser);
+    public Dao dao(Mapper.Dialect dialect,CriteriaParser criteriaParser,Environment environment){
+
+        String driverClassName = environment.getProperty("spring.datasource.driver-class-name");
+
+        Dao dao =  null;
+
+        if (driverClassName.toLowerCase().contains("mysql")
+                || driverClassName.toLowerCase().contains("oracle")) {
+            dao = new DaoImpl();
+            ((DaoImpl) dao).setDialect(dialect);
+            ((DaoImpl) dao).setCriteriaParser(criteriaParser);
+        }
 
         return dao;
     }
@@ -227,7 +240,7 @@ public class RepositoryStarter  {
      *      改成Map,可以动态获取方言
      * @param dialect
      */
-    private static void initDialect(Mapper.Dialect dialect) {
+    private void initDialect(Mapper.Dialect dialect) {
         MapperFactory.Dialect = dialect;
         ResultSetUtil.dialect = dialect;
     }
