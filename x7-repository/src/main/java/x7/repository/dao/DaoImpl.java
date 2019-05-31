@@ -209,14 +209,13 @@ public class DaoImpl implements Dao {
 
         Class clz = obj.getClass();
 
-        String sql = MapperFactory.getSql(clz, Mapper.CREATE);
-
-        List<BeanElement> eles = MapperFactory.getElementList(clz);
-
         long id = -1;
         PreparedStatement pstmt = null;
         try {
+            String sql = MapperFactory.getSql(clz, Mapper.CREATE);
             Parsed parsed = Parser.get(clz);
+            List<BeanElement> eles = parsed.getBeanElementList();
+
             Long keyOneValue = 0L;
             Field keyOneField = parsed.getKeyField(X.KEY_ONE);
             if (Objects.isNull(keyOneField))
@@ -231,7 +230,6 @@ public class DaoImpl implements Dao {
             /*
              * 返回自增键
              */
-
             if (keyOneType != String.class && (keyOneValue == null || keyOneValue == 0)) {
                 pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             } else {
@@ -240,7 +238,6 @@ public class DaoImpl implements Dao {
 
             int i = 1;
             for (BeanElement ele : eles) {
-
                 Object value = ele.getMethod.invoke(obj);
                 if (value == null) {
                     if (ele.clz.isEnum())
@@ -262,9 +259,7 @@ public class DaoImpl implements Dao {
                         value = this.dialect.filterValue(value);
                         pstmt.setObject(i++, value);
                     }
-
                 }
-
             }
 
             pstmt.execute();
@@ -274,7 +269,6 @@ public class DaoImpl implements Dao {
                 if (rs.next()) {
                     id = rs.getLong(1);
                 }
-
             } else {
                 id = keyOneValue;
             }

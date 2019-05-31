@@ -129,7 +129,7 @@ public abstract class DefaultRepository<T> implements BaseRepository<T> {
 
     @Override
     public boolean createBatch(List<T> objList) {
-        return SqlRepository.getInstance().createBatch(objList);
+        return DataRepository.getInstance().createBatch(objList);
     }
 
     @Override
@@ -139,7 +139,7 @@ public abstract class DefaultRepository<T> implements BaseRepository<T> {
          */
         logger.info("BaesRepository.create: " + obj);
 
-        long id = SqlRepository.getInstance().create(obj);
+        long id = DataRepository.getInstance().create(obj);
 
         return id;
 
@@ -165,7 +165,7 @@ public abstract class DefaultRepository<T> implements BaseRepository<T> {
         }
 
 
-        return SqlRepository.getInstance().refresh(obj);
+        return DataRepository.getInstance().refresh(obj);
     }
 
     @Override
@@ -216,31 +216,31 @@ public abstract class DefaultRepository<T> implements BaseRepository<T> {
         if (unSafe)
             throw new PersistenceException("UnSafe Refresh, try to invoke DefaultRepository.refreshUnSafe(RefreshCondition<T> refreshCondition)");
 
-        return SqlRepository.getInstance().refresh(refreshCondition);
+        return DataRepository.getInstance().refresh(refreshCondition);
     }
 
     @Override
     public boolean refreshUnSafe(RefreshCondition<T> refreshCondition) {
         refreshCondition.setClz(this.clz);
-        return SqlRepository.getInstance().refresh(refreshCondition);
+        return DataRepository.getInstance().refresh(refreshCondition);
     }
 
 
     @Override
     public void remove(T obj) {
-        SqlRepository.getInstance().remove(obj);
+        DataRepository.getInstance().remove(obj);
     }
 
     @Override
     public T get(long idOne) {
 
-        return SqlRepository.getInstance().get(clz, idOne);
+        return DataRepository.getInstance().get(clz, idOne);
     }
 
     @Override
     public List<T> list() {
 
-        return SqlRepository.getInstance().list(clz);
+        return DataRepository.getInstance().list(clz);
     }
 
     @Override
@@ -248,41 +248,41 @@ public abstract class DefaultRepository<T> implements BaseRepository<T> {
 
         if (conditionObj instanceof Criteria.ResultMappedCriteria) {
             throw new RuntimeException(
-                    "Exception supported, no page not to invoke SqlRepository.getInstance().list(criteriaJoinalbe);");
+                    "Exception supported, no page not to invoke DataRepository.getInstance().list(criteriaJoinalbe);");
         }
 
-        return SqlRepository.getInstance().list(conditionObj);
+        return DataRepository.getInstance().list(conditionObj);
     }
 
     @Override
     public T getOne(T conditionObj, String orderBy, Direction sc) {
 
-        return SqlRepository.getInstance().getOne(conditionObj, orderBy, sc);
+        return DataRepository.getInstance().getOne(conditionObj, orderBy, sc);
     }
 
     @Override
     public T getOne(T conditionObj) {
 
-        return SqlRepository.getInstance().getOne(conditionObj);
+        return DataRepository.getInstance().getOne(conditionObj);
 
     }
 
     @Override
     public void refreshCache() {
-        SqlRepository.getInstance().refreshCache(clz);
+        DataRepository.getInstance().refreshCache(clz);
     }
 
     @Override
     public Object reduce(ReduceCondition reduceCondition) {
         reduceCondition.setClz(this.clz);
-        return SqlRepository.getInstance().reduce(reduceCondition);
+        return DataRepository.getInstance().reduce(reduceCondition);
     }
 
 
     @Override
     public List<T> in(InCondition inCondition) {
         inCondition.setClz(this.clz);
-        return SqlRepository.getInstance().in(inCondition);
+        return DataRepository.getInstance().in(inCondition);
     }
 
 
@@ -291,20 +291,20 @@ public abstract class DefaultRepository<T> implements BaseRepository<T> {
 
         if (criteria instanceof Criteria.ResultMappedCriteria)
             throw new RuntimeException("Codeing Exception: maybe {Criteria.ResultMappedCriteria criteria = builder.get();} instead of {Criteria criteria = builder.get();}");
-        return SqlRepository.getInstance().find(criteria);
+        return DataRepository.getInstance().find(criteria);
     }
 
 
     @Override
     public Page<Map<String, Object>> find(Criteria.ResultMappedCriteria criteria) {
 
-        return SqlRepository.getInstance().find(criteria);
+        return DataRepository.getInstance().find(criteria);
     }
 
 
     @Override
     public List<Map<String, Object>> list(Criteria.ResultMappedCriteria resultMapped) {
-        return SqlRepository.getInstance().list(resultMapped);
+        return DataRepository.getInstance().list(resultMapped);
     }
 
     @Override
@@ -313,7 +313,7 @@ public abstract class DefaultRepository<T> implements BaseRepository<T> {
         if (criteria instanceof Criteria.ResultMappedCriteria)
             throw new RuntimeException("Codeing Exception: maybe {Criteria.ResultMappedCriteria criteria = builder.get();} instead of {Criteria criteria = builder.get();}");
 
-        return SqlRepository.getInstance().list(criteria);
+        return DataRepository.getInstance().list(criteria);
     }
 
 

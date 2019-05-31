@@ -23,8 +23,8 @@ import x7.core.bean.Parsed;
 import x7.core.bean.Parser;
 import x7.core.bean.Transformed;
 import x7.repository.BaseRepository;
+import x7.repository.DataRepository;
 import x7.repository.RepositoryBooter;
-import x7.repository.SqlRepository;
 import x7.repository.schema.SchemaConfig;
 import x7.repository.schema.SchemaTransformRepository;
 import x7.repository.schema.customizer.SchemaTransformCustomizer;
@@ -79,7 +79,7 @@ public class RepositoryListener implements
     }
 
 
-    public void reparse(List list) {
+    private void reparse(List list) {
 
         Map<String,List<Transformed>> map = new HashMap<>();
 
@@ -119,17 +119,20 @@ public class RepositoryListener implements
 
             parsed.reset(parsed.getBeanElementList());
 
+            Parsed parsedTransformed = Parser.getByTableName(parsed.getTableName());
+            parsed.setParsedTransformed(parsedTransformed);
+
         }
     }
 
-    List list(Class<? extends BaseRepository> clzz) {
+    private List list(Class<? extends BaseRepository> clzz) {
 
         Type[] types = clzz.getGenericInterfaces();
 
         ParameterizedType parameterized = (ParameterizedType) types[0];
         Class clazz = (Class) parameterized.getActualTypeArguments()[0];
 
-        return SqlRepository.getInstance().list(clazz);
+        return DataRepository.getInstance().list(clazz);
 
     }
 

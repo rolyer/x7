@@ -38,15 +38,15 @@ import java.util.*;
 /**
  * @author Sim
  */
-public class SqlRepository implements Repository {
+public class DataRepository implements Repository {
 
-    private final static Logger logger = LoggerFactory.getLogger(SqlRepository.class);
-    private static SqlRepository instance;
+    private final static Logger logger = LoggerFactory.getLogger(DataRepository.class);
+    private static DataRepository instance;
 
-    public static SqlRepository getInstance() {
+    public static DataRepository getInstance() {
 
         if (instance == null) {
-            instance = new SqlRepository();
+            instance = new DataRepository();
         }
         return instance;
     }

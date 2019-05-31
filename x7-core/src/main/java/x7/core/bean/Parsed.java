@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 
-public class Parsed {	
+public class Parsed {
 
 	private boolean isTransformable = false;
 	private String transformedAlia;

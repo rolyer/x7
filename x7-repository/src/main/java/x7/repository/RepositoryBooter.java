@@ -80,7 +80,7 @@ public class RepositoryBooter {
 
     public static void generateId() {
         System.out.println("\n" + "----------------------------------------");
-        List<IdGenerator> idGeneratorList = SqlRepository.getInstance().list(IdGenerator.class);
+        List<IdGenerator> idGeneratorList = DataRepository.getInstance().list(IdGenerator.class);
         for (IdGenerator generator : idGeneratorList) {
             String name = generator.getClzName();
             long maxId = generator.getMaxId();
@@ -142,7 +142,7 @@ public class RepositoryBooter {
             throw new RuntimeException("Primary DataSource start failed");
 
         DataSourceSetter.set(ds_W, ds_R);
-        SqlRepository.getInstance().setSyncDao(DaoImpl.getInstance());
+        DataRepository.getInstance().setSyncDao(DaoImpl.getInstance());
 
     }
 

@@ -85,11 +85,11 @@ public class HealthChecker {
                 final String name = clz.getName();
                 IdGenerator generator = new IdGenerator();
                 generator.setClzName(name);
-                List<IdGenerator> list = SqlRepository.getInstance().list(generator);
+                List<IdGenerator> list = DataRepository.getInstance().list(generator);
                 if (list.isEmpty()) {
                     logger.info("id init: " + generator.getClzName());
                     generator.setMaxId(0);
-                    SqlRepository.getInstance().create(generator);
+                    DataRepository.getInstance().create(generator);
                 }
 
             } catch (Exception e) {
