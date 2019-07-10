@@ -26,7 +26,7 @@ public class MethodParsed {
     private String requestMapping;
     private RequestMethod requestMethod;
     private Class<?> returnType;
-
+    private Class<?> geneType;
     private List<KV> headerList;
 
     public String getRequestMapping() {
@@ -61,12 +61,21 @@ public class MethodParsed {
         this.headerList = headerList;
     }
 
+    public Class<?> getGeneType() {
+        return geneType;
+    }
+
+    public void setGeneType(Class<?> geneType) {
+        this.geneType = geneType;
+    }
+
     @Override
     public String toString() {
         return "MethodParsed{" +
                 "requestMapping='" + requestMapping + '\'' +
                 ", requestMethod=" + requestMethod +
                 ", returnType=" + returnType +
+                ", geneType=" + geneType +
                 ", headerList=" + headerList +
                 '}';
     }

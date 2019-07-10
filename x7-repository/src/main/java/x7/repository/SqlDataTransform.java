@@ -17,12 +17,15 @@
 package x7.repository;
 
 import x7.core.bean.Criteria;
+import x7.core.bean.Parser;
+import x7.core.bean.Transformed;
 import x7.core.bean.condition.InCondition;
 import x7.core.bean.condition.ReduceCondition;
 import x7.core.bean.condition.RefreshCondition;
 import x7.core.web.Direction;
 import x7.core.web.Page;
 import x7.repository.dao.Dao;
+import x7.repository.schema.SchemaConfig;
 
 import java.util.List;
 import java.util.Map;
@@ -42,7 +45,13 @@ public class SqlDataTransform implements DataTransform{
 
     @Override
     public long create(Object obj) {
-        return this.dao.create(obj);
+
+        if (!SchemaConfig.isSchemaTransformEnabled)
+            return this.dao.create(obj);
+
+        Transformed transformed = Parser.transform(obj);
+
+        return this.dao.create(transformed);
     }
 
     @Override

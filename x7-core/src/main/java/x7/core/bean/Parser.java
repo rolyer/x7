@@ -191,4 +191,29 @@ public class Parser {
 		}
 		return null;
 	}
+
+
+	public static <T> T toLogic(Transformed transformed, Class<T> clz){
+
+		return null;
+	}
+
+	public static <T> Transformed transform(T logic){
+
+		Class clz = logic.getClass();
+
+		Parsed parsed = Parser.get(clz);
+
+		Parsed parsedTransformed = parsed.getParsedTransformed();
+
+		if (parsedTransformed == null)
+			throw new RuntimeException("SchemaTransform enabled, but can't find config for logic table to target");
+
+		/*
+		 * TODO:
+		 * 接下来要完成的coding
+		 */
+
+		return null;
+	}
 }

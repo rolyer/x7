@@ -18,6 +18,8 @@ import x7.core.util.JsonX;
 import x7.core.web.Direction;
 import x7.core.web.ViewEntity;
 
+import java.util.List;
+
 
 @Component
 public class XxxTest {
@@ -96,7 +98,7 @@ public class XxxTest {
 //            }
 //        });
 
-        testServiceRemote.testFallBack(new CatRO());
+        List<Cat> list = testServiceRemote.testFallBack(new CatRO());
 
 //        testServiceRemote.test(new CatRO(),null);
 

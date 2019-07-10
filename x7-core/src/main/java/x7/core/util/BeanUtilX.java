@@ -839,90 +839,90 @@ public class BeanUtilX extends BeanUtil {
 
 
 	public static String normalizeSql(String manuSql){
-		StringBuilder valueSb = new StringBuilder();
-
-		int length = manuSql.length();
-		for (int j = 0; j < length; j++){
-			String strEle = String.valueOf(manuSql.charAt(j));
-			if (SPACE.equals(strEle))
-				continue;
-			if (opMap.containsKey(strEle))
-				strEle = opMap.get(strEle);
-			valueSb.append(strEle);
-		}
-
-		String target = valueSb.toString();
-		return target;
+//		StringBuilder valueSb = new StringBuilder();
+//
+//		int length = manuSql.length();
+//		for (int j = 0; j < length; j++){
+//			String strEle = String.valueOf(manuSql.charAt(j));
+//			if (SPACE.equals(strEle))
+//				continue;
+//			if (opMap.containsKey(strEle))
+//				strEle = opMap.get(strEle);
+//			valueSb.append(strEle);
+//		}
+//
+//		String target = valueSb.toString();
+		return manuSql;
 	}
 
+//
+//	public static String normalizeSql(String sql, Map<String,String> mapperMap) {
+//
+//		StringBuilder sb = new StringBuilder();
+//
+//		boolean flag = true;
+//		int length = sql.length();
+//		for (int j = 0; j < length; j++) {
+//			String strEle = String.valueOf(sql.charAt(j));
+//			if (" ".equals(strEle)) {
+//				if (flag) {
+//					sb.append(strEle);
+//					flag = false;
+//				}
+//				continue;
+//			}
+//			if (opMap.containsKey(strEle)) {
+//				if (flag) {
+//					sb.append(SPACE);
+//				}
+//				sb.append(strEle).append(SPACE);
+//				flag = false;
+//				continue;
+//			} else {
+//				sb.append(strEle);
+//			}
+//			flag = true;
+//		}
+//
+//		String target = sb.toString();// times:  80ms / 100000
+//
+//		String[] arr = target.split(SPACE);// times: 170ms / 100000
+//
+//		int l = arr.length;
+//		for (int i = 0; i < l; i++) {
+//			String key = arr[i];
+//			if (key.contains(SQL_KEYWORD_MARK)) {
+//				key = key.substring(1, key.length() - 1);
+//				String mapper = mapperMap.get(key);
+//				if (StringUtil.isNotNull(mapper)) {
+//					arr[i] = SQL_KEYWORD_MARK + mapper + SQL_KEYWORD_MARK;
+//				}
+//			} else {
+//				String mapper = mapperMap.get(key);
+//				if (StringUtil.isNotNull(mapper)) {
+//					arr[i] = mapper;
+//				}
+//			}
+//		}
+//
+//		sb = new StringBuilder();
+//		int i = 0;
+//		for (String s : arr) {
+//			sb.append(s);
+//			i++;
+//			if (i < l) {
+//				sb.append(SPACE);
+//			}
+//		}
+//
+//		return sb.toString();
+//	}
+//
 
-	public static String normalizeSql(String sql, Map<String,String> mapperMap) {
-
-		StringBuilder sb = new StringBuilder();
-
-		boolean flag = true;
-		int length = sql.length();
-		for (int j = 0; j < length; j++) {
-			String strEle = String.valueOf(sql.charAt(j));
-			if (" ".equals(strEle)) {
-				if (flag) {
-					sb.append(strEle);
-					flag = false;
-				}
-				continue;
-			}
-			if (opMap.containsKey(strEle)) {
-				if (flag) {
-					sb.append(SPACE);
-				}
-				sb.append(strEle).append(SPACE);
-				flag = false;
-				continue;
-			} else {
-				sb.append(strEle);
-			}
-			flag = true;
-		}
-
-		String target = sb.toString();// times:  80ms / 100000
-
-		String[] arr = target.split(SPACE);// times: 170ms / 100000
-
-		int l = arr.length;
-		for (int i = 0; i < l; i++) {
-			String key = arr[i];
-			if (key.contains(SQL_KEYWORD_MARK)) {
-				key = key.substring(1, key.length() - 1);
-				String mapper = mapperMap.get(key);
-				if (StringUtil.isNotNull(mapper)) {
-					arr[i] = SQL_KEYWORD_MARK + mapper + SQL_KEYWORD_MARK;
-				}
-			} else {
-				String mapper = mapperMap.get(key);
-				if (StringUtil.isNotNull(mapper)) {
-					arr[i] = mapper;
-				}
-			}
-		}
-
-		sb = new StringBuilder();
-		int i = 0;
-		for (String s : arr) {
-			sb.append(s);
-			i++;
-			if (i < l) {
-				sb.append(SPACE);
-			}
-		}
-
-		return sb.toString();
-	}
-
-
-	public static String normalizeSql(String sql, Parsed parsed) {
-		sql = mapperName(sql,parsed);
-
-		return normalizeSql(sql, parsed.getPropertyMapperMap());
-	}
+//	public static String normalizeSql(String sql, Parsed parsed) {
+//		sql = mapperName(sql,parsed);
+//
+//		return normalizeSql(sql, parsed.getPropertyMapperMap());
+//	}
 
 }

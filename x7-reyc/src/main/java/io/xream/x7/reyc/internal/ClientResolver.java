@@ -136,6 +136,7 @@ public class ClientResolver {
         r.setArgs(args);
         r.setRequestMethod(requestMethod);
         r.setReturnType(methodParsed.getReturnType());
+        r.setGeneType(methodParsed.getGeneType());
         r.setUrl(url);
         r.setHeaderList(methodParsed.getHeaderList());
         return r;
@@ -179,12 +180,22 @@ public class ClientResolver {
         return result;
     }
 
-    protected static Object toObject(Class<?> returnType, String result) {
-        hanleRemoteException(result);
+    protected static Object toObject(Class<?> returnType, Class<?> geneType, String result) {
 
+        if (result == null)
+            return null;
+
+        hanleRemoteException(result);
 
         if (returnType == null || returnType == void.class) {
             return null;
+        }
+
+        if (returnType == Object.class)
+            return result;
+
+        if (returnType == List.class){
+            return JsonX.toList(result,geneType);
         }
 
         Object obj = JsonX.toObject(result, returnType);
@@ -269,6 +280,9 @@ public class ClientResolver {
     }
 
     private static void hanleRemoteException(String result) {
+
+        if (result == null)
+            return;
 
         if (result.contains("RemoteServiceException")
                 || result.contains("RuntimeException")

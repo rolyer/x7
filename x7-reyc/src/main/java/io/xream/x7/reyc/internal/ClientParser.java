@@ -23,6 +23,9 @@ import x7.core.bean.KV;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -112,9 +115,24 @@ public class ClientParser {
                 }
             }
 
+            if (returnType == Map.class)
+                throw new RuntimeException("ReyClient not support  genericReturnType of Map，while parsing " + method);
+
+            Class gtc = null;
+            if (returnType == List.class) {
+                Type gt = method.getGenericReturnType();
+                ParameterizedType pt = (ParameterizedType)gt;
+                Type t = pt.getActualTypeArguments()[0];
+                if (t instanceof ParameterizedType)
+                    throw new RuntimeException("ReyClient not support complex genericReturnType, like List<List<?>>, or" +
+                            "List<Map>，while parsing " + method);
+                gtc = (Class)t;
+            }
+
             MethodParsed methodParsed = new MethodParsed();
             methodParsed.setRequestMapping(mapping);
             methodParsed.setReturnType(returnType);
+            methodParsed.setGeneType(gtc);
             methodParsed.setRequestMethod(rm);
             methodParsed.setHeaderList(hearderList);
 

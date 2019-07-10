@@ -273,14 +273,15 @@ public class XxxController {
 
 
 	@RequestMapping(value = "/reyc/test")
-	public Boolean testRecClient() {
+	public List<Cat> testRecClient() {
 
 		try {
 			TimeUnit.HOURS.sleep(1);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		return true;
+		List<Cat> list = new ArrayList<>();
+		return list;
 	}
 
 	@RequestMapping(value = "/get")

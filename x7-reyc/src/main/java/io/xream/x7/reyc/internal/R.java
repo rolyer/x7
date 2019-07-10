@@ -25,6 +25,7 @@ import java.util.List;
 public class R {
     private String url;
     private Class<?> returnType;
+    private Class<?> geneType;
     private Object[] args;
     private RequestMethod requestMethod;
     private List<KV> headerList;
@@ -43,6 +44,14 @@ public class R {
 
     public void setReturnType(Class<?> returnType) {
         this.returnType = returnType;
+    }
+
+    public Class<?> getGeneType() {
+        return geneType;
+    }
+
+    public void setGeneType(Class<?> geneType) {
+        this.geneType = geneType;
     }
 
     public Object[] getArgs() {
@@ -74,6 +83,7 @@ public class R {
         return "R{" +
                 "url='" + url + '\'' +
                 ", returnType=" + returnType +
+                ", geneType=" + geneType +
                 ", args=" + Arrays.toString(args) +
                 ", requestMethod=" + requestMethod +
                 ", headerList=" + headerList +

@@ -22,13 +22,13 @@ public class AppTest {
 //        xxxTest.domain();
 
 
-//        xxxTest.testReyClient();
+        xxxTest.testReyClient();
 //        xxxTest.testTime();
 //        xxxTest.getBase();
 
 //        xxxTest.testCriteria();
 //        xxxTest.testResultMapped();
-        xxxTest.testDomain();
+//        xxxTest.testDomain();
 
 //        xxxTest.testRefreshCondition();
     }

@@ -2,6 +2,7 @@ package io.xream.x7.demo.remote;
 
 
 import io.xream.x7.demo.CatRO;
+import io.xream.x7.demo.bean.Cat;
 import io.xream.x7.reyc.Url;
 import io.xream.x7.reyc.ReyClient;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -11,34 +12,36 @@ import x7.core.bean.Criteria;
 import x7.core.bean.condition.RefreshCondition;
 import x7.core.web.ViewEntity;
 
+import java.util.List;
 
-@ReyClient(value = "http://${web.demo}", circuitBreaker = "", retry = true, fallback = TestFallback.class)
+
+@ReyClient(value = "http://${web.demo}/xxx", circuitBreaker = "", retry = true, fallback = TestFallback.class)
 public interface TestServiceRemote {
 
 
-    @RequestMapping(value = "/xxx/reyc/test")
+    @RequestMapping(value = "/reyc/test")
     Boolean test(CatRO ro, Url url);
 
-    @RequestMapping(value = "/xxx/reyc/test")
-    Boolean testFallBack(CatRO ro);
+    @RequestMapping(value = "/reyc/test")
+    List<Cat> testFallBack(CatRO ro);
 
-    @RequestMapping(value = "/xxx/time/test", method = RequestMethod.GET)
+    @RequestMapping(value = "/time/test", method = RequestMethod.GET)
     Boolean testTimeJack();
 
-    @RequestMapping(value = "/xxx/reyc/base", method = RequestMethod.GET)
+    @RequestMapping(value = "/reyc/base", method = RequestMethod.GET)
     int getBase();
 
-    @RequestMapping("/xxx/criteria/test")
+    @RequestMapping("/criteria/test")
     ViewEntity testCriteria(Criteria criteria);
 
-    @RequestMapping("/xxx/resultmap/test")
+    @RequestMapping("/resultmap/test")
     ViewEntity testResultMap(Criteria.ResultMappedCriteria criteria);
 
-    @RequestMapping("/xxx/domain/test")
+    @RequestMapping("/domain/test")
     ViewEntity testDomain(Criteria.DomainObjectCriteria criteria);
 
 
-    @RequestMapping("/xxx/refreshCondition/test")
+    @RequestMapping("/refreshCondition/test")
     ViewEntity testRefreshConditionn( RefreshCondition refreshCondition);
 
 }
