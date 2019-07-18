@@ -18,7 +18,9 @@ package x7.repository.schema.customizer;
 
 import x7.repository.BaseRepository;
 
+import java.util.List;
+
 public interface SchemaTransformCustomizer {
 
-    Class<? extends BaseRepository> customize(SchemaTransformRepositoryBuilder builder);
+    List<Class<? extends BaseRepository>> customize(SchemaTransformRepositoryBuilder builder);
 }

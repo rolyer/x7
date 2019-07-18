@@ -46,26 +46,30 @@ public class RepositoryListener implements
     @Override
     public void onApplicationEvent(ApplicationStartedEvent applicationStartedEvent) {
 
-        Class<? extends BaseRepository> clzz = null;
+        List<Class<? extends BaseRepository>> clzzList = null;
         if (SchemaConfig.isSchemaTransformEnabled) {
-            clzz = customizeSchemaTransform(applicationStartedEvent);
+            clzzList = customizeSchemaTransform(applicationStartedEvent);
         }
 
         RepositoryBooter.onStarted();
 
-        if (clzz != null){
+        if (clzzList != null){
 
-            DataRepository dataRepository = (DataRepository) applicationStartedEvent.getApplicationContext().getBean(Repository.class);
+            for (Class<? extends BaseRepository> clzz : clzzList) {
 
-            List list = list(dataRepository,clzz);//查出所有配置
-            if (!list.isEmpty()) {
-                reparse(list);
+                DataRepository dataRepository = (DataRepository) applicationStartedEvent.getApplicationContext().getBean(Repository.class);
+
+                List list = list(dataRepository, clzz);//查出所有配置
+                if (!list.isEmpty()) {
+                    reparse(list);
+                }
             }
         }
     }
 
-    private Class<? extends BaseRepository> customizeSchemaTransform(ApplicationStartedEvent applicationStartedEvent){
-        Class<? extends BaseRepository> clzz = SchemaTransformRepository.class;
+    private List<Class<? extends BaseRepository>> customizeSchemaTransform(ApplicationStartedEvent applicationStartedEvent){
+
+
         SchemaTransformCustomizer customizer = null;
         try {
             customizer = applicationStartedEvent.getApplicationContext().getBean(SchemaTransformCustomizer.class);
@@ -74,12 +78,14 @@ public class RepositoryListener implements
 
         if (customizer != null) {
             SchemaTransformRepositoryBuilder builder = new SchemaTransformRepositoryBuilder();
-            clzz = customizer.customize(builder);
+           return customizer.customize(builder);
         }
 
         SchemaTransformRepositoryBuilder.registry = null;
 
-        return clzz;
+        List<Class<? extends BaseRepository>> list = new ArrayList<>();
+        list.add(SchemaTransformRepository.class);
+        return list;
     }
 
 
@@ -110,12 +116,12 @@ public class RepositoryListener implements
 
             List<Transformed> transformedList = entry.getValue();
             for (Transformed transformed : transformedList) {
-                parsed.setTableName(transformed.getTargetTable());
+                parsed.setTableName(transformed.getTargetTable());//FIXME 直接替换了原始的表
                 parsed.setTransforemedAlia(transformed.getAlia());
 
                 for (BeanElement be : parsed.getBeanElementList()){
                     if (be.getMapper().equals(transformed.getOriginColumn())){
-                        be.mapper = transformed.getTargetColumn();
+                        be.mapper = transformed.getTargetColumn();//FIXME 直接替换了原始的列, 只需要目标对象的属性有值
                         break;
                     }
                 }

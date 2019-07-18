@@ -29,6 +29,7 @@ import x7.repository.schema.SchemaConfig;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class SqlDataTransform implements DataTransform{
 
@@ -56,17 +57,42 @@ public class SqlDataTransform implements DataTransform{
 
     @Override
     public boolean refresh(Object obj) {
-        return this.dao.refresh(obj);
+        if (!SchemaConfig.isSchemaTransformEnabled)
+            return this.dao.refresh(obj);
+
+        Transformed transformed = Parser.transform(obj);
+
+        return this.dao.refresh(transformed);
     }
 
     @Override
     public <T> boolean refresh(RefreshCondition<T> refreshCondition) {
-        return this.dao.refreshByCondition(refreshCondition);
+
+        if (!SchemaConfig.isSchemaTransformEnabled)
+            return this.dao.refreshByCondition(refreshCondition);
+
+        RefreshCondition refreshConditionTransformed = new RefreshCondition();
+        refreshConditionTransformed.setClz(refreshCondition.getClz());
+        refreshConditionTransformed.setRefreshList(refreshCondition.getRefreshList());
+        refreshConditionTransformed.setCondition(refreshCondition.getCondition());
+        refreshConditionTransformed.setSourceStript(refreshCondition.getSourceStript());
+
+        Object obj = refreshCondition.getObj();
+        if (Objects.nonNull(obj)) {
+            Transformed transformed = Parser.transform(obj);
+            refreshConditionTransformed.setObj(transformed);
+        }
+
+        return this.dao.refreshByCondition(refreshConditionTransformed);
     }
 
     @Override
     public boolean remove(Object obj) {
-        return this.dao.remove(obj);
+        if (!SchemaConfig.isSchemaTransformEnabled)
+            return this.dao.remove(obj);
+
+        Transformed transformed = Parser.transform(obj);
+        return this.dao.remove(transformed);
     }
 
     @Override

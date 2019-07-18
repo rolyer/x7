@@ -16,6 +16,8 @@
  */
 package x7.core.bean;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import x7.core.repository.ReflectionCache;
 import x7.core.repository.X;
 import x7.core.util.BeanUtil;
@@ -23,6 +25,7 @@ import x7.core.util.BeanUtilX;
 import x7.core.util.StringUtil;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Parser {
 
+	private static Logger logger = LoggerFactory.getLogger(Parser.class);
 	@SuppressWarnings("rawtypes")
 	private final static Map<Class, Parsed> map = new ConcurrentHashMap<Class, Parsed>();
 	
@@ -212,7 +216,35 @@ public class Parser {
 		/*
 		 * TODO:
 		 * 接下来要完成的coding
+		 * 反射, 把逻辑对象值赋值给存储对象
 		 */
+
+		Transformed transformed = null;
+		try {
+			transformed = (Transformed)parsedTransformed.getClz().newInstance();
+			Class clazz = parsedTransformed.getClz();
+			/*
+			 *  如何通过列名找到属性名
+			 */
+			List<BeanElement> logicBeanElementList = parsed.getBeanElementList();
+			List<BeanElement> transformedBeanElementList = parsedTransformed.getBeanElementList();
+
+			for (BeanElement logicBe : logicBeanElementList) {
+				String logicMapper = logicBe.getMapper();
+				for (BeanElement transformedBe : transformedBeanElementList) {
+					String transformedMapper = transformedBe.getMapper();
+					if (logicMapper.equals(transformedMapper)) { //找到了
+
+						Object propertyValue = logicBe.getMethod.invoke(logic); //logic对象的属性值
+						transformedBe.setMethod.invoke(transformed,propertyValue);//赋给存储对象的属性
+					}
+				}
+			}
+
+			return transformed;
+		}catch (Exception e){
+
+		}
 
 		return null;
 	}

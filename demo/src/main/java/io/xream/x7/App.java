@@ -10,6 +10,9 @@ import x7.repository.BaseRepository;
 import x7.repository.schema.customizer.SchemaTransformCustomizer;
 import x7.repository.schema.customizer.SchemaTransformRepositoryBuilder;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * Demo
@@ -32,16 +35,21 @@ public class App {
     }
 
 
-//    @Bean
-//    public SchemaTransformCustomizer schemaTransformCustomizer(){
-//
-//        SchemaTransformCustomizer schemaTransformCustomizer = new SchemaTransformCustomizer() {
-//            @Override
-//            public Class<? extends BaseRepository> customize(SchemaTransformRepositoryBuilder builder) {
-//                return builder.build(PigRepository.class);
-//            }
-//        };
-//
-//        return schemaTransformCustomizer;
-//    }
+    @Bean
+    public SchemaTransformCustomizer schemaTransformCustomizer(){
+
+        SchemaTransformCustomizer schemaTransformCustomizer = new SchemaTransformCustomizer() {
+            @Override
+            public List<Class<? extends BaseRepository>> customize(SchemaTransformRepositoryBuilder builder) {
+
+                List<Class<? extends BaseRepository>> list = new ArrayList<>();
+                Class<? extends BaseRepository> clzz = builder.build(PigRepository.class);
+                list.add(clzz);
+
+                return list;
+            }
+        };
+
+        return schemaTransformCustomizer;
+    }
 }
