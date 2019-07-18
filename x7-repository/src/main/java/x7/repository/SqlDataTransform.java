@@ -27,6 +27,7 @@ import x7.core.web.Page;
 import x7.repository.dao.Dao;
 import x7.repository.schema.SchemaConfig;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -96,34 +97,105 @@ public class SqlDataTransform implements DataTransform{
     }
 
     @Override
+    public boolean createBatch(List<?> objList) {
+        if (!SchemaConfig.isSchemaTransformEnabled)
+            return this.dao.createBatch(objList);
+
+        List<Transformed> list = new ArrayList<>();
+        for (Object obj : objList){
+            Transformed tf = Parser.transform(obj);
+            list.add(tf);
+        }
+
+        return this.dao.createBatch(list);
+    }
+
+    @Override
+    public <T> boolean execute(T obj, String sql) {
+        if (!SchemaConfig.isSchemaTransformEnabled)
+            return this.dao.execute(obj,sql);
+
+        Transformed transformed = Parser.transform(obj);
+        return this.dao.execute(transformed, sql);
+    }
+
+    @Override
     public <T> T get(Class<T> clz, long idOne) {
-        return this.dao.get(clz,idOne);
+        if (!SchemaConfig.isSchemaTransformEnabled)
+            return this.dao.get(clz,idOne);
+
+        Class clzz = Parser.transformClzz(clz);
+
+        Object obj = this.dao.get(clzz, idOne);
+        if (Objects.isNull(obj))
+            return null;
+
+        T t = Parser.toLogic((Transformed)obj,clz);
+        return t;
     }
 
     @Override
-    public <T> List<T> list(Object conditionObj) {
-        return this.dao.list(conditionObj);
-    }
+    public <T> List<T> list(Object obj) {
+        if (!SchemaConfig.isSchemaTransformEnabled)
+            return this.dao.list(obj);
 
-    @Override
-    public <T> T getOne(T conditionObj) {
-        return this.dao.getOne(conditionObj);
-    }
+        Transformed transformed = Parser.transform(obj);
 
-    @Override
-    public <T> T getOne(T conditionObj, String orderBy, Direction sc) {
-        return this.dao.getOne(conditionObj,orderBy,sc);
-    }
+        List<Transformed> transformedList = this.dao.list(transformed);
 
-    @Override
-    public <T> Page<T> find(Criteria criteria) {
-        return this.dao.find(criteria);
+        Class<T> clzz = (Class<T>) obj.getClass();
+        List<T> list = new ArrayList<>();
+        for (Transformed tf : transformedList) {
+            T t = Parser.toLogic(tf, clzz);
+            list.add(t);
+        }
+
+        return list;
     }
 
     @Override
     public <T> List<T> list(Class<T> clz) {
-        return this.dao.list(clz);
+        if (!SchemaConfig.isSchemaTransformEnabled)
+            return this.dao.list(clz);
+
+        Class<? extends Transformed> clzz = Parser.transformClzz(clz);
+        List<? extends  Transformed> transformedList = this.dao.list(clzz);
+
+        List<T> list = new ArrayList<>();
+        for (Transformed tf : transformedList) {
+            T t = Parser.toLogic(tf, clz);
+            list.add(t);
+        }
+
+        return list;
     }
+
+    @Override
+    public <T> T getOne(T obj) {
+        if (!SchemaConfig.isSchemaTransformEnabled)
+            return this.dao.getOne(obj);
+
+        Transformed transformed = Parser.transform(obj);
+        Transformed tf = this.dao.getOne(transformed);
+        if (Objects.isNull(tf))
+            return null;
+        T t = Parser.toLogic(tf, (Class<T>) obj.getClass());
+        return t;
+    }
+
+    @Override
+    public <T> T getOne(T obj, String orderBy, Direction sc) {
+        if (!SchemaConfig.isSchemaTransformEnabled)
+            return this.dao.getOne(obj,orderBy,sc);
+
+        Transformed transformed = Parser.transform(obj);
+        Transformed tf = this.dao.getOne(transformed, orderBy, sc);
+        if (Objects.isNull(tf))
+            return null;
+        T t = Parser.toLogic(tf, (Class<T>) obj.getClass());
+        return t;
+    }
+
 
     @Override
     public <T> List<T> in(InCondition inCondition) {
@@ -133,6 +205,11 @@ public class SqlDataTransform implements DataTransform{
     @Override
     public Object reduce(ReduceCondition reduceCondition) {
         return this.dao.reduce(reduceCondition);
+    }
+
+    @Override
+    public <T> Page<T> find(Criteria criteria) {
+        return this.dao.find(criteria);
     }
 
     @Override
@@ -150,15 +227,6 @@ public class SqlDataTransform implements DataTransform{
         return this.dao.list(criteria);
     }
 
-    @Override
-    public boolean createBatch(List<?> objList) {
-        return this.dao.createBatch(objList);
-    }
-
-    @Override
-    public <T> boolean execute(T obj, String sql) {
-        return this.dao.execute(obj,sql);
-    }
 
     @Override
     public List<Map<String, Object>> list(Class clz, String sql, List<Object> conditionList) {

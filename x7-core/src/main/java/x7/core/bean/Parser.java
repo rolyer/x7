@@ -22,6 +22,7 @@ import x7.core.repository.ReflectionCache;
 import x7.core.repository.X;
 import x7.core.util.BeanUtil;
 import x7.core.util.BeanUtilX;
+import x7.core.util.ExceptionUtil;
 import x7.core.util.StringUtil;
 
 import java.lang.reflect.Field;
@@ -199,7 +200,36 @@ public class Parser {
 
 	public static <T> T toLogic(Transformed transformed, Class<T> clz){
 
-		return null;
+		if (transformed == null)
+			return null;
+
+		T t = null;
+		try {
+			t = clz.newInstance();
+
+			Parsed parsed = Parser.get(clz);
+			Parsed parsedTransformed = Parser.get(transformed.getClass());
+
+			List<BeanElement> logicBeanElementList = parsed.getBeanElementList();
+			List<BeanElement> transformedBeanElementList = parsedTransformed.getBeanElementList();
+
+			for (BeanElement logicBe : logicBeanElementList) {
+				String logicMapper = logicBe.getMapper();
+				for (BeanElement transformedBe : transformedBeanElementList) {
+					String transformedMapper = transformedBe.getMapper();
+					if (logicMapper.equals(transformedMapper)) { //找到了
+
+						Object propertyValue = transformedBe.getMethod.invoke(transformed); //logic对象的属性值
+						logicBe.setMethod.invoke(t,propertyValue);//赋给存储对象的属性
+					}
+				}
+			}
+
+		}catch (Exception e) {
+			throw new RuntimeException(ExceptionUtil.getMessage(e));
+		}
+
+		return t;
 	}
 
 	public static <T> Transformed transform(T logic){
@@ -241,11 +271,19 @@ public class Parser {
 				}
 			}
 
-			return transformed;
 		}catch (Exception e){
-
+			throw new RuntimeException(ExceptionUtil.getMessage(e));
 		}
 
-		return null;
+		return transformed;
 	}
+
+	public static <T> Class<? extends Transformed> transformClzz(Class<T> clz) {
+
+		Parsed parsed = get(clz);
+		Parsed parsedTransformed = parsed.getParsedTransformed();
+
+		return parsedTransformed.getClz();
+	}
+
 }
