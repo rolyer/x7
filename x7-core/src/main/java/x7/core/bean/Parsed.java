@@ -37,6 +37,7 @@ public class Parsed {
 
 	private Class clz;
 	private String tableName;
+	private String originTable;
 	private boolean isNoSpec = true;
 
 	private final Map<Integer,String> keyMap = new HashMap<Integer,String>();
@@ -118,6 +119,14 @@ public class Parsed {
 		this.beanElementList = beanElementList;
 	}
 
+	public String getOriginTable() {
+		return originTable;
+	}
+
+	public void setOriginTable(String originTable) {
+		this.originTable = originTable;
+	}
+
 	public void reset(List<BeanElement> beanElementList){
 		this.beanElementList = beanElementList;
 		this.propertyMapperMap.clear();
@@ -160,13 +169,6 @@ public class Parsed {
 		this.isNoCache = isNoCache;
 	}
 
-	public boolean isTransformable() {
-		return isTransformable;
-	}
-
-	public void setTransformable(boolean transformable) {
-		isTransformable = transformable;
-	}
 
 	public String getTransformedAlia() {
 		return this.transformedAlia;
@@ -234,13 +236,25 @@ public class Parsed {
 
 	@Override
 	public String toString() {
-		return "Parsed [clz=" + clz + ", tableName=" + tableName + ", keyMap=" + keyMap + ", keyFieldMap=" + keyFieldMap
-				+ ", beanElementList=" + beanElementList + ", elementMap=" + elementMap
-				+ ", isNoCache=" + isNoCache
-				+ ", isTransformable=" + isTransformable
-				+ ", transformedAlia=" + transformedAlia
-				+ ", keywordsList=" + keywordsList
-				+ ", isSearchable=" + isSearchable + ", tagMap=" + tagMap +  "]";
+		return "Parsed{" +
+				"isTransformable=" + isTransformable +
+				", transformedAlia='" + transformedAlia + '\'' +
+				", parsedTransformed=" + parsedTransformed +
+				", isChecked=" + isChecked +
+				", clz=" + clz +
+				", tableName='" + tableName + '\'' +
+				", originTable='" + originTable + '\'' +
+				", isNoSpec=" + isNoSpec +
+				", keyMap=" + keyMap +
+				", keyFieldMap=" + keyFieldMap +
+				", beanElementList=" + beanElementList +
+				", elementMap=" + elementMap +
+				", propertyMapperMap=" + propertyMapperMap +
+				", mapperPropertyMap=" + mapperPropertyMap +
+				", isNoCache=" + isNoCache +
+				", keywordsList=" + keywordsList +
+				", isSearchable=" + isSearchable +
+				", tagMap=" + tagMap +
+				'}';
 	}
-
 }

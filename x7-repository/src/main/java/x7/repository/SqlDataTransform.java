@@ -17,25 +17,27 @@
 package x7.repository;
 
 import x7.core.bean.Criteria;
+import x7.core.bean.Parsed;
 import x7.core.bean.Parser;
 import x7.core.bean.Transformed;
 import x7.core.bean.condition.InCondition;
 import x7.core.bean.condition.ReduceCondition;
 import x7.core.bean.condition.RefreshCondition;
+import x7.core.repository.X;
+import x7.core.util.ExceptionUtil;
 import x7.core.web.Direction;
 import x7.core.web.Page;
 import x7.repository.dao.Dao;
 import x7.repository.schema.SchemaConfig;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.lang.reflect.Field;
+import java.util.*;
 
-public class SqlDataTransform implements DataTransform{
+public class SqlDataTransform implements DataTransform {
 
     private Dao dao;
-    public void setDao(Dao dao){
+
+    public void setDao(Dao dao) {
         this.dao = dao;
     }
 
@@ -48,17 +50,35 @@ public class SqlDataTransform implements DataTransform{
     @Override
     public long create(Object obj) {
 
-        if (!SchemaConfig.isSchemaTransformEnabled)
+        if (SchemaConfig.isNormal(obj.getClass()))
             return this.dao.create(obj);
 
         Transformed transformed = Parser.transform(obj);
+
+        createId(obj, transformed);
 
         return this.dao.create(transformed);
     }
 
     @Override
+    public boolean createBatch(List<?> objList) {
+        Object first = objList.get(0);
+        if (SchemaConfig.isNormal(first.getClass()))
+            return this.dao.createBatch(objList);
+
+        List<Transformed> list = new ArrayList<>();
+        for (Object obj : objList) {
+            Transformed tf = Parser.transform(obj);
+            createId(obj, tf);
+            list.add(tf);
+        }
+
+        return this.dao.createBatch(list);
+    }
+
+    @Override
     public boolean refresh(Object obj) {
-        if (!SchemaConfig.isSchemaTransformEnabled)
+        if (SchemaConfig.isNormal(obj.getClass()))
             return this.dao.refresh(obj);
 
         Transformed transformed = Parser.transform(obj);
@@ -69,7 +89,7 @@ public class SqlDataTransform implements DataTransform{
     @Override
     public <T> boolean refresh(RefreshCondition<T> refreshCondition) {
 
-        if (!SchemaConfig.isSchemaTransformEnabled)
+        if (SchemaConfig.isNormal(refreshCondition.getClz()))
             return this.dao.refreshByCondition(refreshCondition);
 
         RefreshCondition refreshConditionTransformed = new RefreshCondition();
@@ -89,31 +109,18 @@ public class SqlDataTransform implements DataTransform{
 
     @Override
     public boolean remove(Object obj) {
-        if (!SchemaConfig.isSchemaTransformEnabled)
+        if (SchemaConfig.isNormal(obj.getClass()))
             return this.dao.remove(obj);
 
         Transformed transformed = Parser.transform(obj);
         return this.dao.remove(transformed);
     }
 
-    @Override
-    public boolean createBatch(List<?> objList) {
-        if (!SchemaConfig.isSchemaTransformEnabled)
-            return this.dao.createBatch(objList);
-
-        List<Transformed> list = new ArrayList<>();
-        for (Object obj : objList){
-            Transformed tf = Parser.transform(obj);
-            list.add(tf);
-        }
-
-        return this.dao.createBatch(list);
-    }
 
     @Override
     public <T> boolean execute(T obj, String sql) {
-        if (!SchemaConfig.isSchemaTransformEnabled)
-            return this.dao.execute(obj,sql);
+        if (SchemaConfig.isNormal(obj.getClass()))
+            return this.dao.execute(obj, sql);
 
         Transformed transformed = Parser.transform(obj);
         return this.dao.execute(transformed, sql);
@@ -121,8 +128,8 @@ public class SqlDataTransform implements DataTransform{
 
     @Override
     public <T> T get(Class<T> clz, long idOne) {
-        if (!SchemaConfig.isSchemaTransformEnabled)
-            return this.dao.get(clz,idOne);
+        if (SchemaConfig.isNormal(clz))
+            return this.dao.get(clz, idOne);
 
         Class clzz = Parser.transformClzz(clz);
 
@@ -130,13 +137,13 @@ public class SqlDataTransform implements DataTransform{
         if (Objects.isNull(obj))
             return null;
 
-        T t = Parser.toLogic((Transformed)obj,clz);
+        T t = Parser.toLogic((Transformed) obj, clz);
         return t;
     }
 
     @Override
     public <T> List<T> list(Object obj) {
-        if (!SchemaConfig.isSchemaTransformEnabled)
+        if (SchemaConfig.isNormal(obj.getClass()))
             return this.dao.list(obj);
 
         Transformed transformed = Parser.transform(obj);
@@ -155,11 +162,11 @@ public class SqlDataTransform implements DataTransform{
 
     @Override
     public <T> List<T> list(Class<T> clz) {
-        if (!SchemaConfig.isSchemaTransformEnabled)
+        if (SchemaConfig.isNormal(clz))
             return this.dao.list(clz);
 
         Class<? extends Transformed> clzz = Parser.transformClzz(clz);
-        List<? extends  Transformed> transformedList = this.dao.list(clzz);
+        List<? extends Transformed> transformedList = this.dao.list(clzz);
 
         List<T> list = new ArrayList<>();
         for (Transformed tf : transformedList) {
@@ -172,7 +179,7 @@ public class SqlDataTransform implements DataTransform{
 
     @Override
     public <T> T getOne(T obj) {
-        if (!SchemaConfig.isSchemaTransformEnabled)
+        if (SchemaConfig.isNormal(obj.getClass()))
             return this.dao.getOne(obj);
 
         Transformed transformed = Parser.transform(obj);
@@ -185,8 +192,8 @@ public class SqlDataTransform implements DataTransform{
 
     @Override
     public <T> T getOne(T obj, String orderBy, Direction sc) {
-        if (!SchemaConfig.isSchemaTransformEnabled)
-            return this.dao.getOne(obj,orderBy,sc);
+        if (SchemaConfig.isNormal(obj.getClass()))
+            return this.dao.getOne(obj, orderBy, sc);
 
         Transformed transformed = Parser.transform(obj);
         Transformed tf = this.dao.getOne(transformed, orderBy, sc);
@@ -199,7 +206,14 @@ public class SqlDataTransform implements DataTransform{
 
     @Override
     public <T> List<T> in(InCondition inCondition) {
+//        if (SchemaConfig.isNormal())
         return this.dao.in(inCondition);
+
+//        InCondition inConditionTransformed = new InCondition();
+//        inConditionTransformed.setClz(inCondition.getClz());
+//        inConditionTransformed.setProperty(inCondition.getProperty());
+//        inConditionTransformed.setInList(inCondition.getInList());
+
     }
 
     @Override
@@ -230,6 +244,44 @@ public class SqlDataTransform implements DataTransform{
 
     @Override
     public List<Map<String, Object>> list(Class clz, String sql, List<Object> conditionList) {
-        return this.dao.list(clz,sql,conditionList);
+        return this.dao.list(clz, sql, conditionList);
+    }
+
+    public void createId(Object obj, Transformed transformed) {
+        Parsed transformedParsed = Parser.get(transformed.getClass());
+        Field field = transformedParsed.getKeyField(X.KEY_ONE);
+        try {
+            Object keyOneObj = field.get(transformed);
+            if (Objects.nonNull(keyOneObj))
+                return;
+        }catch (Exception e){
+            throw new RuntimeException(ExceptionUtil.getMessage(e));
+        }
+        String keyOne = null;
+        if (field.getType() == String.class) {
+
+            Parsed parsed = Parser.get(obj.getClass());
+            Field f = parsed.getKeyField(X.KEY_ONE);
+
+            if (f.getType() == String.class) {
+                try {
+                    keyOne = (String) f.get(obj);
+                } catch (Exception e) {
+                    throw new RuntimeException(ExceptionUtil.getMessage(e));
+                }
+            } else {
+                UUID uuid = UUID.randomUUID();
+                keyOne = uuid.toString().replace("-", "").toUpperCase();
+            }
+
+            try {
+                field.set(transformed, keyOne.toUpperCase());
+            } catch (Exception e) {
+                throw new RuntimeException(ExceptionUtil.getMessage(e));
+            }
+
+        } else {
+            throw new RuntimeException("Transform target table primary key must be String");
+        }
     }
 }

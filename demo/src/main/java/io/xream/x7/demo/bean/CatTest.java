@@ -1,10 +1,9 @@
 package io.xream.x7.demo.bean;
 
-import java.sql.Timestamp;
-
 import x7.core.repository.X;
 
-@X.Transformable()
+import java.sql.Timestamp;
+
 public class CatTest {
 
 	@X.Key

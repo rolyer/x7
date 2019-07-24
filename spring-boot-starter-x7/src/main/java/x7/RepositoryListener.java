@@ -18,10 +18,7 @@ package x7;
 
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationListener;
-import x7.core.bean.BeanElement;
-import x7.core.bean.Parsed;
-import x7.core.bean.Parser;
-import x7.core.bean.Transformed;
+import x7.core.bean.*;
 import x7.repository.BaseRepository;
 import x7.repository.DataRepository;
 import x7.repository.Repository;
@@ -91,14 +88,15 @@ public class RepositoryListener implements
 
     private void reparse(List list) {
 
-        Map<String,List<Transformed>> map = new HashMap<>();
+        //key: originTable
+        Map<String,List<TransformConfigurable>> map = new HashMap<>();
 
         for (Object obj : list) {
-            if (obj instanceof Transformed) {
+            if (obj instanceof TransformConfigurable) {
 
-                Transformed transformed = (Transformed) obj;
+                TransformConfigurable transformed = (TransformConfigurable) obj;
                 String originTable = transformed.getOriginTable();
-                List<Transformed> transformedList = map.get(originTable);
+                List<TransformConfigurable> transformedList = map.get(originTable);
                 if (transformedList == null){
                     transformedList = new ArrayList<>();
                     map.put(originTable,transformedList);
@@ -107,15 +105,15 @@ public class RepositoryListener implements
             }
         }
 
-        for (Map.Entry<String,List<Transformed>> entry : map.entrySet()){
+        for (Map.Entry<String,List<TransformConfigurable>> entry : map.entrySet()){
             String originTable = entry.getKey();
 
             Parsed parsed = Parser.getByTableName(originTable);
             if (parsed == null)
                 continue;
 
-            List<Transformed> transformedList = entry.getValue();
-            for (Transformed transformed : transformedList) {
+            List<TransformConfigurable> transformedList = entry.getValue();
+            for (TransformConfigurable transformed : transformedList) {
                 parsed.setTableName(transformed.getTargetTable());//FIXME 直接替换了原始的表
                 parsed.setTransforemedAlia(transformed.getAlia());
 
@@ -128,10 +126,11 @@ public class RepositoryListener implements
             }
 
             parsed.reset(parsed.getBeanElementList());
-
-            Parsed parsedTransformed = Parser.getByTableName(parsed.getTableName());
+            String tableName = parsed.getTableName();
+            Parsed parsedTransformed = Parser.getByTableName(tableName);
             parsed.setParsedTransformed(parsedTransformed);
 
+            SchemaConfig.transformableSet.add(parsed.getClz());
         }
     }
 
@@ -142,8 +141,9 @@ public class RepositoryListener implements
         ParameterizedType parameterized = (ParameterizedType) types[0];
         Class clazz = (Class) parameterized.getActualTypeArguments()[0];
 
-        return dataRepository.list(clazz);
+        List list = dataRepository.list(clazz);
 
+        return list;
     }
 
 }

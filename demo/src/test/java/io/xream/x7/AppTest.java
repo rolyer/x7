@@ -13,6 +13,8 @@ public class AppTest {
 
     @Autowired
     private XxxTest xxxTest;
+    @Autowired
+    private TransformTest transformTest;
 
     @Test
     public void testAll(){
@@ -22,7 +24,7 @@ public class AppTest {
 //        xxxTest.domain();
 
 
-        xxxTest.testReyClient();
+//        xxxTest.testReyClient();
 //        xxxTest.testTime();
 //        xxxTest.getBase();
 
@@ -31,6 +33,9 @@ public class AppTest {
 //        xxxTest.testDomain();
 
 //        xxxTest.testRefreshCondition();
+
+
+        transformTest.testCreate();
     }
 
 }

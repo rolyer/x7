@@ -24,12 +24,14 @@ import x7.core.util.BeanUtil;
 import x7.core.util.BeanUtilX;
 import x7.core.util.ExceptionUtil;
 import x7.core.util.StringUtil;
+import x7.core.web.Paged;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Parser {
@@ -110,6 +112,7 @@ public class Parser {
 			String tableName = mapping.value();
 			if (!tableName.equals("")) {
 				parsed.setTableName(tableName);
+				parsed.setOriginTable(tableName);
 				parsed.setNoSpec(false);
 			} else {
 				String name = BeanUtil.getByFirstLower(clz.getSimpleName());
@@ -123,6 +126,7 @@ public class Parser {
 				}
 
 				parsed.setTableName(mapper);
+				parsed.setOriginTable(mapper);
 			}
 		} else {
 			String name = BeanUtil.getByFirstLower(clz.getSimpleName());
@@ -136,6 +140,7 @@ public class Parser {
 			}
 
 			parsed.setTableName(mapper);
+			parsed.setOriginTable(mapper);
 		}
 
 		/*
@@ -165,10 +170,6 @@ public class Parser {
 		 * parseCacheable
 		 */
 		BeanUtilX.parseCacheableAnno(clz, parsed);
-		/*
-		 * parseTransformable
-		 */
-		BeanUtilX.parseTransformableAnno(clz,parsed);
 
 		put(clz, parsed);
 
@@ -191,7 +192,7 @@ public class Parser {
 
 	public static Parsed getByTableName(String tableName){
 		for (Parsed parsed : map.values()){
-			if (parsed.getTableName().equals(tableName))
+			if (parsed.getOriginTable().equals(tableName))
 				return parsed;
 		}
 		return null;
@@ -251,13 +252,18 @@ public class Parser {
 
 		Transformed transformed = null;
 		try {
-			transformed = (Transformed)parsedTransformed.getClz().newInstance();
 			Class clazz = parsedTransformed.getClz();
+            transformed = (Transformed) clazz.newInstance();
+
+            transformed.setAlia(parsed.getTransformedAlia());
+
 			/*
 			 *  如何通过列名找到属性名
 			 */
 			List<BeanElement> logicBeanElementList = parsed.getBeanElementList();
 			List<BeanElement> transformedBeanElementList = parsedTransformed.getBeanElementList();
+
+
 
 			for (BeanElement logicBe : logicBeanElementList) {
 				String logicMapper = logicBe.getMapper();

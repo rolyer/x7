@@ -20,7 +20,7 @@ import x7.core.repository.X;
 
 import java.io.Serializable;
 
-public class SchemaTransform implements Transformed, Serializable {
+public class SchemaTransform implements TransformConfigurable, Serializable {
     private static final long serialVersionUID = -7325036922933379064L;
 
     @X.Key
@@ -43,6 +43,7 @@ public class SchemaTransform implements Transformed, Serializable {
         return alia;
     }
 
+    @Override
     public void setAlia(String alia) {
         this.alia = alia;
     }

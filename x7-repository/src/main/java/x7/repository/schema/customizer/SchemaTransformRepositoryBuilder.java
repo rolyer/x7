@@ -24,7 +24,6 @@ import x7.core.bean.Transformed;
 import x7.repository.BaseRepository;
 import x7.repository.HealthChecker;
 import x7.repository.internal.RepositoryProxy;
-import x7.repository.schema.SchemaConfig;
 import x7.repository.schema.SchemaTransformRepository;
 
 import java.lang.reflect.ParameterizedType;

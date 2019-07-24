@@ -1,14 +1,15 @@
 package io.xream.x7.demo.bean;
 
+import x7.core.bean.Transformed;
 import x7.core.repository.X;
 
-public class Transformed  {
+public class TransformedDemo implements Transformed {
 
     @X.Key
     private String id;
     private String alia;
-    private long originId;
     private String value;
+
 
     public String getId() {
         return id;
@@ -26,14 +27,6 @@ public class Transformed  {
         this.alia = alia;
     }
 
-    public long getOriginId() {
-        return originId;
-    }
-
-    public void setOriginId(long originId) {
-        this.originId = originId;
-    }
-
     public String getValue() {
         return value;
     }
@@ -44,10 +37,9 @@ public class Transformed  {
 
     @Override
     public String toString() {
-        return "Transformed{" +
+        return "TransformedDemo{" +
                 "id='" + id + '\'' +
                 ", alia='" + alia + '\'' +
-                ", originId='" + originId + '\'' +
                 ", value='" + value + '\'' +
                 '}';
     }

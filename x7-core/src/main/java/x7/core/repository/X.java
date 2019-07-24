@@ -52,16 +52,6 @@ public @interface X {
 		String value() default "";
 	}
 
-	/**
-	 *
-	 * Tranform table and column defined in SchemaTransform
-	 *
-	 */
-	@Retention(RetentionPolicy.RUNTIME)
-	@Target({ElementType.TYPE})
-	@interface Transformable{
-	}
-
 
 	/**
 	 * 

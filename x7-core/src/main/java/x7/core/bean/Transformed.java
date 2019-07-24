@@ -26,8 +26,5 @@ public interface Transformed {
      * the value suggest 1,2,3...., or A,B,C,D....
      */
     String getAlia();
-    String getOriginTable();
-    String getTargetTable();
-    String getOriginColumn();
-    String getTargetColumn();
+    void setAlia(String alia);
 }

@@ -16,8 +16,17 @@
  */
 package x7.repository.schema;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class SchemaConfig {
 
     public static boolean isSchemaTransformEnabled;
+
+    public static Set<Class> transformableSet = new HashSet<>();
+
+    public static boolean isNormal(Class clz){
+        return ! (isSchemaTransformEnabled && transformableSet.contains(clz));
+    }
 
 }
