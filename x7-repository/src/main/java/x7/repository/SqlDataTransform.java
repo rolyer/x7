@@ -16,10 +16,7 @@
  */
 package x7.repository;
 
-import x7.core.bean.Criteria;
-import x7.core.bean.Parsed;
-import x7.core.bean.Parser;
-import x7.core.bean.Transformed;
+import x7.core.bean.*;
 import x7.core.bean.condition.InCondition;
 import x7.core.bean.condition.ReduceCondition;
 import x7.core.bean.condition.RefreshCondition;
@@ -112,7 +109,7 @@ public class SqlDataTransform implements DataTransform {
         if (SchemaConfig.isNormal(obj.getClass()))
             return this.dao.remove(obj);
 
-        Transformed transformed = Parser.transform(obj);
+        Transformed transformed = Parser.transformForRemove(obj);
         return this.dao.remove(transformed);
     }
 
@@ -128,17 +125,7 @@ public class SqlDataTransform implements DataTransform {
 
     @Override
     public <T> T get(Class<T> clz, long idOne) {
-        if (SchemaConfig.isNormal(clz))
-            return this.dao.get(clz, idOne);
-
-        Class clzz = Parser.transformClzz(clz);
-
-        Object obj = this.dao.get(clzz, idOne);
-        if (Objects.isNull(obj))
-            return null;
-
-        T t = Parser.toLogic((Transformed) obj, clz);
-        return t;
+        return this.dao.get(clz, idOne);
     }
 
     @Override
@@ -166,19 +153,37 @@ public class SqlDataTransform implements DataTransform {
             return this.dao.list(clz);
 
         Class<? extends Transformed> clzz = Parser.transformClzz(clz);
-        List<? extends Transformed> transformedList = this.dao.list(clzz);
 
-        List<T> list = new ArrayList<>();
-        for (Transformed tf : transformedList) {
-            T t = Parser.toLogic(tf, clz);
-            list.add(t);
+        try {
+            Parsed parsed = Parser.get(clz);
+            Transformed transformed = clzz.newInstance();
+            transformed.setAlia(parsed.getTransformedAlia());
+
+            List<? extends Transformed> transformedList = this.dao.list(transformed);
+
+            List<T> list = new ArrayList<>();
+            for (Transformed tf : transformedList) {
+                T t = Parser.toLogic(tf, clz);
+                list.add(t);
+            }
+
+            return list;
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
         }
 
-        return list;
+        return new ArrayList<>();
     }
 
     @Override
-    public <T> T getOne(T obj) {
+    public List<Map<String, Object>> list(Class clz, String sql, List<Object> conditionList) {
+        return this.dao.list(clz, sql, conditionList);
+    }
+
+    @Override
+    public <T> T getOne(T obj) {//带ID查询, 不需要alia; 不带ID查询,需要alia
         if (SchemaConfig.isNormal(obj.getClass()))
             return this.dao.getOne(obj);
 
@@ -206,48 +211,132 @@ public class SqlDataTransform implements DataTransform {
 
     @Override
     public <T> List<T> in(InCondition inCondition) {
-//        if (SchemaConfig.isNormal())
-        return this.dao.in(inCondition);
+        if (SchemaConfig.isNormal(inCondition.getClz()))
+            return this.dao.in(inCondition);
 
-//        InCondition inConditionTransformed = new InCondition();
-//        inConditionTransformed.setClz(inCondition.getClz());
-//        inConditionTransformed.setProperty(inCondition.getProperty());
-//        inConditionTransformed.setInList(inCondition.getInList());
+        InCondition inConditionTransformed = Parser.toTransformedInCondition(inCondition);
 
+        // TODO: 如果 inProperty不是keyOne, 需要拼接上alia
+        List<Transformed> transformedList = this.dao.in(inConditionTransformed);
+
+        List<T> list = new ArrayList<>();
+        for (Transformed transformed : transformedList){
+            T logic = (T)Parser.toLogic(transformed, inCondition.getClz());
+            list.add(logic);
+        }
+
+        return list;
     }
 
     @Override
     public Object reduce(ReduceCondition reduceCondition) {
+
+        Class clzz = reduceCondition.getCondition().getClz();
+
+        if (SchemaConfig.isNormal(clzz))
+            return this.dao.reduce(reduceCondition);
+
+        Class clzzTransformed = Parser.transformClzz(clzz);
+
+        Parsed parsed = Parser.get(clzz);
+        Criteria.X x = new Criteria.X();
+        x.setKey("alia");
+        x.setConjunction(Conjunction.AND);
+        x.setPredicate(Predicate.EQ);
+        x.setValue(parsed.getTransformedAlia());
+
+        reduceCondition.getCondition().setClz(clzzTransformed);
+        reduceCondition.getCondition().getListX().add(x);
+
         return this.dao.reduce(reduceCondition);
     }
 
     @Override
     public <T> Page<T> find(Criteria criteria) {
+
+        Class clzz = criteria.getClz();
+
+        if (SchemaConfig.isNormal(clzz))
+            return this.dao.find(criteria);
+
+        Parsed parsed = Parser.get(clzz);
+        Criteria.X x = new Criteria.X();
+        x.setKey("alia");
+        x.setConjunction(Conjunction.AND);
+        x.setPredicate(Predicate.EQ);
+        x.setValue(parsed.getTransformedAlia());
+
+        Class clzzTransformed = Parser.transformClzz(clzz);
+
+        criteria.getListX().add(x);
+        criteria.setClz(clzzTransformed);
+
+        Page page = this.dao.find(criteria);
+
+        List list = new ArrayList();
+        List listTransformed = page.getList();
+        for (Object obj : listTransformed){
+            Object o = Parser.toLogic((Transformed) obj,clzz);
+            list.add(o);
+        }
+        page.setClz(clzz);
+        page.reSetList(list);
+
+        return page;
+    }
+
+    @Override
+    public Page<Map<String, Object>> find(Criteria.ResultMappedCriteria criteria) {
+
+        Class clzz = criteria.getClz();
+
+        if (SchemaConfig.isNormal(clzz))
+            return this.dao.find(criteria);
+
+        Class clzzTransformed = Parser.transformClzz(clzz);
+        criteria.setClz(clzzTransformed);
+
         return this.dao.find(criteria);
     }
 
     @Override
-    public Page<Map<String, Object>> find(Criteria.ResultMappedCriteria resultMapped) {
-        return this.dao.find(resultMapped);
-    }
+    public List<Map<String, Object>> list(Criteria.ResultMappedCriteria criteria) {
 
-    @Override
-    public List<Map<String, Object>> list(Criteria.ResultMappedCriteria resultMapped) {
-        return this.dao.list(resultMapped);
+        Class clzz = criteria.getClz();
+
+        if (SchemaConfig.isNormal(clzz))
+            return this.dao.list(criteria);
+
+        Class clzzTransformed = Parser.transformClzz(clzz);
+        criteria.setClz(clzzTransformed);
+
+        return this.dao.list(criteria);
     }
 
     @Override
     public <T> List<T> list(Criteria criteria) {
+        Class clzz = criteria.getClz();
+
+        if (SchemaConfig.isNormal(clzz))
+            return this.dao.list(criteria);
+
+        Parsed parsed = Parser.get(clzz);
+        Criteria.X x = new Criteria.X();
+        x.setKey("alia");
+        x.setConjunction(Conjunction.AND);
+        x.setPredicate(Predicate.EQ);
+        x.setValue(parsed.getTransformedAlia());
+
+        Class clzzTransformed = Parser.transformClzz(clzz);
+
+        criteria.getListX().add(x);
+        criteria.setClz(clzzTransformed);
+
         return this.dao.list(criteria);
     }
 
 
-    @Override
-    public List<Map<String, Object>> list(Class clz, String sql, List<Object> conditionList) {
-        return this.dao.list(clz, sql, conditionList);
-    }
-
-    public void createId(Object obj, Transformed transformed) {
+    private void createId(Object obj, Transformed transformed) {
         Parsed transformedParsed = Parser.get(transformed.getClass());
         Field field = transformedParsed.getKeyField(X.KEY_ONE);
         try {

@@ -23,6 +23,7 @@ import x7.repository.BaseRepository;
 import x7.repository.DataRepository;
 import x7.repository.Repository;
 import x7.repository.RepositoryBooter;
+import x7.repository.mapper.MapperFactory;
 import x7.repository.schema.SchemaConfig;
 import x7.repository.schema.SchemaTransformRepository;
 import x7.repository.schema.customizer.SchemaTransformCustomizer;
@@ -131,6 +132,9 @@ public class RepositoryListener implements
             parsed.setParsedTransformed(parsedTransformed);
 
             SchemaConfig.transformableSet.add(parsed.getClz());
+
+            Map<String,String> sqlMap = MapperFactory.getSqlMap(parsedTransformed.getClz());
+            MapperFactory.putSqlMap(parsed.getClz(),sqlMap);
         }
     }
 

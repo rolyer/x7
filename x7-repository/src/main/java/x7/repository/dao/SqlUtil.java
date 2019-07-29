@@ -24,7 +24,7 @@ import x7.core.util.BeanUtilX;
 import x7.core.util.StringUtil;
 import x7.repository.CriteriaParser;
 import x7.repository.DbType;
-import x7.repository.mapper.Mapper;
+import x7.repository.util.SqlParserUtil;
 
 import java.io.Reader;
 import java.io.StringReader;
@@ -33,7 +33,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -182,7 +181,7 @@ public class SqlUtil {
 
 				String target = BeanUtilX.normalizeSql(str);
 
-				target = BeanUtilX.mapper(target,parsed);
+				target = SqlParserUtil.mapper(target,parsed);
 
 				sb.append(target);
 
@@ -234,7 +233,7 @@ public class SqlUtil {
 
 		String conditionSql = criteriaParser.parseCondition(condition);
 
-		conditionSql = BeanUtilX.mapper(conditionSql,parsed);
+		conditionSql = SqlParserUtil.mapper(conditionSql,parsed);
 
 		sb.append(conditionSql);
 

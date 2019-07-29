@@ -486,4 +486,5 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 	}
 
 
+
 }

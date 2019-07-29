@@ -33,6 +33,7 @@ import x7.repository.mapper.Mapper;
 import x7.repository.mapper.MapperFactory;
 import x7.repository.util.ResultSetUtil;
 import x7.repository.util.ResultSortUtil;
+import x7.repository.util.SqlParserUtil;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
@@ -290,7 +291,7 @@ public class DaoImpl implements Dao {
         StringBuilder sb = new StringBuilder();
         sb.append(SqlScript.UPDATE).append(SqlScript.SPACE).append(tableName).append(SqlScript.SPACE);
 
-        Map<String, Object> refreshMap = BeanUtilX.getRefreshMap(parsed, obj);
+        Map<String, Object> refreshMap = SqlParserUtil.getRefreshMap(parsed, obj);
 
         String sql = SqlUtil.concatRefresh(sb, parsed, refreshMap);
 
@@ -428,8 +429,8 @@ public class DaoImpl implements Dao {
         // 必须考虑应用代码的漏
         Parsed parsed = Parser.get(clz);
 
-        sql = BeanUtilX.mapper(sql, parsed);//FIXME 解析之后, 替换,拼接
-        sql = BeanUtilX.mapperForManu(sql, parsed);//FIXME 解析之后, 替换,拼接
+        sql = SqlParserUtil.mapper(sql, parsed);//FIXME 解析之后, 替换,拼接
+        sql = SqlParserUtil.mapperForManu(sql, parsed);//FIXME 解析之后, 替换,拼接
 
         if (ConfigAdapter.isIsShowSql())
             System.out.println(sql);
@@ -532,7 +533,7 @@ public class DaoImpl implements Dao {
 
         Parsed parsed = Parser.get(clz);
 
-        Map<String, Object> queryMap = BeanUtilX.getQueryMap(parsed, conditionObj);
+        Map<String, Object> queryMap = SqlParserUtil.getQueryMap(parsed, conditionObj);
         sql = SqlUtil.concat(parsed, sql, queryMap);
 
         if (ConfigAdapter.isIsShowSql())
@@ -765,7 +766,7 @@ public class DaoImpl implements Dao {
         sql = sql.replace(SqlScript.STAR, script);
         sql += conditionSql;
 
-        sql = BeanUtilX.mapper(sql, parsed);
+        sql = SqlParserUtil.mapper(sql, parsed);
 
         if (ConfigAdapter.isIsShowSql())
             System.out.println(sql);
@@ -852,7 +853,7 @@ public class DaoImpl implements Dao {
 
         Parsed parsed = Parser.get(clz);
 
-        Map<String, Object> queryMap = BeanUtilX.getQueryMap(parsed, conditionObj);
+        Map<String, Object> queryMap = SqlParserUtil.getQueryMap(parsed, conditionObj);
         sql = SqlUtil.concat(parsed, sql, queryMap);
 
         String mapper = BeanUtilX.getMapper(orderBy);
@@ -919,7 +920,7 @@ public class DaoImpl implements Dao {
 
         sql = sql.replace(" drop ", SqlScript.SPACE).replace(" delete ", SqlScript.SPACE).replace(" insert ", SqlScript.SPACE).replace(";", SqlScript.SPACE); // 手动拼接SQL,
         // 必须考虑应用代码的漏洞
-        sql = BeanUtilX.mapper(sql, parsed);
+        sql = SqlParserUtil.mapper(sql, parsed);
 
         if (ConfigAdapter.isIsShowSql())
             System.out.println(sql);
@@ -953,7 +954,7 @@ public class DaoImpl implements Dao {
 
         Parsed parsed = Parser.get(clz);
 
-        Map<String, Object> refreshMap = BeanUtilX.getRefreshMap(parsed, obj);
+        Map<String, Object> refreshMap = SqlParserUtil.getRefreshMap(parsed, obj);
 
         String tableName = parsed.getTableName();
         StringBuilder sb = new StringBuilder();
@@ -1039,8 +1040,13 @@ public class DaoImpl implements Dao {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append(sql).append(SqlScript.WHERE).append(mapper);
-        sb.append(SqlScript.IN).append(SqlScript.LEFT_PARENTTHESIS);//" IN ("
+        sb.append(sql).append(SqlScript.WHERE);
+
+        if (inCondition.getTransformAlia()!= null){
+            sb.append("alia = ").append(inCondition.getTransformAlia());
+        }
+
+        sb.append(mapper).append(SqlScript.IN).append(SqlScript.LEFT_PARENTTHESIS);//" IN ("
 
         Class<?> keyType = be.getMethod.getReturnType();
         boolean isNumber = (keyType == long.class || keyType == int.class || keyType == Long.class

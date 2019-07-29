@@ -23,4 +23,15 @@ public class TransformTest {
 
         return id > 0;
     }
+
+    public Mouse getOne(){
+
+        Mouse mouse = new Mouse();
+        mouse.setId("1B265CCC08234DE6B161120648846D50");
+
+        Mouse m = this.repository.getOne(mouse);
+
+        return m;
+
+    }
 }

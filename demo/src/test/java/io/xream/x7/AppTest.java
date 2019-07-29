@@ -35,7 +35,7 @@ public class AppTest {
 //        xxxTest.testRefreshCondition();
 
 
-        transformTest.testCreate();
+        transformTest.getOne();
     }
 
 }
