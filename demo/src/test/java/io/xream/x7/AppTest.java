@@ -39,7 +39,7 @@ public class AppTest {
 
 //        transformTest.getOne();
 
-        this.catTest.reduce();
+        this.catTest.in();
 
 
     }

@@ -4,16 +4,15 @@ import io.xream.x7.demo.CatRepository;
 import io.xream.x7.demo.bean.Cat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import x7.core.bean.CriteriaBuilder;
 import x7.core.bean.Reduce;
+import x7.core.bean.condition.InCondition;
 import x7.core.bean.condition.ReduceCondition;
 import x7.core.bean.condition.RefreshCondition;
 import x7.core.util.BeanUtil;
 import x7.core.util.JsonX;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 @Service
@@ -82,6 +81,27 @@ public class CatTest {
         System.out.println(obj);
 
         return obj;
+    }
+
+    public List<Cat> listByCriteria(){
+        CriteriaBuilder builder = CriteriaBuilder.build(Cat.class);
+        builder.and().eq("type","MMM");
+
+        List<Cat> list = this.repository.list(builder.get());
+
+        System.out.println(list);
+
+        return list;
+    }
+
+
+    public List<Cat> in(){
+        List<Long> inList = new ArrayList<>();
+        inList.add(3L);
+        InCondition inCondition = new InCondition("dogId", inList);
+        List<Cat> list = this.repository.in(inCondition);
+        System.out.println(list);
+        return list;
     }
 
 }
