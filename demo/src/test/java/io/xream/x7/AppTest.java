@@ -15,6 +15,8 @@ public class AppTest {
     private XxxTest xxxTest;
     @Autowired
     private TransformTest transformTest;
+    @Autowired
+    private CatTest catTest;
 
     @Test
     public void testAll(){
@@ -35,7 +37,13 @@ public class AppTest {
 //        xxxTest.testRefreshCondition();
 
 
-        transformTest.getOne();
+//        transformTest.getOne();
+
+        this.catTest.reduce();
+
+
     }
+
+
 
 }

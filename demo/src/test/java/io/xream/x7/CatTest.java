@@ -1,6 +1,12 @@
 package io.xream.x7;
 
+import io.xream.x7.demo.CatRepository;
 import io.xream.x7.demo.bean.Cat;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import x7.core.bean.Reduce;
+import x7.core.bean.condition.ReduceCondition;
+import x7.core.bean.condition.RefreshCondition;
 import x7.core.util.BeanUtil;
 import x7.core.util.JsonX;
 
@@ -9,37 +15,73 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
+@Service
 public class CatTest {
 
-    public static void main(String[] args) {
+    @Autowired
+    private CatRepository repository;
+    public void create(){
 
         Cat cat = new Cat();
-        cat.setId(1);
+        cat.setId(1212);
         cat.setDogId(2);
 
-        Cat cat1 = new Cat();
-        cat1.setId(2);
-        cat1.setDogId(4);
+        this.repository.create(cat);
 
-        Cat cat3 = BeanUtil.copy(Cat.class,cat);
+    }
 
-        List<Cat> catList = new ArrayList<>();
-        catList.add(cat3);
-        catList.add(cat1);
+    public void refresh(){
 
-        Map<Object,Object> map = new HashMap<>();
-        map.put(""+1,"test ok ok");
-        map.put(""+2,"xxxx ok ok");
+        Cat cat = new Cat();
+        cat.setId(1212);
+        cat.setDogId(2222);
 
-        PetVo vo = new PetVo();
-        vo.setCat(cat);
-        vo.setCatList(catList);
-        vo.transform(map);
+        this.repository.refresh(cat);
 
-        String str = JsonX.toJson(vo);
-        System.out.println(str);
+    }
+
+    public void refreshByCondition(){
+
+        RefreshCondition<Cat> refreshCondition = new RefreshCondition<>();
+        refreshCondition.refresh("type","TEST_X");
+//        refreshCondition.and().eq("id",1213);
+        refreshCondition.and().eq("test",433);
+
+        this.repository.refreshUnSafe(refreshCondition);
+
+    }
+
+    public void remove(){
+
+        Cat cat = new Cat();
+        cat.setId(1212);
+        cat.setDogId(2222);
+
+        this.repository.remove(cat);
+
+    }
 
 
+    public Cat getOne() {
+        Cat cat = new Cat();
+        cat.setType("MMM");
+
+        Cat c =  this.repository.getOne(cat);
+        System.out.println(c);
+        return c;
+    }
+
+    public Object reduce(){
+        ReduceCondition condition = new ReduceCondition();
+        condition.setReduceProperty("dogId");
+        condition.setType(Reduce.ReduceType.MAX);
+
+        Object obj = this.repository.reduce(condition);
+
+        System.out.println(obj);
+
+        return obj;
     }
 
 }

@@ -89,6 +89,8 @@ public class SqlCriteriaParser implements CriteriaParser {
 
     @Override
     public String parseCondition(CriteriaCondition criteriaCondition) {
+        if (Objects.isNull(criteriaCondition))
+            return "";
         StringBuilder sb = new StringBuilder();
         List<Criteria.X> xList = criteriaCondition.getListX();
         x(sb, xList, criteriaCondition, true);

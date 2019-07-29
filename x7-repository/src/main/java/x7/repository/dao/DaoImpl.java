@@ -781,10 +781,12 @@ public class DaoImpl implements Dao {
 
             int i = 1;
 
-            List<Object> valueList = reduceCondition.getCondition().getValueList();
-            for (Object value : valueList) {
-                value = this.dialect.filterValue(value);
-                this.dialect.setObject(i++, value, pstmt);
+            if (reduceCondition.getCondition()!=null) {
+                List<Object> valueList = reduceCondition.getCondition().getValueList();
+                for (Object value : valueList) {
+                    value = this.dialect.filterValue(value);
+                    this.dialect.setObject(i++, value, pstmt);
+                }
             }
 
             ResultSet rs = pstmt.executeQuery();

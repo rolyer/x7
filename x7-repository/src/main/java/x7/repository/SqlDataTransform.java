@@ -231,7 +231,7 @@ public class SqlDataTransform implements DataTransform {
     @Override
     public Object reduce(ReduceCondition reduceCondition) {
 
-        Class clzz = reduceCondition.getCondition().getClz();
+        Class clzz = reduceCondition.getClz();
 
         if (SchemaConfig.isNormal(clzz))
             return this.dao.reduce(reduceCondition);
