@@ -16,6 +16,8 @@
  */
 package x7.repository.dao;
 
+import x7.core.config.ConfigAdapter;
+
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -56,6 +58,9 @@ public class RcDataSourceUtil {
         String key = getKey();
 
         DataSource ds = getDataSourceReadable();
+
+        if (ConfigAdapter.isIsShowSql())
+            System.out.println("Find By DataSource: " + ds);
 
         Connection conn = null;
 
