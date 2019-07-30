@@ -26,6 +26,7 @@ public class DataSourceProperties_R {
     private String driverClassName;
     private String username;
     private String password;
+    private int maximumPoolSize;
 
     public String getUrl() {
         return url;
@@ -59,13 +60,22 @@ public class DataSourceProperties_R {
         this.password = password;
     }
 
+    public int getMaximumPoolSize() {
+        return maximumPoolSize;
+    }
+
+    public void setMaximumPoolSize(int maximumPoolSize) {
+        this.maximumPoolSize = maximumPoolSize;
+    }
+
     @Override
     public String toString() {
         return "DataSourceProperties_R{" +
-                "value='" + url + '\'' +
+                "url='" + url + '\'' +
                 ", driverClassName='" + driverClassName + '\'' +
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
+                ", maximumPoolSize=" + maximumPoolSize +
                 '}';
     }
 }

@@ -208,7 +208,7 @@ public class RepositoryStarter  {
         dsR.setUsername(username);
         dsR.setPassword(password);
         dsR.setDriverClassName(driverClassName);
-
+        dsR.setMaximumPoolSize(dataSourceProperties_r.getMaximumPoolSize());
 
         logger.info("Readable DataSource Created, value:"+dataSourceProperties_r.getUrl());
         return dsR;
