@@ -633,9 +633,10 @@ public class DataRepository implements Repository {
 
     @Override
     public boolean createBatch(List<? extends Object> objList) {
-        testAvailable();
         if (objList.isEmpty())
             return false;
+        testAvailable();
+
         Class clz = objList.get(0).getClass();
         Parsed parsed = Parser.get(clz);
         boolean flag = this.dataTransform.createBatch(objList);

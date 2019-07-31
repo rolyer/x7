@@ -288,27 +288,18 @@ public class SqlDataTransform implements DataTransform {
     @Override
     public Page<Map<String, Object>> find(Criteria.ResultMappedCriteria criteria) {
 
-        Class clzz = criteria.getClz();
-
-        if (SchemaConfig.isNormal(clzz))
-            return this.dao.find(criteria);
-
-        Class clzzTransformed = Parser.transformClzz(clzz);
-        criteria.setClz(clzzTransformed);
-
+        /**
+         * TODO:
+         */
         return this.dao.find(criteria);
     }
 
     @Override
     public List<Map<String, Object>> list(Criteria.ResultMappedCriteria criteria) {
 
-        Class clzz = criteria.getClz();
-
-        if (SchemaConfig.isNormal(clzz))
-            return this.dao.list(criteria);
-
-        Class clzzTransformed = Parser.transformClzz(clzz);
-        criteria.setClz(clzzTransformed);
+        /**
+         * TODO:
+         */
 
         return this.dao.list(criteria);
     }
