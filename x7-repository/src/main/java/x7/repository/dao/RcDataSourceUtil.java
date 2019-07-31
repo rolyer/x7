@@ -60,7 +60,7 @@ public class RcDataSourceUtil {
         DataSource ds = getDataSourceReadable();
 
         if (ConfigAdapter.isIsShowSql())
-            System.out.println("Find By DataSource: " + ds);
+            System.out.println("Find By Read DataSource: " + ds);
 
         Connection conn = null;
 
@@ -75,8 +75,6 @@ public class RcDataSourceUtil {
                 }
                 conn = ds.getConnection();
             }
-
-
 
         } else {
             conn = connectionMap.get(key);

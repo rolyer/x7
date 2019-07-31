@@ -26,9 +26,9 @@ import java.sql.SQLException;
 public class DataSourceUtil {
 
 
-    public static Connection getConnection() throws SQLException {
+    public static Connection getConnection() {
 
-        String key = DataSourceHolder.WRITEABLE_DEFAULT;
+//        String key = DataSourceHolder.WRITEABLE_DEFAULT;
         DataSource ds = DataSourceHolder.getDataSource();
 
         Connection conn = DataSourceUtils.getConnection(ds);
@@ -38,7 +38,7 @@ public class DataSourceUtil {
 
     public static void releaseConnection(Connection conn){
 
-        String key = DataSourceHolder.WRITEABLE_DEFAULT;
+//        String key = DataSourceHolder.WRITEABLE_DEFAULT;
         DataSource ds = DataSourceHolder.getDataSource();
 
         DataSourceUtils.releaseConnection(conn,ds);
