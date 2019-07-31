@@ -22,6 +22,7 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -58,9 +59,6 @@ public class RcDataSourceUtil {
         String key = getKey();
 
         DataSource ds = getDataSourceReadable();
-
-        if (ConfigAdapter.isIsShowSql())
-            System.out.println("Find By Read DataSource: " + ds);
 
         Connection conn = null;
 
@@ -122,7 +120,7 @@ public class RcDataSourceUtil {
 
     }
 
-    public static void closeConnection(){
+    public static void end(){
 
         String key = getKey();
 
@@ -145,19 +143,22 @@ public class RcDataSourceUtil {
 
     private static String getKey() {
         String threadId = String.valueOf(Thread.currentThread().getId());
-        return keyMap.get(threadId);
-
+        String key = keyMap.get(threadId);
+        return key;
     }
 
     private static DataSource getDataSourceReadable(){
         DataSource ds = DataSourceHolder.getReadableDataSource();
         if (ds == null) {
             ds = DataSourceHolder.getDataSource();
+        }else{
+            if (ConfigAdapter.isIsShowSql())
+                System.out.println("Find By Read DataSource: " + ds );
         }
         return ds;
     }
 
-    public static void key(){
+    public static void  start(){
         String threadId = String.valueOf(Thread.currentThread().getId());
         String key = "rcTx."+threadId;
         keyMap.put(threadId,key);

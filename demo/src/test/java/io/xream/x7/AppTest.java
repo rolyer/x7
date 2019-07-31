@@ -7,6 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+
 @SpringBootTest
 @RunWith(SpringRunner.class)
 public class AppTest {
@@ -17,6 +20,8 @@ public class AppTest {
     private TransformTest transformTest;
     @Autowired
     private CatTest catTest;
+
+    private Executor executor = Executors.newFixedThreadPool(11);
 
     @Test
     public void testAll(){
@@ -39,7 +44,16 @@ public class AppTest {
 
 //        transformTest.getOne();
 
-        this.catTest.in();
+        for (int i=0;  i<300; i++) {
+
+            executor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    catTest.in();
+                }
+            });
+
+        }
 
 
     }

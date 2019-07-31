@@ -28,7 +28,7 @@ public class RcDataSourceInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
-        RcDataSourceUtil.key();
+        RcDataSourceUtil.start();
         return true;
     }
 
@@ -40,7 +40,7 @@ public class RcDataSourceInterceptor implements HandlerInterceptor {
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
 
-        RcDataSourceUtil.closeConnection();
+        RcDataSourceUtil.end();
 
     }
 }
