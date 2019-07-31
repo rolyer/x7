@@ -21,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import x7.core.bean.*;
 import x7.core.bean.condition.InCondition;
-import x7.core.bean.condition.ReduceCondition;
 import x7.core.bean.condition.RefreshCondition;
 import x7.core.config.Configs;
 import x7.core.repository.CacheResolver;
@@ -493,12 +492,6 @@ public class DataRepository implements Repository {
         return sortedList;
     }
 
-    @Override
-    public Object reduce(ReduceCondition reduceCondition) {
-        testAvailable();
-        return dataTransform.reduce(reduceCondition);
-
-    }
 
     protected <T> boolean execute(T obj, String sql) {
         testAvailable();

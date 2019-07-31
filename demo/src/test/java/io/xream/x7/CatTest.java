@@ -5,12 +5,8 @@ import io.xream.x7.demo.bean.Cat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import x7.core.bean.CriteriaBuilder;
-import x7.core.bean.Reduce;
 import x7.core.bean.condition.InCondition;
-import x7.core.bean.condition.ReduceCondition;
 import x7.core.bean.condition.RefreshCondition;
-import x7.core.util.BeanUtil;
-import x7.core.util.JsonX;
 
 import java.util.*;
 
@@ -71,17 +67,6 @@ public class CatTest {
         return c;
     }
 
-    public Object reduce(){
-        ReduceCondition condition = new ReduceCondition();
-        condition.setReduceProperty("dogId");
-        condition.setType(Reduce.ReduceType.MAX);
-
-        Object obj = this.repository.reduce(condition);
-
-        System.out.println(obj);
-
-        return obj;
-    }
 
     public List<Cat> listByCriteria(){
         CriteriaBuilder builder = CriteriaBuilder.build(Cat.class);

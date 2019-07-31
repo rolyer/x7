@@ -27,7 +27,7 @@ import java.util.List;
 @EnableTracingServlet
 @EnableCorsConfig
 @EnableDateToLongForJackson
-@EnableSchemaTransform
+//@EnableSchemaTransform
 public class App {
     public static void main( String[] args )
     {

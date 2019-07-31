@@ -22,7 +22,6 @@ import x7.core.async.CasualWorker;
 import x7.core.async.IAsyncTask;
 import x7.core.bean.*;
 import x7.core.bean.condition.InCondition;
-import x7.core.bean.condition.ReduceCondition;
 import x7.core.bean.condition.RefreshCondition;
 import x7.core.repository.X;
 import x7.core.util.StringUtil;
@@ -277,11 +276,6 @@ public abstract class DefaultRepository<T> implements BaseRepository<T> {
         dataRepository.refreshCache(clz);
     }
 
-    @Override
-    public Object reduce(ReduceCondition reduceCondition) {
-        reduceCondition.setClz(this.clz);
-        return dataRepository.reduce(reduceCondition);
-    }
 
 
     @Override

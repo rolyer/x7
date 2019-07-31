@@ -18,12 +18,10 @@ package x7.repository.dao;
 
 import x7.core.bean.Criteria;
 import x7.core.bean.condition.InCondition;
-import x7.core.bean.condition.ReduceCondition;
 import x7.core.bean.condition.RefreshCondition;
 import x7.core.web.Direction;
 import x7.core.web.Page;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -74,8 +72,6 @@ public interface Dao {
 	<T> Page<T> find(Criteria criteria);
 
 	<T> List<T> list(Criteria criteria);
-
-	Object reduce(ReduceCondition reduceCondition);
 
 	@Deprecated
 	<T>boolean execute(T obj, String sql);

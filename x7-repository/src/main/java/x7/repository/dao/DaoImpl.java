@@ -19,7 +19,6 @@ package x7.repository.dao;
 import org.springframework.beans.factory.annotation.Autowired;
 import x7.core.bean.*;
 import x7.core.bean.condition.InCondition;
-import x7.core.bean.condition.ReduceCondition;
 import x7.core.bean.condition.RefreshCondition;
 import x7.core.config.ConfigAdapter;
 import x7.core.repository.X;
@@ -734,75 +733,6 @@ public class DaoImpl implements Dao {
 
         Connection conn = RcDataSourceUtil.getConnection();
         return list(criteria, conn);
-    }
-
-    @Override
-    public Object reduce(ReduceCondition reduceCondition) {
-
-        Connection conn = RcDataSourceUtil.getConnection();
-        return reduce(reduceCondition, conn);
-    }
-
-    protected Object reduce(ReduceCondition reduceCondition, Connection conn) {
-
-        Class<?> clz = reduceCondition.getClz();
-        Parsed parsed = Parser.get(clz);
-
-        String conditionSql = this.criteriaParser.parseCondition(reduceCondition.getCondition());
-
-        String type = reduceCondition.getType().toString();
-        String returnStr = type.toLowerCase();
-        String property = reduceCondition.getReduceProperty();
-        if (StringUtil.isNotNull(property)) {
-            property = parsed.getMapper(property);
-        }
-        if (Objects.isNull(property)) {
-            property = SqlScript.STAR;
-        }
-        String script = type + SqlScript.LEFT_PARENTTHESIS + property + SqlScript.RIGHT_PARENTTHESIS + SqlScript.SPACE + returnStr;
-
-        String sql = MapperFactory.getSql(clz, Mapper.LOAD);
-
-        sql = sql.replace(SqlScript.STAR, script);
-        sql += conditionSql;
-
-        sql = SqlParserUtil.mapper(sql, parsed);
-
-        if (ConfigAdapter.isIsShowSql())
-            System.out.println(sql);
-
-        Object result = null;
-
-        PreparedStatement pstmt = null;
-        try {
-            conn = RcDataSourceUtil.getConnection();
-            conn.setAutoCommit(true);
-            pstmt = conn.prepareStatement(sql);
-
-            int i = 1;
-
-            if (reduceCondition.getCondition()!=null) {
-                List<Object> valueList = reduceCondition.getCondition().getValueList();
-                for (Object value : valueList) {
-                    value = this.dialect.filterValue(value);
-                    this.dialect.setObject(i++, value, pstmt);
-                }
-            }
-
-            ResultSet rs = pstmt.executeQuery();
-
-            if (rs.next()) {
-                result = rs.getObject(returnStr);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            close(pstmt);
-            close(conn);
-        }
-
-        return result;
     }
 
     /**

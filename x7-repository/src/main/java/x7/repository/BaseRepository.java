@@ -19,7 +19,6 @@ package x7.repository;
 import x7.core.bean.Criteria;
 import x7.core.bean.DomainObject;
 import x7.core.bean.condition.InCondition;
-import x7.core.bean.condition.ReduceCondition;
 import x7.core.bean.condition.RefreshCondition;
 import x7.core.web.Direction;
 import x7.core.web.Page;
@@ -106,12 +105,6 @@ public interface BaseRepository<T> {
 	 */
 	Page<Map<String, Object>> find(Criteria.ResultMappedCriteria criteria);
 
-	/**
-	 *  SUM | COUNT | AVG | MIN | MAX
-	 * @param condition
-	 * @return Object
-	 */
-	Object reduce(ReduceCondition condition);
 
 	List<Map<String,Object>> list(Criteria.ResultMappedCriteria resultMapped);
 
