@@ -26,7 +26,6 @@ import x7.core.config.Configs;
 import x7.core.repository.CacheResolver;
 import x7.core.repository.X;
 import x7.core.util.JsonX;
-import x7.core.web.Direction;
 import x7.core.web.Page;
 import x7.repository.exception.PersistenceException;
 
@@ -40,13 +39,14 @@ public class DataRepository implements Repository {
 
     private final static Logger logger = LoggerFactory.getLogger(DataRepository.class);
 
-    public DataRepository(){
+    public DataRepository() {
         ManuRepository.init(this);
         HealthChecker.init(this);
         RepositoryBooter.init(this);
     }
 
     private DataTransform dataTransform;
+
     public void setDataTransform(DataTransform dataTransform) {
 
         logger.info("X7 Repository on starting....");
@@ -55,6 +55,7 @@ public class DataRepository implements Repository {
     }
 
     private CacheResolver cacheResolver;
+
     public void setCacheResolver(CacheResolver cacheResolver) {
         this.cacheResolver = cacheResolver;
     }
@@ -91,26 +92,17 @@ public class DataRepository implements Repository {
                 T obj = null;
 
                 Field f = parsed.getKeyField(X.KEY_ONE);
-                if (f.getType() == String.class) {
-                    T condition = null;
-                    try {
-                        condition = clz.newInstance();
-                        f.set(condition, key);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
 
-                    List<T> tempList = null;
-                    tempList = dataTransform.list(condition);
-
-                    if (!tempList.isEmpty()) {
-                        obj = tempList.get(0);
-                    }
-
-                } else {
-                    long idOne = Long.valueOf(key);
-                    obj = dataTransform.get(clz, idOne);
+                T condition = null;
+                try {
+                    condition = clz.newInstance();
+                    f.set(condition, key);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
+
+                obj = dataTransform.getOne(condition);
+
 
                 /*
                  * 更新或重置缓存
@@ -236,25 +228,6 @@ public class DataRepository implements Repository {
         return flag;
     }
 
-    @Override
-    public <T> T get(Class<T> clz, long idOne) {
-        testAvailable();
-        Parsed parsed = Parser.get(clz);
-
-        if (isNoCache() || parsed.isNoCache()) {
-            return dataTransform.get(clz, idOne);
-        }
-
-        String key = String.valueOf(idOne);
-        T obj = cacheResolver.get(clz, key);
-
-        if (obj == null) {
-            obj = dataTransform.get(clz, idOne);
-            cacheResolver.set(clz, key, obj);
-        }
-
-        return obj;
-    }
 
     @Override
     public <T> List<T> list(Object conditionObj) {
@@ -323,30 +296,6 @@ public class DataRepository implements Repository {
         return obj;
     }
 
-    @Override
-    public <T> T getOne(T conditionObj, String orderBy, Direction sc) {
-        testAvailable();
-        Class<T> clz = (Class<T>) conditionObj.getClass();
-        Parsed parsed = Parser.get(clz);
-
-        if (isNoCache() || parsed.isNoCache()) {
-            return (T) dataTransform.getOne(conditionObj, orderBy, sc);
-        }
-
-        String condition = JsonX.toJson(conditionObj) + orderBy + sc;
-
-        T obj = cacheResolver.get(clz, condition);
-
-        if (obj == null) {
-            T t = dataTransform.getOne(conditionObj, orderBy, sc);
-
-            cacheResolver.set(clz, condition, obj);
-
-            return t;
-        }
-
-        return obj;
-    }
 
     @Override
     public <T> Page<T> find(Criteria criteria) {
@@ -450,47 +399,6 @@ public class DataRepository implements Repository {
 
     }
 
-    @Override
-    public <T> List<T> list(Class<T> clz) {
-        testAvailable();
-        Parsed parsed = Parser.get(clz);
-
-        if (isNoCache() || parsed.isNoCache()) {
-            return dataTransform.list(clz);
-        }
-
-        List<T> list = null;
-
-        String condition = "loadAll";
-
-        List<String> keyList = cacheResolver.getResultKeyList(clz, condition);
-
-        if (keyList == null || keyList.isEmpty()) {
-            list = dataTransform.list(clz);
-
-            keyList = new ArrayList<String>();
-
-            for (T t : list) {
-                String key = getCacheKey(t, parsed);
-                keyList.add(key);
-            }
-
-            cacheResolver.setResultKeyList(clz, condition, keyList);
-
-            return list;
-        }
-
-        list = cacheResolver.list(clz, keyList);// FIXME 可能要先转Object
-
-        if (keyList.size() == list.size())
-            return list;
-
-        replenishAndRefreshCache(keyList, list, clz, parsed);
-
-        List<T> sortedList = sort(keyList, list, parsed);
-
-        return sortedList;
-    }
 
 
     protected <T> boolean execute(T obj, String sql) {

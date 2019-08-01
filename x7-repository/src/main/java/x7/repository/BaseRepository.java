@@ -20,7 +20,6 @@ import x7.core.bean.Criteria;
 import x7.core.bean.DomainObject;
 import x7.core.bean.condition.InCondition;
 import x7.core.bean.condition.RefreshCondition;
-import x7.core.web.Direction;
 import x7.core.web.Page;
 
 import java.util.List;
@@ -62,7 +61,7 @@ public interface BaseRepository<T> {
 	 * 
 	 */
 	T get(long idOne);
-
+	T get(String idOne);
 
 	/**
 	 * LOAD
@@ -79,7 +78,6 @@ public interface BaseRepository<T> {
 	 */
 	List<T> list(T conditionObj);
 
-	T getOne(T conditionObj, String orderBy, Direction sc);
 
 	T getOne(T conditionObj);
 

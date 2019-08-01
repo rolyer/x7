@@ -24,6 +24,7 @@ import x7.core.bean.*;
 import x7.core.bean.condition.InCondition;
 import x7.core.bean.condition.RefreshCondition;
 import x7.core.repository.X;
+import x7.core.util.ExceptionUtil;
 import x7.core.util.StringUtil;
 import x7.core.web.Direction;
 import x7.core.web.Page;
@@ -238,13 +239,49 @@ public abstract class DefaultRepository<T> implements BaseRepository<T> {
     @Override
     public T get(long idOne) {
 
-        return dataRepository.get(clz, idOne);
+        Parsed parsed = Parser.get(this.clz);
+        Field f = parsed.getKeyField(X.KEY_ONE);
+
+        T condition = null;
+        try {
+            condition = clz.newInstance();
+            f.set(condition, idOne);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return dataRepository.getOne(condition);
+    }
+
+    @Override
+    public T get(String idOne) {
+
+        Parsed parsed = Parser.get(this.clz);
+        Field f = parsed.getKeyField(X.KEY_ONE);
+
+        T condition = null;
+        try {
+            condition = clz.newInstance();
+            f.set(condition, idOne);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return dataRepository.getOne(condition);
     }
 
     @Override
     public List<T> list() {
 
-        return dataRepository.list(clz);
+        T t = null;
+        try {
+            t = clz.newInstance();
+        } catch (InstantiationException e) {
+            throw new RuntimeException(ExceptionUtil.getMessage(e));
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(ExceptionUtil.getMessage(e));
+        }
+        return dataRepository.list(t);
     }
 
     @Override
@@ -258,11 +295,6 @@ public abstract class DefaultRepository<T> implements BaseRepository<T> {
         return dataRepository.list(conditionObj);
     }
 
-    @Override
-    public T getOne(T conditionObj, String orderBy, Direction sc) {
-
-        return dataRepository.getOne(conditionObj, orderBy, sc);
-    }
 
     @Override
     public T getOne(T conditionObj) {

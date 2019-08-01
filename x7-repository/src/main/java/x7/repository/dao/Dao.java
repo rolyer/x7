@@ -19,7 +19,6 @@ package x7.repository.dao;
 import x7.core.bean.Criteria;
 import x7.core.bean.condition.InCondition;
 import x7.core.bean.condition.RefreshCondition;
-import x7.core.web.Direction;
 import x7.core.web.Page;
 
 import java.util.List;
@@ -42,26 +41,13 @@ public interface Dao {
 	boolean remove(Object obj);
 
 	<T> boolean refreshByCondition(RefreshCondition<T> conditon);
-
-	
-	/**
-	 * 适合单主键
-	 * @param clz
-	 * @param idOne
-	 * @return
-	 */
-	<T> T get(Class<T> clz, long idOne);
-
 	
 	<T> List<T> list(Object conditionObj);
 	
 	List<Map<String,Object>>  list(Class clz, String sql,
 			List<Object> conditionList);
 
-	<T> List<T> list(Class<T> clz);
-
 	<T> T getOne(T conditionObj);
-	<T> T getOne(T conditionObj, String orderBy, Direction sc);
 	
 	<T> List<T> in(InCondition inCondition);
 	

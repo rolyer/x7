@@ -19,7 +19,6 @@ package x7.repository;
 import x7.core.bean.Criteria;
 import x7.core.bean.condition.InCondition;
 import x7.core.bean.condition.RefreshCondition;
-import x7.core.web.Direction;
 import x7.core.web.Page;
 
 import java.util.List;
@@ -68,15 +67,6 @@ public interface Repository {
 	 */
 	boolean remove(Object obj);
 
-	
-	/**
-	 * 根据主键查出单条
-	 * @param clz
-	 * @param idOne
-	 * @return
-	 */
-	<T> T get(Class<T> clz, long idOne);
-
 
 	/**
 	 * 根据对象内容查询<br>
@@ -92,14 +82,6 @@ public interface Repository {
 	 * @return T
 	 */
 	<T> T getOne(T conditionObj);
-	/**
-	 * 根据对象查一条记录
-	 * @param conditionObj
-	 * @param orderBy
-	 * @param sc "DESC", "ASC"
-	 * @return
-	 */
-	<T> T getOne(T conditionObj, String orderBy, Direction sc);
 
 	/**
 	 * 根据对象内容查询<br>
@@ -109,12 +91,6 @@ public interface Repository {
 	 */
 	<T> Page<T> find(Criteria criteria);
 
-	/**
-	 * loadAll
-	 * @param clz
-	 * 
-	 */
-	<T> List<T> list(Class<T> clz);
 	
 	/**
 	 * 支持单一的指定property的in查询, 包括主键

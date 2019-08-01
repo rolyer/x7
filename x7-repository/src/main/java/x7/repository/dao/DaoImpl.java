@@ -416,12 +416,6 @@ public class DaoImpl implements Dao {
         return list.get(0);
     }
 
-    @Override
-    public <T> T get(Class<T> clz, long idOne) {
-        Connection conn = RcDataSourceUtil.getConnection();
-        return get(clz, idOne, conn);
-    }
-
     protected List<Map<String, Object>> list(Class clz, String sql, List<Object> conditionList, Connection conn) {
 
         sql = sql.replace("drop", SqlScript.SPACE).replace("delete", SqlScript.SPACE).replace("insert", SqlScript.SPACE).replace(";", SqlScript.SPACE); // 手动拼接SQL,
@@ -484,44 +478,6 @@ public class DaoImpl implements Dao {
     public List<Map<String, Object>> list(Class clz, String sql, List<Object> conditionList) {
         Connection conn = RcDataSourceUtil.getConnection();
         return list(clz, sql, conditionList, conn);
-    }
-
-    @Override
-    public <T> List<T> list(Class<T> clz) {
-
-        List<T> list = new ArrayList<T>();
-
-        String sql = MapperFactory.getSql(clz, Mapper.LOAD);
-        List<BeanElement> eles = MapperFactory.getElementList(clz);
-
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        BeanElement tempEle = null;
-        try {
-            conn = RcDataSourceUtil.getConnection();
-            conn.setAutoCommit(true);
-            pstmt = conn.prepareStatement(sql);
-
-            ResultSet rs = pstmt.executeQuery();
-
-            if (rs != null) {
-                while (rs.next()) {
-                    T obj = clz.newInstance();
-                    list.add(obj);
-                    initObj(obj, rs, tempEle, eles);
-                }
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RollbackException(
-                    "Exception occured by class = " + clz.getName() + ",column："+ tempEle!=null?(tempEle.property+"|"+tempEle.getMapper()):"" + ", message: " + e.getMessage());
-        } finally {
-            close(pstmt);
-            close(conn);
-        }
-
-        return list;
     }
 
     protected <T> List<T> list(Object conditionObj, Connection conn) {
@@ -775,68 +731,6 @@ public class DaoImpl implements Dao {
     }
 
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    @Override
-    public <T> T getOne(T conditionObj, String orderBy, Direction sc) {
-
-        Class clz = conditionObj.getClass();
-
-        String sql = MapperFactory.getSql(clz, Mapper.LOAD);
-
-        Parsed parsed = Parser.get(clz);
-
-        Map<String, Object> queryMap = SqlParserUtil.getQueryMap(parsed, conditionObj);
-        sql = SqlUtil.concat(parsed, sql, queryMap);
-
-        String mapper = BeanUtilX.getMapper(orderBy);
-        StringBuilder sb = new StringBuilder();
-        sb.append(Conjunction.ORDER_BY.sql()).append(mapper).append(" ").append(sc.toString()).append(SqlScript.LIMIT).append("1");
-
-        sql += sb.toString();
-
-        if (ConfigAdapter.isIsShowSql())
-            System.out.println(sql);
-
-        List<Object> list = new ArrayList<Object>();
-
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        BeanElement tempEle = null;
-        try {
-            conn = RcDataSourceUtil.getConnection();
-            conn.setAutoCommit(true);
-            pstmt = conn.prepareStatement(sql);
-
-            int i = 1;
-            for (Object value : queryMap.values()) {
-                value = this.dialect.filterValue(value);
-                this.dialect.setObject(i++, value, pstmt);
-            }
-
-            List<BeanElement> eles = parsed.getBeanElementList();
-            ResultSet rs = pstmt.executeQuery();
-            if (rs != null) {
-                while (rs.next()) {
-                    Object obj = clz.newInstance();
-                    list.add(obj);
-                    initObj(obj, rs, tempEle, eles);
-                }
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RollbackException(
-                    "Exception occured by class = " + clz.getName() + ", message: " + e.getMessage());
-        } finally {
-            close(pstmt);
-            close(conn);
-        }
-
-        if (list.isEmpty())
-            return null;
-
-        return (T) list.get(0);
-    }
 
     /**
      * 没有特殊需求，请不要调用此代码

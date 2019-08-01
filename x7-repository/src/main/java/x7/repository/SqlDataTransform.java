@@ -19,7 +19,6 @@ package x7.repository;
 import x7.core.bean.Criteria;
 import x7.core.bean.condition.InCondition;
 import x7.core.bean.condition.RefreshCondition;
-import x7.core.web.Direction;
 import x7.core.web.Page;
 import x7.repository.dao.Dao;
 
@@ -119,10 +118,6 @@ public class SqlDataTransform implements DataTransform {
 //        return this.dao.execute(transformed, sql);
     }
 
-    @Override
-    public <T> T get(Class<T> clz, long idOne) {
-        return this.dao.get(clz, idOne);
-    }
 
     @Override
     public <T> List<T> list(Object obj) {
@@ -144,36 +139,6 @@ public class SqlDataTransform implements DataTransform {
     }
 
     @Override
-    public <T> List<T> list(Class<T> clz) {
-//        if (SchemaConfig.isNormal(clz))
-            return this.dao.list(clz);
-
-//        Class<? extends Transformed> clzz = Parser.transformClzz(clz);
-//
-//        try {
-//            Parsed parsed = Parser.get(clz);
-//            Transformed transformed = clzz.newInstance();
-//            transformed.setAlia(parsed.getTransformedAlia());
-//
-//            List<? extends Transformed> transformedList = this.dao.list(transformed);
-//
-//            List<T> list = new ArrayList<>();
-//            for (Transformed tf : transformedList) {
-//                T t = Parser.toLogic(tf, clz);
-//                list.add(t);
-//            }
-//
-//            return list;
-//        } catch (InstantiationException e) {
-//            e.printStackTrace();
-//        } catch (IllegalAccessException e) {
-//            e.printStackTrace();
-//        }
-//
-//        return new ArrayList<>();
-    }
-
-    @Override
     public List<Map<String, Object>> list(Class clz, String sql, List<Object> conditionList) {
         return this.dao.list(clz, sql, conditionList);
     }
@@ -191,18 +156,6 @@ public class SqlDataTransform implements DataTransform {
 //        return t;
     }
 
-    @Override
-    public <T> T getOne(T obj, String orderBy, Direction sc) {
-//        if (SchemaConfig.isNormal(obj.getClass()))
-            return this.dao.getOne(obj, orderBy, sc);
-
-//        Transformed transformed = Parser.transform(obj);
-//        Transformed tf = this.dao.getOne(transformed, orderBy, sc);
-//        if (Objects.isNull(tf))
-//            return null;
-//        T t = Parser.toLogic(tf, (Class<T>) obj.getClass());
-//        return t;
-    }
 
 
     @Override
