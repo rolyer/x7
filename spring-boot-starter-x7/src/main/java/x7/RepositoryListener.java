@@ -145,7 +145,15 @@ public class RepositoryListener implements
         ParameterizedType parameterized = (ParameterizedType) types[0];
         Class clazz = (Class) parameterized.getActualTypeArguments()[0];
 
-        List list = dataRepository.list(clazz);
+        Object obj = null;
+        try {
+            obj = clazz.newInstance();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        List list = dataRepository.list(obj);
 
         return list;
     }

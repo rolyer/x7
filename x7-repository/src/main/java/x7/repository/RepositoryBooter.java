@@ -98,7 +98,15 @@ public class RepositoryBooter {
 
     public static void generateId() {
         System.out.println("\n" + "----------------------------------------");
-        List<IdGenerator> idGeneratorList = dataRepository.list(IdGenerator.class);
+        IdGenerator obj = null;
+        try {
+            obj = IdGenerator.class.newInstance();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        List<IdGenerator> idGeneratorList = dataRepository.list(obj);
         for (IdGenerator generator : idGeneratorList) {
             String name = generator.getClzName();
             long maxId = generator.getMaxId();

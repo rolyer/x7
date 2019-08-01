@@ -20,6 +20,10 @@ public class AppTest {
     private TransformTest transformTest;
     @Autowired
     private CatTest catTest;
+    @Autowired
+    private CatRepositoryTest repositoryTest;
+    @Autowired
+    private DarkRepositoryTest darkRepositoryTest;
 
     private Executor executor = Executors.newFixedThreadPool(11);
 
@@ -42,18 +46,7 @@ public class AppTest {
 //        xxxTest.testRefreshCondition();
 
 
-//        transformTest.getOne();
-
-        for (int i=0;  i<300; i++) {
-
-            executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    catTest.in();
-                }
-            });
-
-        }
+        darkRepositoryTest.get();
 
 
     }
