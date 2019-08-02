@@ -41,15 +41,12 @@ public class RepositoryBooter {
             instance = new RepositoryBooter();
             init();
             HealthChecker.onStarted();
-            CasualWorker.accept(new IAsyncTask() {
-                @Override
-                public void execute() throws Exception {
-                    try {
-                        Thread.sleep(3000);
-                        generateId();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+            CasualWorker.accept(() -> {
+                try {
+                    Thread.sleep(3000);
+                    generateId();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             });
         }
@@ -58,15 +55,12 @@ public class RepositoryBooter {
     public static void onStarted(){
 
         HealthChecker.onStarted();
-        CasualWorker.accept(new IAsyncTask() {
-            @Override
-            public void execute() throws Exception {
-                try {
-                    Thread.sleep(1000);
-                    generateId();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        CasualWorker.accept(() -> {
+            try {
+                Thread.sleep(1000);
+                generateId();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
     }
@@ -128,5 +122,6 @@ public class RepositoryBooter {
         }
         System.out.println("----------------------------------------" + "\n");
     }
+
 
 }
