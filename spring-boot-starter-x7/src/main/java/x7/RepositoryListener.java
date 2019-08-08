@@ -44,12 +44,13 @@ public class RepositoryListener implements
     @Override
     public void onApplicationEvent(ApplicationStartedEvent applicationStartedEvent) {
 
+        if (!X7Data.isEnabled)
+            return;
+
         List<Class<? extends BaseRepository>> clzzList = null;
         if (SchemaConfig.isSchemaTransformEnabled) {
             clzzList = customizeSchemaTransform(applicationStartedEvent);
         }
-
-        RepositoryBooter.onStarted();
 
         if (clzzList != null){
 

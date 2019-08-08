@@ -29,6 +29,9 @@ public class ParserStarter implements ImportBeanDefinitionRegistrar {
 
 	@Override
 	public void registerBeanDefinitions(AnnotationMetadata annotationMetadata, BeanDefinitionRegistry beanDefinitionRegistry) {
+
+		X7Data.isEnabled = true;
+
 		Map<String, Object> attributesX7Repository = annotationMetadata.getAnnotationAttributes(EnableX7Repository.class.getName());
 
 		Object prefix = attributesX7Repository.get("mappingPrefix");

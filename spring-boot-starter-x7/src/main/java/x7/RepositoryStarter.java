@@ -233,6 +233,8 @@ public class RepositoryStarter  {
 
         RepositoryBooter.boot(dsW,dsR);
 
+        RepositoryBooter.onStarted();
+
     }
 
     /**
