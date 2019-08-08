@@ -18,5 +18,5 @@ package x7;
 
 public class X7Data {
 
-    public static boolean isEnabled = false;
+    protected static boolean isEnabled = false;
 }
