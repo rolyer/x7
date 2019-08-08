@@ -17,22 +17,25 @@
 package io.xream.x7.reyc.internal;
 
 import io.xream.x7.reyc.ReyClient;
+import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import x7.core.bean.KV;
+import x7.core.util.StringUtil;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public class ClientParser {
 
+    protected static Pattern pattern1 = Pattern.compile("\\$\\{[\\s\\S]*\\}");
 
     private final static Map<String, ClientParsed> map = new HashMap<>();
 
@@ -41,7 +44,7 @@ public class ClientParser {
         return map.get(intfName);
     }
 
-    public static void parse(Class<?> clz) {
+    public static void parse(Class<?> clz, Environment environment) {
 
         Annotation reyClientAnno = clz.getAnnotation(ReyClient.class);
         if (reyClientAnno == null)
@@ -51,12 +54,31 @@ public class ClientParser {
 
         String url = reyClient.value();
 
+        {
+            if (StringUtil.isNotNull(url)) {
+                if (url.contains("$")) {
+                    List<String> regxList = StringUtil.listByRegEx(url, pattern1);
+                    if (regxList != null && !regxList.isEmpty()) {
+                        String regx = regxList.get(0);
+                        String key = regx.replace("${", "").replace("}", "");
+                        String value = environment.getProperty(key);
+
+                        if (value == null)
+                            throw new RuntimeException("Can't find the config of key: " + key);
+
+                        url = url.replace(regx, value);
+                    }
+                }
+            }
+        }
+
         ClientParsed parsed = new ClientParsed();
 
         map.put(clz.getName(),parsed);
 
         parsed.setObjectType(clz);
         parsed.setUrl(url);
+
 
         /*
          * fallback

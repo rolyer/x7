@@ -22,12 +22,11 @@ import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerOpenException;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.github.resilience4j.retry.Retry;
-import io.github.resilience4j.retry.RetryConfig;
 import io.github.resilience4j.retry.RetryRegistry;
 import io.vavr.control.Try;
 import io.xream.x7.reyc.ReyClient;
-import io.xream.x7.reyc.Url;
 import io.xream.x7.reyc.TracingConfig;
+import io.xream.x7.reyc.Url;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
@@ -45,7 +44,6 @@ import x7.core.util.StringUtil;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
@@ -63,14 +61,11 @@ public class ClientResolver {
 
     private static HttpClientProperies properies;
 
-    private static Environment environment;
 
-
-    public static void init(HttpClientProperies p, CircuitBreakerRegistry c, RetryRegistry r, Environment env) {
+    public static void init(HttpClientProperies p, CircuitBreakerRegistry c, RetryRegistry r) {
         circuitBreakerRegistry = c;
         properies = p;
         retryRegistry = r;
-        environment = env;
     }
 
     public static void initInterceptor(BraveHttpRequestInterceptor req, BraveHttpResponseInterceptor rep) {
@@ -79,26 +74,11 @@ public class ClientResolver {
     }
 
     private static Pattern pattern = Pattern.compile("\\{[\\w]*\\}");
-    private static Pattern pattern1 = Pattern.compile("\\$\\{[\\s\\S]*\\}");
 
     protected static R r(String remoteIntfName, String methodName, Object[] args) {
 
         ClientParsed parsed = ClientParser.get(remoteIntfName);
         String url = parsed.getUrl();
-
-        {
-            if (StringUtil.isNotNull(url)) {
-                if (url.contains("$")) {
-                    List<String> regxList = StringUtil.listByRegEx(url, pattern1);
-                    if (regxList != null && !regxList.isEmpty()) {
-                        String regx = regxList.get(0);
-                        String key = regx.replace("${", "").replace("}", "");
-                        String value = environment.getProperty(key);
-                        url = url.replace(regx, value);
-                    }
-                }
-            }
-        }
 
         MethodParsed methodParsed = parsed.getMap().get(methodName);
 

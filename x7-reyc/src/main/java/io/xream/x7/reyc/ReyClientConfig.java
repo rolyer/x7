@@ -30,10 +30,10 @@ import org.springframework.core.env.Environment;
 @Import({HttpClientProperies.class})
 public class ReyClientConfig {
 
-    public ReyClientConfig(HttpClientProperies properies, CircuitBreakerRegistry circuitBreakerRegistry, Environment env){
+    public ReyClientConfig(HttpClientProperies properies, CircuitBreakerRegistry circuitBreakerRegistry){
 
         RetryRegistry retryRegistry = RetryRegistry.ofDefaults();
-        ClientResolver.init(properies, circuitBreakerRegistry, retryRegistry,env);
+        ClientResolver.init(properies, circuitBreakerRegistry, retryRegistry);
 
     }
 

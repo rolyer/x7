@@ -48,6 +48,8 @@ public class AppTest {
 
         darkRepositoryTest.get();
 
+        xxxTest.testTime();
+
 
     }
 
