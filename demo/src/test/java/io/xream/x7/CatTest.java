@@ -32,13 +32,13 @@ public class CatTest {
         cat.setId(1212);
         cat.setDogId(2222);
 
-        this.repository.refresh(cat);
+//        this.repository.refresh(cat);
 
     }
 
     public void refreshByCondition(){
 
-        RefreshCondition<Cat> refreshCondition = new RefreshCondition<>();
+        RefreshCondition refreshCondition = new RefreshCondition();
         refreshCondition.refresh("type","TEST_X");
 //        refreshCondition.and().eq("id",1213);
         refreshCondition.and().eq("test",433);
@@ -49,11 +49,7 @@ public class CatTest {
 
     public void remove(){
 
-        Cat cat = new Cat();
-        cat.setId(1212);
-        cat.setDogId(2222);
-
-        this.repository.remove(cat);
+        this.repository.remove(1212);
 
     }
 

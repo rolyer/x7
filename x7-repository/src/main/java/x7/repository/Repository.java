@@ -47,12 +47,6 @@ public interface Repository {
 	 * @return
 	 */
 	long create(Object obj);
-
-	/**
-	 * 更新, 支持局部更新
-	 * @param obj
-	 */
-	boolean refresh(Object obj);
 	
 	/**
 	 * 带条件支持局部更新
@@ -65,7 +59,7 @@ public interface Repository {
 	 * 删除
 	 * @param obj
 	 */
-	boolean remove(Object obj);
+	<T> boolean remove(KeyOne<T> obj);
 
 
 	/**

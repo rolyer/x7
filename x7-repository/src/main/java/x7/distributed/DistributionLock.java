@@ -20,16 +20,20 @@ package x7.distributed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import x7.core.exception.DistributionLockException;
-import x7.repository.redis.JedisConnector_Persistence;
 
 
 public class DistributionLock {
 
     private static Logger logger = LoggerFactory.getLogger(DistributionLock.class);
 
+    private static LockStorage lockStorage;
+    protected static void init(LockStorage ls) {
+        lockStorage = ls;
+    }
+
     private static void lock(String key) {
 
-        boolean locked = JedisConnector_Persistence.getInstance().lock(key);
+        boolean locked = lockStorage.lock(key);
         if (!locked) {
             logger.info("Get distributed lock failed, lockKey: " + key);
             throw new DistributionLockException();
@@ -37,7 +41,7 @@ public class DistributionLock {
     }
 
     private static void unLock( String key){
-        JedisConnector_Persistence.getInstance().unLock(key);
+        lockStorage.unLock(key);
     }
 
     private static void unLockAsync( String key){

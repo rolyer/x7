@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package x7.repository.redis;
+package x7.repository.cache;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -23,32 +23,14 @@ import x7.config.SpringHelper;
 import java.util.List;
 import java.util.Set;
 
-public class JedisConnector_Cache {
+public class DefaultCacheStoragePolicy implements CacheStoragePolicy{
 
-	private RedisTemplate redisTemplate;
 
 	private StringRedisTemplate stringRedisTemplate;
-	
-	private static JedisConnector_Cache instance;
 
-	
-	public static JedisConnector_Cache getInstance(){
-		if (instance == null){
-			instance = new JedisConnector_Cache();
-
-		}
-		return instance;
+	public void setStringRedisTemplate(StringRedisTemplate stringRedisTemplate){
+		this.stringRedisTemplate = stringRedisTemplate;
 	}
-
-	private void init(){
-		redisTemplate = (RedisTemplate) SpringHelper.getObject("redisTemplate");
-		stringRedisTemplate = (StringRedisTemplate)SpringHelper.getObject("stringRedisTemplate");
-	}
-	
-	private JedisConnector_Cache(){
-		init();
-	}
-	
 
 	public boolean set(String key, String value){
 		if (key == null || key.equals("") ) 
@@ -56,13 +38,7 @@ public class JedisConnector_Cache {
 		this.stringRedisTemplate.opsForValue().set(key, value);
 		return true;
 	}
-	
-	public boolean set(byte[] key, byte[] value){
 
-		this.redisTemplate.opsForValue().set(key, value);
-
-		return true;
-	}
 
 	public boolean set(String key, String value,int validSeconds){
 		if (key == null || key.equals("") )
@@ -70,12 +46,7 @@ public class JedisConnector_Cache {
 		this.stringRedisTemplate.opsForValue().set(key, value,validSeconds);
 		return true;
 	}
-	
-	public boolean set(byte[] key, byte[] value, int validSeconds){
 
-		this.redisTemplate.opsForValue().set(key, value,validSeconds);
-		return true;
-	}
 	
 	public String get(String key){
 
@@ -84,20 +55,9 @@ public class JedisConnector_Cache {
 			return str;
 		return str.trim();
 	}
-	
-//	public List<byte[]> mget(List<byte[]> keyList){
-//
-//		if (keyList == null || keyList.isEmpty())
-//			return null;
-//
-//		Object obj = this.redisTemplate.opsForValue().multiGet(keyList);
-//		if (obj == null)
-//			return null;
-//		return (List<byte[]>) obj;
-//
-//	}
 
-	public List<String> mget(List<String> keyList){
+
+	public List<String> multiGet(List<String> keyList){
 
 		if (keyList == null || keyList.isEmpty())
 			return null;
@@ -108,19 +68,7 @@ public class JedisConnector_Cache {
 		return list;
 
 	}
-	
-	public byte[] get(byte[] key){
 
-		Object obj = this.redisTemplate.opsForValue().get(key);
-		
-		return (byte[])obj;
-	}
-	
-	public boolean delete(byte[] key){
-
-		this.redisTemplate.delete(key);
-		return true;
-	}
 
 	public boolean delete(String key){
 

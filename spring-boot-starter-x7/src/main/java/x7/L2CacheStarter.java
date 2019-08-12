@@ -19,7 +19,7 @@ package x7;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.type.AnnotationMetadata;
-import x7.repository.redis.LevelTwoCacheResolver;
+import x7.repository.cache.LevelTwoCacheResolver;
 
 import java.util.Map;
 

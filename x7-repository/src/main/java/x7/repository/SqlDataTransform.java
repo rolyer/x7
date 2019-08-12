@@ -68,15 +68,6 @@ public class SqlDataTransform implements DataTransform {
 //        return this.dao.createBatch(list);
     }
 
-    @Override
-    public boolean refresh(Object obj) {
-//        if (SchemaConfig.isNormal(obj.getClass()))
-            return this.dao.refresh(obj);
-//
-//        Transformed transformed = Parser.transform(obj);
-//
-//        return this.dao.refresh(transformed);
-    }
 
     @Override
     public <T> boolean refresh(RefreshCondition<T> refreshCondition) {
@@ -100,9 +91,9 @@ public class SqlDataTransform implements DataTransform {
     }
 
     @Override
-    public boolean remove(Object obj) {
+    public <T> boolean remove(KeyOne<T> keyOne) {
 //        if (SchemaConfig.isNormal(obj.getClass()))
-            return this.dao.remove(obj);
+            return this.dao.remove(keyOne);
 
 //        Transformed transformed = Parser.transformForRemove(obj);
 //        return this.dao.remove(transformed);

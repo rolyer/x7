@@ -20,6 +20,7 @@ import x7.core.bean.Criteria;
 import x7.core.bean.condition.InCondition;
 import x7.core.bean.condition.RefreshCondition;
 import x7.core.web.Page;
+import x7.repository.KeyOne;
 
 import java.util.List;
 import java.util.Map;
@@ -36,9 +37,7 @@ public interface Dao {
 
 	boolean createBatch(List<? extends Object> objList);
 
-	boolean refresh(Object obj);
-
-	boolean remove(Object obj);
+	<T> boolean remove(KeyOne<T> keyOne);
 
 	<T> boolean refreshByCondition(RefreshCondition<T> conditon);
 	

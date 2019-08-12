@@ -259,6 +259,9 @@ public class SqlParserUtil {
             }
             String key = SPACE + property + SPACE;
             String value = SPACE + parsed.getMapper(property) + SPACE;
+            if (!sql.startsWith(SPACE)){
+                sql = SPACE + sql;
+            }
             sql = sql.replaceAll(key, value);
         }
         return sql;

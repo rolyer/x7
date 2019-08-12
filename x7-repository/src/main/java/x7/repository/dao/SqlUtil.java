@@ -33,9 +33,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 
 public class SqlUtil {
@@ -100,75 +98,56 @@ public class SqlUtil {
 	 * 拼接SQL
 	 *
 	 */
-	protected static String concatRefresh(StringBuilder sb, Parsed parsed, Map<String, Object> refreshMap) {
-
-		String keyOne = parsed.getKey(X.KEY_ONE);
-		refreshMap.remove(keyOne);
-
-		sb.append(SqlScript.SET);
-		int size = refreshMap.size();
-		int i = 0;
-		for (String key : refreshMap.keySet()) {
-
-			BeanElement element = parsed.getElement(key);
-			if (element.isJson && DbType.ORACLE.equals(DbType.value)){
-				Object obj = refreshMap.get(key);
-				Reader reader = new StringReader(obj.toString());
-				refreshMap.put(key,reader);
-			}
-
-			String mapper = parsed.getMapper(key);
-			sb.append(mapper);
-			sb.append(SqlScript.EQ_PLACE_HOLDER);
-			if (i < size - 1) {
-				sb.append(SqlScript.COMMA);
-			}
-			i++;
-		}
-
-
-		sb.append(SqlScript.WHERE);
-		String mapper = parsed.getMapper(keyOne);
-		sb.append(mapper).append(SqlScript.EQ_PLACE_HOLDER);
-
-		return sb.toString();
-	}
+//	protected static String concatRefresh(StringBuilder sb, Parsed parsed, Map<String, Object> refreshMap) {
+//
+//		String keyOne = parsed.getKey(X.KEY_ONE);
+//		refreshMap.remove(keyOne);
+//
+//		sb.append(SqlScript.SET);
+//		int size = refreshMap.size();
+//		int i = 0;
+//		for (String key : refreshMap.keySet()) {
+//
+//			BeanElement element = parsed.getElement(key);
+//			if (element.isJson && DbType.ORACLE.equals(DbType.value)){
+//				Object obj = refreshMap.get(key);
+//				Reader reader = new StringReader(obj.toString());
+//				refreshMap.put(key,reader);
+//			}
+//
+//			String mapper = parsed.getMapper(key);
+//			sb.append(mapper);
+//			sb.append(SqlScript.EQ_PLACE_HOLDER);
+//			if (i < size - 1) {
+//				sb.append(SqlScript.COMMA);
+//			}
+//			i++;
+//		}
+//
+//
+//		sb.append(SqlScript.WHERE);
+//		String mapper = parsed.getMapper(keyOne);
+//		sb.append(mapper).append(SqlScript.EQ_PLACE_HOLDER);
+//
+//		return sb.toString();
+//	}
 
 	/**
 	 * 拼接SQL
 	 *
 	 */
-	protected static String concatRefresh(StringBuilder sb, Parsed parsed, Map<String, Object> refreshMap,
+	protected static String concatRefresh(StringBuilder sb, Parsed parsed,
 										  RefreshCondition refreshCondition, CriteriaParser criteriaParser) {
-
-		String keyOne = parsed.getKey(X.KEY_ONE);
-		Object keyOneValue = refreshMap.get(keyOne);
-
-		refreshMap.remove(keyOne);
-
-		if(Objects.nonNull(keyOneValue)){
-			String valueStr = keyOneValue.toString();
-			if(StringUtil.isNullOrEmpty(valueStr)){
-				keyOneValue = null;
-			}else{
-				try{
-					long id = Long.valueOf(valueStr);
-					if (id == 0){
-						keyOneValue = null;
-					}
-				}catch (Exception e){
-
-				}
-			}
-
-		}
 
 		sb.append(SqlScript.SET);
 
 		List<Criteria.X> refreshList = refreshCondition.getRefreshList();
 
+		List<Object> refrshValueList = new ArrayList<>();
+
+		int i=0;
 		int size = refreshList.size();
-		int i = 0;
+
 		for (Criteria.X x : refreshList){
 			if (x.getPredicate() == Predicate.X){
 
@@ -185,50 +164,23 @@ public class SqlUtil {
 
 				sb.append(target);
 
-				if (i < size + refreshMap.size() - 1) {
-					sb.append(SqlScript.COMMA);
-				}
 			}else{
-				refreshMap.put(x.getKey(),x.getValue());
+				String mapper = parsed.getMapper(x.getKey());
+				sb.append(mapper);
+				sb.append(SqlScript.EQ_PLACE_HOLDER);
+				refrshValueList.add(x.getValue());
 			}
 
-			i++;
-		}
-
-		size = refreshMap.size();
-		i = 0;
-		for (String key : refreshMap.keySet()) {
-
-			String mapper = parsed.getMapper(key);
-			sb.append(mapper);
-			sb.append(SqlScript.EQ_PLACE_HOLDER);
-			if (i < size - 1) {
-				sb.append(SqlScript.COMMA);
+			if (i < size-1){
+				sb.append(SqlScript.COMMA).append(SqlScript.SPACE);
 			}
-
 			i++;
 		}
 
 
 		CriteriaCondition condition = refreshCondition.getCondition();
-
-		List<Criteria.X> xList = condition.getListX();
-
-		boolean flag = true;
-		for (Criteria.X x : xList){
-			if (keyOne.equals(x.getKey())){//allready
-				flag = false;
-				break;
-			}
-		}
-
-		if (flag && Objects.nonNull(keyOneValue)){
-			Criteria.X x = new Criteria.X();
-			x.setConjunction(Conjunction.AND);
-			x.setPredicate(Predicate.EQ);
-			x.setKey(keyOne);
-			x.setValue(keyOneValue);
-			xList.add(0, x);
+		if (!refrshValueList.isEmpty()) {
+			condition.getValueList().addAll(0,refrshValueList);
 		}
 
 		String conditionSql = criteriaParser.parseCondition(condition);

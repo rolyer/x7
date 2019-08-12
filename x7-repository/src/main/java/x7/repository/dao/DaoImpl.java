@@ -26,6 +26,7 @@ import x7.core.util.*;
 import x7.core.web.Direction;
 import x7.core.web.Page;
 import x7.repository.CriteriaParser;
+import x7.repository.KeyOne;
 import x7.repository.exception.PersistenceException;
 import x7.repository.exception.RollbackException;
 import x7.repository.mapper.Mapper;
@@ -162,9 +163,10 @@ public class DaoImpl implements Dao {
         return true;
     }
 
-    protected boolean remove(Object obj, Connection conn) {
 
-        Class clz = obj.getClass();
+    protected <T> boolean remove(KeyOne<T> keyOne, Connection conn) {
+
+        Class clz = keyOne.getClzz();
 
         String sql = MapperFactory.getSql(clz, Mapper.REMOVE);
 
@@ -182,7 +184,7 @@ public class DaoImpl implements Dao {
             Field keyOneField = parsed.getKeyField(X.KEY_ONE);
             if (Objects.isNull(keyOneField))
                 throw new PersistenceException("No setting of PrimaryKey by @X.Key");
-            SqlUtil.adpterSqlKey(pstmt, keyOneField, obj, i);
+            SqlUtil.adpterSqlKey(pstmt, keyOneField, keyOne.get(), i);
 
             flag = pstmt.executeUpdate() == 0 ? false : true;
 
@@ -279,62 +281,7 @@ public class DaoImpl implements Dao {
         return id;
     }
 
-    protected boolean refresh(Object obj, Connection conn) {
 
-        @SuppressWarnings("rawtypes")
-        Class clz = obj.getClass();
-        Parsed parsed = Parser.get(clz);
-
-        String tableName = parsed.getTableName();
-
-        StringBuilder sb = new StringBuilder();
-        sb.append(SqlScript.UPDATE).append(SqlScript.SPACE).append(tableName).append(SqlScript.SPACE);
-
-        Map<String, Object> refreshMap = SqlParserUtil.getRefreshMap(parsed, obj);
-
-        String sql = SqlUtil.concatRefresh(sb, parsed, refreshMap);
-
-        if (ConfigAdapter.isIsShowSql())
-            System.out.println("refresh normally: " + sql);
-
-        if (sql.contains("SET  WHERE"))
-            return false;
-
-        boolean flag = false;
-
-        PreparedStatement pstmt = null;
-        try {
-
-            pstmt = conn.prepareStatement(sql);
-
-            int i = 1;
-            for (Object value : refreshMap.values()) {
-                value = this.dialect.filterValue(value);
-                this.dialect.setObject(i++, value, pstmt);
-            }
-
-            /*
-             * 处理KEY
-             */
-            Field keyOneField = parsed.getKeyField(X.KEY_ONE);
-            if (Objects.isNull(keyOneField))
-                throw new PersistenceException("No setting of PrimaryKey by @X.Key");
-            SqlUtil.adpterSqlKey(pstmt, keyOneField, obj, i);
-
-            flag = pstmt.executeUpdate() == 0 ? false : true;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-
-            throw new RollbackException("RollbackException: " + e.getMessage());
-
-        } finally {
-            close(pstmt);
-            DataSourceUtil.releaseConnection(conn);
-        }
-
-        return flag;
-    }
 
     @Override
     public long create(Object obj) {
@@ -348,27 +295,16 @@ public class DaoImpl implements Dao {
         return create(obj, conn);
     }
 
-    @Override
-    public boolean refresh(Object obj) {
 
+    @Override
+    public <T> boolean remove(KeyOne<T> keyOne) {
         Connection conn = null;
         try {
             conn = DataSourceUtil.getConnection();
         } catch (Exception e) {
             throw new RuntimeException("NO CONNECTION");
         }
-        return refresh(obj, conn);
-    }
-
-    @Override
-    public boolean remove(Object obj) {
-        Connection conn = null;
-        try {
-            conn = DataSourceUtil.getConnection();
-        } catch (Exception e) {
-            throw new RuntimeException("NO CONNECTION");
-        }
-        return remove(obj, conn);
+        return remove(keyOne, conn);
     }
 
     protected <T> T get(Class<T> clz, long idOne, Connection conn) {
@@ -415,6 +351,7 @@ public class DaoImpl implements Dao {
             return null;
         return list.get(0);
     }
+
 
     protected List<Map<String, Object>> list(Class clz, String sql, List<Object> conditionList, Connection conn) {
 
@@ -776,16 +713,13 @@ public class DaoImpl implements Dao {
 
         @SuppressWarnings("rawtypes")
         Class clz = refreshCondition.getClz();
-        Object obj = refreshCondition.getObj();
 
         Parsed parsed = Parser.get(clz);
-
-        Map<String, Object> refreshMap = SqlParserUtil.getRefreshMap(parsed, obj);
 
         String tableName = parsed.getTableName();
         StringBuilder sb = new StringBuilder();
         sb.append(SqlScript.UPDATE).append(SqlScript.SPACE).append(tableName).append(SqlScript.SPACE);
-        String sql = SqlUtil.concatRefresh(sb, parsed, refreshMap, refreshCondition, this.criteriaParser);
+        String sql = SqlUtil.concatRefresh(sb, parsed, refreshCondition, this.criteriaParser);
 
         if (ConfigAdapter.isIsShowSql())
             System.out.println("________refreshByCondition: " + sql);
@@ -800,10 +734,6 @@ public class DaoImpl implements Dao {
             pstmt = conn.prepareStatement(sql);
 
             int i = 1;
-            for (Object value : refreshMap.values()) {
-                value = this.dialect.filterValue(value);
-                this.dialect.setObject(i++, value, pstmt);
-            }
 
             SqlUtil.adpterRefreshCondition(pstmt, i, refreshCondition.getCondition());
 

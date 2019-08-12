@@ -28,6 +28,7 @@ import x7.core.repository.X;
 import x7.core.util.JsonX;
 import x7.core.web.Page;
 import x7.repository.exception.PersistenceException;
+import x7.repository.id.IdGeneratorPolicy;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -52,6 +53,20 @@ public class DataRepository implements Repository {
         logger.info("X7 Repository on starting....");
 
         this.dataTransform = dataTransform;
+    }
+
+    private IdGeneratorPolicy idGeneratorPolicy;
+
+    public void setIdGeneratorPolicy(IdGeneratorPolicy idGeneratorPolicy){
+        this.idGeneratorPolicy = idGeneratorPolicy;
+    }
+
+    public IdGeneratorPolicy getIdGeneratorPolicy(){
+        return this.idGeneratorPolicy;
+    }
+
+    public long createId(String clzName){
+        return this.idGeneratorPolicy.createId(clzName);
     }
 
     private CacheResolver cacheResolver;
@@ -149,24 +164,6 @@ public class DataRepository implements Repository {
         return id;
     }
 
-    @Override
-    public boolean refresh(Object obj) {
-        testAvailable();
-        boolean flag = false;
-        Class clz = obj.getClass();
-        Parsed parsed = Parser.get(clz);
-        flag = dataTransform.refresh(obj);
-
-        if (flag) {
-            String key = getCacheKey(obj, parsed);
-            if (!isNoCache() && !parsed.isNoCache()) {
-                if (key != null)
-                    cacheResolver.remove(clz, key);
-                cacheResolver.markForRefresh(clz);
-            }
-        }
-        return flag;
-    }
 
     @Override
     public <T> boolean refresh(RefreshCondition<T> refreshCondition) {
@@ -185,16 +182,22 @@ public class DataRepository implements Repository {
 
         if (!isNoCache() && !parsed.isNoCache()) {
 
-            T obj = refreshCondition.getObj();
-            if (Objects.isNull(obj)) {
-                cacheResolver.remove(clz);
-                cacheResolver.markForRefresh(clz);
-            } else {
-                String key = getCacheKey(obj, parsed);
-                if (key != null)
-                    cacheResolver.remove(clz, key);
-                cacheResolver.markForRefresh(clz);
+
+            cacheResolver.remove(clz);
+            cacheResolver.markForRefresh(clz);
+
+            String keyOne = parsed.getKey(X.KEY_ONE);
+            Object pk = null;
+            for (Criteria.X x : refreshCondition.getCondition().getListX()) {
+                String key = x.getKey();
+                if (key != null && key.equals(keyOne)) {
+                    pk = x.getValue();
+                }
             }
+
+            if (pk != null)
+                cacheResolver.remove(clz, String.valueOf(pk));
+
         }
         return flag;
     }
@@ -212,13 +215,13 @@ public class DataRepository implements Repository {
     }
 
     @Override
-    public boolean remove(Object obj) {
+    public <T> boolean remove(KeyOne<T> keyOne) {
         testAvailable();
         boolean flag = false;
-        Class clz = obj.getClass();
+        Class clz = keyOne.getClzz();
         Parsed parsed = Parser.get(clz);
-        String key = getCacheKey(obj, parsed);
-        flag = dataTransform.remove(obj);
+        String key = String.valueOf(keyOne.get());
+        flag = dataTransform.remove(keyOne);
 
         if (!isNoCache() && !parsed.isNoCache()) {
             if (key != null)
@@ -400,7 +403,6 @@ public class DataRepository implements Repository {
     }
 
 
-
     protected <T> boolean execute(T obj, String sql) {
         testAvailable();
         boolean b;
@@ -574,5 +576,7 @@ public class DataRepository implements Repository {
         if (Objects.isNull(this.dataTransform))
             throw new PersistenceException("X7-Repository does not started");
     }
+
+
 
 }

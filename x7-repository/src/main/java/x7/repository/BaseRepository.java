@@ -26,42 +26,34 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 
+ *
+ * x7-repository programmer API
+ *
  * @author Sim
  *
  * @param <T>
  */
-public interface BaseRepository<T> {
-
-	Class<T> getClz();
+public interface BaseRepository<T> extends Typed<T>{
 
 	long createId();
+	void refreshCache();
 
 	boolean createBatch(List<T> objList);
 
 	long create(T obj);
 
-	void refreshCache();
-
-	/**
-	 * @param obj
-	 */
-	boolean refresh(T obj);
-
 	boolean refresh(RefreshCondition<T> refreshCondition);
 	boolean refreshUnSafe(RefreshCondition<T> refreshCondition);
-	/**
-	 * @param obj
-	 */
-	void remove(T obj);
 
+	boolean remove(String keyOne);
+	boolean remove(long keyOne);
 	/**
 	 *
-	 * @param idOne
+	 * @param keyOne
 	 * 
 	 */
-	T get(long idOne);
-	T get(String idOne);
+	T get(long keyOne);
+	T get(String keyOne);
 
 	/**
 	 * LOAD
@@ -77,7 +69,6 @@ public interface BaseRepository<T> {
 	 * 
 	 */
 	List<T> list(T conditionObj);
-
 
 	T getOne(T conditionObj);
 

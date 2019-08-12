@@ -46,9 +46,7 @@ public class AppTest {
 //        xxxTest.testRefreshCondition();
 
 
-        darkRepositoryTest.get();
-
-        xxxTest.testTime();
+        repositoryTest.refresh();
 
 
     }

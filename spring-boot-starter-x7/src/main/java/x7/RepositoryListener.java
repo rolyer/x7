@@ -18,11 +18,20 @@ package x7;
 
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationListener;
-import x7.core.bean.*;
+import x7.core.bean.BeanElement;
+import x7.core.bean.Parsed;
+import x7.core.bean.Parser;
+import x7.core.bean.TransformConfigurable;
+import x7.core.repository.CacheResolver;
 import x7.repository.BaseRepository;
 import x7.repository.DataRepository;
 import x7.repository.Repository;
 import x7.repository.RepositoryBooter;
+import x7.repository.cache.CacheStoragePolicy;
+import x7.repository.cache.LevelTwoCacheResolver;
+import x7.repository.cache.customizer.CacheStoragePolicyCustomizer;
+import x7.repository.id.IdGeneratorPolicy;
+import x7.repository.id.customizer.IdGeneratorPolicyCustomizer;
 import x7.repository.mapper.MapperFactory;
 import x7.repository.schema.SchemaConfig;
 import x7.repository.schema.SchemaTransformRepository;
@@ -47,12 +56,70 @@ public class RepositoryListener implements
         if (!X7Data.isEnabled)
             return;
 
+        customizeCacheStoragePolicy(applicationStartedEvent);
+
+        customizeIdGeneratorPolicy(applicationStartedEvent);
+
+        RepositoryBooter.onStarted();
+
+        transform(applicationStartedEvent);
+    }
+
+
+    private void customizeCacheStoragePolicy(ApplicationStartedEvent applicationStartedEvent) {
+
+        CacheStoragePolicyCustomizer customizer = null;
+        try {
+            customizer = applicationStartedEvent.getApplicationContext().getBean(CacheStoragePolicyCustomizer.class);
+        } catch (Exception e) {
+
+        }
+
+        if (customizer == null)
+            return;
+
+        CacheStoragePolicy cacheStoragePolicy = customizer.customize();
+        if (cacheStoragePolicy == null)
+            return;
+
+        CacheResolver levelTwoCacheResolver = applicationStartedEvent.getApplicationContext().getBean(CacheResolver.class);
+        if (levelTwoCacheResolver == null)
+            return;
+        ((LevelTwoCacheResolver)levelTwoCacheResolver).setCacheStoragePolicy(cacheStoragePolicy);
+
+    }
+
+
+    private void customizeIdGeneratorPolicy(ApplicationStartedEvent applicationStartedEvent) {
+        IdGeneratorPolicyCustomizer customizer = null;
+        try {
+            customizer = applicationStartedEvent.getApplicationContext().getBean(IdGeneratorPolicyCustomizer.class);
+        } catch (Exception e) {
+
+        }
+
+        if (customizer == null)
+            return;
+
+        IdGeneratorPolicy idGeneratorPolicy = customizer.customize();
+        if (idGeneratorPolicy == null)
+            return;
+
+        DataRepository dataRepository = applicationStartedEvent.getApplicationContext().getBean(DataRepository.class);
+        if (dataRepository == null)
+            return;
+        dataRepository.setIdGeneratorPolicy(idGeneratorPolicy);
+
+    }
+
+
+    private void transform(ApplicationStartedEvent applicationStartedEvent) {
         List<Class<? extends BaseRepository>> clzzList = null;
         if (SchemaConfig.isSchemaTransformEnabled) {
             clzzList = customizeSchemaTransform(applicationStartedEvent);
         }
 
-        if (clzzList != null){
+        if (clzzList != null) {
 
             for (Class<? extends BaseRepository> clzz : clzzList) {
 
@@ -66,18 +133,19 @@ public class RepositoryListener implements
         }
     }
 
-    private List<Class<? extends BaseRepository>> customizeSchemaTransform(ApplicationStartedEvent applicationStartedEvent){
+
+    private List<Class<? extends BaseRepository>> customizeSchemaTransform(ApplicationStartedEvent applicationStartedEvent) {
 
 
         SchemaTransformCustomizer customizer = null;
         try {
             customizer = applicationStartedEvent.getApplicationContext().getBean(SchemaTransformCustomizer.class);
-        }catch (Exception e){
+        } catch (Exception e) {
         }
 
         if (customizer != null) {
             SchemaTransformRepositoryBuilder builder = new SchemaTransformRepositoryBuilder();
-           return customizer.customize(builder);
+            return customizer.customize(builder);
         }
 
         SchemaTransformRepositoryBuilder.registry = null;
@@ -91,7 +159,7 @@ public class RepositoryListener implements
     private void reparse(List list) {
 
         //key: originTable
-        Map<String,List<TransformConfigurable>> map = new HashMap<>();
+        Map<String, List<TransformConfigurable>> map = new HashMap<>();
 
         for (Object obj : list) {
             if (obj instanceof TransformConfigurable) {
@@ -99,15 +167,15 @@ public class RepositoryListener implements
                 TransformConfigurable transformed = (TransformConfigurable) obj;
                 String originTable = transformed.getOriginTable();
                 List<TransformConfigurable> transformedList = map.get(originTable);
-                if (transformedList == null){
+                if (transformedList == null) {
                     transformedList = new ArrayList<>();
-                    map.put(originTable,transformedList);
+                    map.put(originTable, transformedList);
                 }
                 transformedList.add(transformed);
             }
         }
 
-        for (Map.Entry<String,List<TransformConfigurable>> entry : map.entrySet()){
+        for (Map.Entry<String, List<TransformConfigurable>> entry : map.entrySet()) {
             String originTable = entry.getKey();
 
             Parsed parsed = Parser.getByTableName(originTable);
@@ -119,8 +187,8 @@ public class RepositoryListener implements
                 parsed.setTableName(transformed.getTargetTable());//FIXME 直接替换了原始的表
                 parsed.setTransforemedAlia(transformed.getAlia());
 
-                for (BeanElement be : parsed.getBeanElementList()){
-                    if (be.getMapper().equals(transformed.getOriginColumn())){
+                for (BeanElement be : parsed.getBeanElementList()) {
+                    if (be.getMapper().equals(transformed.getOriginColumn())) {
                         be.mapper = transformed.getTargetColumn();//FIXME 直接替换了原始的列, 只需要目标对象的属性有值
                         break;
                     }
@@ -134,12 +202,12 @@ public class RepositoryListener implements
 
             SchemaConfig.transformableSet.add(parsed.getClz());
 
-            Map<String,String> sqlMap = MapperFactory.getSqlMap(parsedTransformed.getClz());
-            MapperFactory.putSqlMap(parsed.getClz(),sqlMap);
+            Map<String, String> sqlMap = MapperFactory.getSqlMap(parsedTransformed.getClz());
+            MapperFactory.putSqlMap(parsed.getClz(), sqlMap);
         }
     }
 
-    private List list(DataRepository dataRepository,Class<? extends BaseRepository> clzz) {
+    private List list(DataRepository dataRepository, Class<? extends BaseRepository> clzz) {
 
         Type[] types = clzz.getGenericInterfaces();
 

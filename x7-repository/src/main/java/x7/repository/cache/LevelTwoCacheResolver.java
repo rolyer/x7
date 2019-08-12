@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package x7.repository.redis;
+package x7.repository.cache;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +62,11 @@ public class LevelTwoCacheResolver implements CacheResolver {
 	private int getValidSecondAdjusted(){
 		return  this.validSecond;
 	}
-	
+
+	private CacheStoragePolicy cacheStoragePolicy;
+	public void setCacheStoragePolicy(CacheStoragePolicy cacheStoragePolicy){
+		this.cacheStoragePolicy = cacheStoragePolicy;
+	}
 	/**
 	 * 标记缓存要更新
 	 * @param clz
@@ -72,7 +76,7 @@ public class LevelTwoCacheResolver implements CacheResolver {
 	public String markForRefresh(Class clz){
 		String key = getNSKey(clz);
 		String time = String.valueOf(System.nanoTime());
-		boolean flag = JedisConnector_Cache.getInstance().set(key, time);
+		boolean flag = cacheStoragePolicy.set(key, time);
 		if (!flag)
 			throw new CacheException("markForRefresh failed");
 		return time;
@@ -85,7 +89,7 @@ public class LevelTwoCacheResolver implements CacheResolver {
 	@SuppressWarnings("rawtypes")
 	public void remove(Class clz, String key){
 		key = getSimpleKey(clz, key);
-		boolean flag = JedisConnector_Cache.getInstance().delete(key);
+		boolean flag = cacheStoragePolicy.delete(key);
 		if (!flag)
 			throw new CacheException("remove failed");
 	}
@@ -94,10 +98,10 @@ public class LevelTwoCacheResolver implements CacheResolver {
 
 		String key = getSimpleKeyLike(clz);
 
-		Set<String> keySet = JedisConnector_Cache.getInstance().keys(key);
+		Set<String> keySet = cacheStoragePolicy.keys(key);
 
 		for (String k : keySet) {
-			boolean flag = JedisConnector_Cache.getInstance().delete(k);
+			boolean flag = cacheStoragePolicy.delete(k);
 			if (!flag)
 				throw new CacheException("remove failed");
 		}
@@ -111,7 +115,7 @@ public class LevelTwoCacheResolver implements CacheResolver {
 	
 	@SuppressWarnings("unused")
 	private String getNS(String nsKey){
-		return JedisConnector_Cache.getInstance().get(nsKey);
+		return cacheStoragePolicy.get(nsKey);
 	}
 	
 	@SuppressWarnings("rawtypes")
@@ -128,26 +132,6 @@ public class LevelTwoCacheResolver implements CacheResolver {
 
 		return keyList;
 	}
-
-//	@SuppressWarnings("rawtypes")
-//	private List<byte[]> getKeyList(Class clz, List<String> conditionList){
-//		if (conditionList == null || conditionList.isEmpty())
-//			return null;
-//		List<byte[]> keyList = new ArrayList<byte[]>();
-//		for (String condition : conditionList){
-//			String key = getSimpleKey(clz, condition);
-//			keyList.add(key.getBytes());
-//		}
-//		if (keyList.isEmpty())
-//			return null;
-//		List<byte[]> arrList= new ArrayList<byte[]>();
-//
-//		int i = 0;
-//		for (byte[] keyB : keyList){
-//			arrList.add(keyB);
-//		}
-//		return arrList;
-//	}
 	
 	/**
 	 * FIXME 有简单simpleKey的地方全改成字符串存储, value为bytes, new String(bytes)
@@ -186,7 +170,7 @@ public class LevelTwoCacheResolver implements CacheResolver {
 	@SuppressWarnings("rawtypes")
 	private String getPrefix(Class clz){
 		String key = getNSKey(clz);
-		String nsStr = JedisConnector_Cache.getInstance().get(key);
+		String nsStr = cacheStoragePolicy.get(key);
 		if (nsStr == null){
 			String str = markForRefresh(clz);
 			return "{"+clz.getName()+"}." + str;
@@ -202,7 +186,7 @@ public class LevelTwoCacheResolver implements CacheResolver {
 	public void set(Class clz, String key, Object obj) {
 		key = getSimpleKey(clz, key);
 		int validSecond =  getValidSecondAdjusted();
-		JedisConnector_Cache.getInstance().set(key, JsonX.toJson(obj), validSecond);
+		cacheStoragePolicy.set(key, JsonX.toJson(obj), validSecond);
 	}
 
 
@@ -211,7 +195,7 @@ public class LevelTwoCacheResolver implements CacheResolver {
 	public void setResultKeyList(Class clz, Object condition, List<String> keyList) {
 		String key = getKey(clz, condition);
 		try{
-			JedisConnector_Cache.getInstance().set(key, JsonX.toJson(keyList), validSecond);
+			cacheStoragePolicy.set(key, JsonX.toJson(keyList), validSecond);
 		}catch (Exception e) {
 			throw new PersistenceException(e.getMessage());
 		}
@@ -223,7 +207,7 @@ public class LevelTwoCacheResolver implements CacheResolver {
 		
 		String key = getKey(clz, condition);
 		try{
-			JedisConnector_Cache.getInstance().set(key, JsonX.toJson(pagination), validSecond);
+			cacheStoragePolicy.set(key, JsonX.toJson(pagination), validSecond);
 		}catch (Exception e) {
 			throw new PersistenceException(e.getMessage());
 		}
@@ -233,7 +217,7 @@ public class LevelTwoCacheResolver implements CacheResolver {
 	@Override
 	public List<String> getResultKeyList(Class clz, Object condition) {
 		String key = getKey(clz, condition);
-		String str = JedisConnector_Cache.getInstance().get(key);
+		String str = cacheStoragePolicy.get(key);
 		if (StringUtil.isNullOrEmpty(str))
 			return new ArrayList<String>();
 		
@@ -244,7 +228,7 @@ public class LevelTwoCacheResolver implements CacheResolver {
 	@Override
 	public Page<String> getResultKeyListPaginated(Class clz, Object condition) {
 		String key = getKey(clz, condition);
-		String json = JedisConnector_Cache.getInstance().get(key);
+		String json = cacheStoragePolicy.get(key);
 		
 		if (StringUtil.isNullOrEmpty(json))
 			return null;
@@ -256,7 +240,7 @@ public class LevelTwoCacheResolver implements CacheResolver {
 	public <T> List<T> list(Class<T> clz, List<String> keyList) {
 		List<String> keyArr = getKeyList(clz, keyList);//转换成缓存需要的keyList
 		
-		List<String> jsonList = JedisConnector_Cache.getInstance().mget(keyArr);
+		List<String> jsonList = cacheStoragePolicy.multiGet(keyArr);
 		
 		if (jsonList == null)
 			return new ArrayList<T>();
@@ -278,7 +262,7 @@ public class LevelTwoCacheResolver implements CacheResolver {
 	@Override
 	public <T> T get(Class<T> clz, String key) {
 		key = getSimpleKey(clz,key);
-		String str = JedisConnector_Cache.getInstance().get(key);
+		String str = cacheStoragePolicy.get(key);
 		if (StringUtil.isNullOrEmpty(str))
 			return null;
 		T obj = JsonX.toObject(str,clz);
@@ -289,15 +273,15 @@ public class LevelTwoCacheResolver implements CacheResolver {
 	public void setMapList(Class clz, String key, List<Map<String, Object>> mapList) {
 		key = getSimpleKey(clz, key);
 		int validSecond =  getValidSecondAdjusted();
-		
-		JedisConnector_Cache.getInstance().set(key, JsonX.toJson(mapList), validSecond);
+
+		cacheStoragePolicy.set(key, JsonX.toJson(mapList), validSecond);
 	}
 
 	@Override
 	public List<Map<String, Object>> getMapList(Class clz, String key) {
 		
 		key = getSimpleKey(clz,key);
-		String str = JedisConnector_Cache.getInstance().get(key);
+		String str = cacheStoragePolicy.get(key);
 		if (StringUtil.isNullOrEmpty(str))
 			return null;
 		List mapList = JsonX.toList(str,Map.class);

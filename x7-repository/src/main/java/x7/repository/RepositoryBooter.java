@@ -17,9 +17,6 @@
 package x7.repository;
 
 import x7.core.async.CasualWorker;
-import x7.core.async.IAsyncTask;
-import x7.repository.internal.DefaultRepository;
-import x7.repository.redis.JedisConnector_Persistence;
 
 import javax.sql.DataSource;
 import java.util.List;
@@ -44,7 +41,18 @@ public class RepositoryBooter {
             CasualWorker.accept(() -> {
                 try {
                     Thread.sleep(3000);
-                    generateId();
+
+                    IdGenerator obj = null;
+                    try {
+                        obj = IdGenerator.class.newInstance();
+                    } catch (InstantiationException e) {
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                    List<IdGenerator> idGeneratorList = dataRepository.list(obj);
+
+                    dataRepository.getIdGeneratorPolicy().onStart(idGeneratorList);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -58,7 +66,16 @@ public class RepositoryBooter {
         CasualWorker.accept(() -> {
             try {
                 Thread.sleep(1000);
-                generateId();
+                IdGenerator obj = null;
+                try {
+                    obj = IdGenerator.class.newInstance();
+                } catch (InstantiationException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+                List<IdGenerator> idGeneratorList = dataRepository.list(obj);
+                dataRepository.getIdGeneratorPolicy().onStart(idGeneratorList);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -87,40 +104,6 @@ public class RepositoryBooter {
 
         DataSourceSetter.set(ds_W, ds_R);
 
-    }
-
-
-    public static void generateId() {
-        System.out.println("\n" + "----------------------------------------");
-        IdGenerator obj = null;
-        try {
-            obj = IdGenerator.class.newInstance();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        List<IdGenerator> idGeneratorList = dataRepository.list(obj);
-        for (IdGenerator generator : idGeneratorList) {
-            String name = generator.getClzName();
-            long maxId = generator.getMaxId();
-
-            String idInRedis = JedisConnector_Persistence.getInstance().hget(DefaultRepository.ID_MAP_KEY, name);
-
-            System.out.println(name + ",test, idInDB = " + maxId + ", idInRedis = " + idInRedis);
-
-
-            if (idInRedis == null) {
-                JedisConnector_Persistence.getInstance().hset(DefaultRepository.ID_MAP_KEY, name, String.valueOf(maxId));
-            } else if (idInRedis != null && maxId > Long.valueOf(idInRedis)) {
-                JedisConnector_Persistence.getInstance().hset(DefaultRepository.ID_MAP_KEY, name, String.valueOf(maxId));
-            }
-
-            System.out.println(name + ",final, idInRedis = " + JedisConnector_Persistence.getInstance().hget(DefaultRepository.ID_MAP_KEY, name));
-
-
-        }
-        System.out.println("----------------------------------------" + "\n");
     }
 
 

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package x7.repository.redis;
+package x7.repository.cache;
 
 import x7.core.util.JsonX;
 import x7.core.util.StringUtil;

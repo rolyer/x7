@@ -24,17 +24,22 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import x7.config.SpringHelper;
 import x7.core.config.ConfigAdapter;
 import x7.core.config.Configs;
 import x7.core.repository.CacheResolver;
+import x7.distributed.LockStorage;
 import x7.repository.*;
+import x7.repository.cache.DefaultCacheStoragePolicy;
+import x7.repository.cache.LevelTwoCacheResolver;
 import x7.repository.dao.Dao;
 import x7.repository.dao.DaoImpl;
 import x7.repository.dao.SqlCriteriaParser;
+import x7.repository.id.DefaultIdGeneratorPolicy;
+import x7.repository.id.IdGeneratorPolicy;
 import x7.repository.mapper.Mapper;
 import x7.repository.mapper.MapperFactory;
-import x7.repository.redis.LevelTwoCacheResolver;
 import x7.repository.util.ResultSetUtil;
 
 import javax.sql.DataSource;
@@ -130,13 +135,27 @@ public class RepositoryStarter  {
 
     @Bean
     @Order(6)
-    public CacheResolver cacheResolver(){
-        return new LevelTwoCacheResolver();
+    public CacheResolver cacheResolver(StringRedisTemplate stringRedisTemplate){
+
+        DefaultCacheStoragePolicy cacheStoragePolicy = new DefaultCacheStoragePolicy();
+        cacheStoragePolicy.setStringRedisTemplate(stringRedisTemplate);
+        LevelTwoCacheResolver levelTwoCacheResolver = new LevelTwoCacheResolver();
+        levelTwoCacheResolver.setCacheStoragePolicy(cacheStoragePolicy);
+
+        return levelTwoCacheResolver;
     }
 
     @Bean
     @Order(7)
-    public DataRepository dataRepository(Dao dao, CacheResolver cacheResolver,Environment environment){
+    public IdGeneratorPolicy idGeneratorPolicy(StringRedisTemplate stringRedisTemplate){
+        DefaultIdGeneratorPolicy defaultIdGeneratorPolicy =  new DefaultIdGeneratorPolicy();
+        defaultIdGeneratorPolicy.setStringRedisTemplate(stringRedisTemplate);
+        return defaultIdGeneratorPolicy;
+    }
+
+    @Bean
+    @Order(8)
+    public DataRepository dataRepository(Dao dao, CacheResolver cacheResolver,IdGeneratorPolicy idGeneratorPolicy,Environment environment){
 
         String driverClassName = environment.getProperty("spring.datasource.driver-class-name");
 
@@ -151,6 +170,7 @@ public class RepositoryStarter  {
         DataRepository repository = new DataRepository();
         repository.setDataTransform(dataTransform);
         repository.setCacheResolver(cacheResolver);
+        repository.setIdGeneratorPolicy(idGeneratorPolicy);
 
         return repository;
     }
@@ -158,8 +178,8 @@ public class RepositoryStarter  {
 
     @ConditionalOnMissingBean(X7Data.class)
     @Bean
-    @Order(8)
-    public X7Data enableData(DataSource dataSource,DataSourceProperties_R dataSourceProperties_r){
+    @Order(9)
+    public X7Data enableData(DataSource dataSource,DataSourceProperties_R dataSourceProperties_r,StringRedisTemplate stringRedisTemplate){
 
         DataSource writeDataSource = dataSource;
 
@@ -171,6 +191,11 @@ public class RepositoryStarter  {
         DataSource readDataSource = getReadDataSource(dataSourceProperties_r);
 
         startX7Repsository(writeDataSource, readDataSource);
+
+        {//初始化分布式锁
+            LockStorage lockStorage = new LockStorage();
+            lockStorage.setStringRedisTemplate(stringRedisTemplate);
+        }
 
         return new X7Data();
     }
@@ -233,7 +258,6 @@ public class RepositoryStarter  {
 
         RepositoryBooter.boot(dsW,dsR);
 
-        RepositoryBooter.onStarted();
 
     }
 

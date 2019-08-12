@@ -20,8 +20,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import x7.core.bean.Criteria;
 import x7.core.bean.CriteriaBuilder;
 import x7.core.bean.Predicate;
-import x7.core.util.JsonX;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -29,7 +30,6 @@ import java.util.Objects;
 
 public class RefreshCondition<T> {
 
-    private T obj;
     private Criteria condition;
     private List<Criteria.X> refreshList = new ArrayList<>();
     private String sourceStript;//FIXME fetch
@@ -45,17 +45,7 @@ public class RefreshCondition<T> {
 
     public void setClz(Class clz) {
         this.clz = clz;
-        if (this.obj != null && this.obj.getClass() != clz){
-            this.obj = (T)JsonX.toObject(this.obj,clz);
-        }
-    }
 
-    public T getObj() {
-        return obj;
-    }
-
-    public void setObj(T obj) {
-        this.obj = obj;
     }
 
     public List<Criteria.X> getRefreshList() {
@@ -90,14 +80,6 @@ public class RefreshCondition<T> {
     public RefreshCondition(){
         CriteriaBuilder builder = CriteriaBuilder.buildCondition();
         this.builder = builder;
-    }
-
-    public RefreshCondition(T t){
-
-        this.obj = t;
-        CriteriaBuilder builder = CriteriaBuilder.buildCondition();
-        this.builder = builder;
-
     }
 
 

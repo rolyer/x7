@@ -1,17 +1,12 @@
 package io.xream.x7;
 
-import io.xream.x7.demo.PigRepository;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import x7.*;
-import x7.repository.BaseRepository;
-import x7.repository.schema.customizer.SchemaTransformCustomizer;
-import x7.repository.schema.customizer.SchemaTransformRepositoryBuilder;
-
-import java.util.ArrayList;
-import java.util.List;
+import x7.repository.id.IdGeneratorPolicy;
+import x7.repository.id.customizer.IdGeneratorPolicyCustomizer;
 
 /**
  *
@@ -51,5 +46,19 @@ public class App {
 //        };
 //
 //        return schemaTransformCustomizer;
+//    }
+
+//    @Bean
+//    public IdGeneratorPolicyCustomizer idGeneratorPolicyCustomizer(){
+//
+//        return new IdGeneratorPolicyCustomizer() {
+//            @Override
+//            public IdGeneratorPolicy customize() {
+//
+//                IdGeneratorPolicy idGeneratorPolicy = null;
+//
+//                return idGeneratorPolicy;
+//            }
+//        };
 //    }
 }

@@ -14,25 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package x7;
+package x7.repository;
 
-import org.springframework.context.annotation.Import;
+public interface Typed<T> {
 
-import java.lang.annotation.*;
-
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-@Documented
-@Import({ParserStarter.class, RepositoryBeanRegistrar.class, RepositoryStarter.class})
-public @interface EnableX7Repository {
-
-    /**
-     * t_
-     */
-    String mappingPrefix() default "";
-    /**
-     * _
-     */
-    String mappingSpec() default "";
-
+    Class<T> getClz();
 }
