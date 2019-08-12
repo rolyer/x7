@@ -2,7 +2,6 @@ package io.xream.x7;
 
 import io.xream.x7.demo.CatRepository;
 import io.xream.x7.demo.bean.Cat;
-import io.xream.x7.demo.bean.DogTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import x7.core.bean.condition.RefreshCondition;

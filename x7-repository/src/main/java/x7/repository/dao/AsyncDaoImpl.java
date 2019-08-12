@@ -18,8 +18,8 @@ package x7.repository.dao;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import x7.core.async.HeartBeator;
 import x7.core.async.HeartBeat;
+import x7.core.async.HeartBeator;
 import x7.core.bean.BeanElement;
 import x7.core.bean.Parsed;
 import x7.core.bean.Parser;

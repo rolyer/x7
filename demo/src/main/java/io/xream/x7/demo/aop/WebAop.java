@@ -1,18 +1,15 @@
 package io.xream.x7.demo.aop;
 
 
-
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.context.annotation.Configuration;
-import x7.core.bean.DataPermission;
 import x7.config.SpringHelper;
 import x7.core.util.ExceptionUtil;
 import x7.core.util.TimeUtil;
-import x7.core.web.Tokened;
 import x7.core.web.ViewEntity;
 import x7.repository.dao.Tx;
 

@@ -25,7 +25,6 @@ import io.xream.x7.reyc.internal.HttpClientProperies;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.env.Environment;
 
 @Import({HttpClientProperies.class})
 public class ReyClientConfig {

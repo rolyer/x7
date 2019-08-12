@@ -16,9 +16,7 @@
  */
 package x7.repository.cache;
 
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import x7.config.SpringHelper;
 
 import java.util.List;
 import java.util.Set;

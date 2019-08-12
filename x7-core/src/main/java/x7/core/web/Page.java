@@ -23,8 +23,6 @@ import x7.core.search.Tag;
 import x7.core.util.JsonX;
 
 import java.io.Serializable;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

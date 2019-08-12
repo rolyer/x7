@@ -2,11 +2,8 @@ package io.xream.x7;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import x7.*;
-import x7.repository.id.IdGeneratorPolicy;
-import x7.repository.id.customizer.IdGeneratorPolicyCustomizer;
 
 /**
  *

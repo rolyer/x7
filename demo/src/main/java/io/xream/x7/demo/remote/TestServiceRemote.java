@@ -3,9 +3,8 @@ package io.xream.x7.demo.remote;
 
 import io.xream.x7.demo.CatRO;
 import io.xream.x7.demo.bean.Cat;
-import io.xream.x7.reyc.Url;
 import io.xream.x7.reyc.ReyClient;
-import org.springframework.web.bind.annotation.RequestBody;
+import io.xream.x7.reyc.Url;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import x7.core.bean.Criteria;

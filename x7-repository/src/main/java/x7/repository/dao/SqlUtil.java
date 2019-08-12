@@ -18,22 +18,20 @@ package x7.repository.dao;
 
 import x7.core.bean.*;
 import x7.core.bean.condition.RefreshCondition;
-import x7.core.repository.X;
 import x7.core.util.BeanUtil;
 import x7.core.util.BeanUtilX;
-import x7.core.util.StringUtil;
 import x7.repository.CriteriaParser;
-import x7.repository.DbType;
 import x7.repository.util.SqlParserUtil;
 
-import java.io.Reader;
-import java.io.StringReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 
 public class SqlUtil {

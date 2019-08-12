@@ -4,12 +4,9 @@ import x7.core.bean.BeanElement;
 import x7.core.bean.DataPermission;
 import x7.core.bean.Parsed;
 import x7.core.config.ConfigAdapter;
-import x7.core.repository.X;
 import x7.core.util.BeanUtil;
 import x7.core.util.JsonX;
-import x7.core.util.StringUtil;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.sql.Timestamp;

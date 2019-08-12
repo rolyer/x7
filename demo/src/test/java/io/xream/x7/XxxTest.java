@@ -1,20 +1,16 @@
 package io.xream.x7;
 
-import io.xream.x7.demo.bean.Cat;
 import io.xream.x7.demo.CatRO;
+import io.xream.x7.demo.bean.Cat;
 import io.xream.x7.demo.bean.CatTest;
 import io.xream.x7.demo.bean.DogTest;
-import io.xream.x7.demo.bean.Pig;
 import io.xream.x7.demo.controller.XxxController;
 import io.xream.x7.demo.remote.TestServiceRemote;
-import io.xream.x7.reyc.Url;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import x7.core.bean.Criteria;
 import x7.core.bean.CriteriaBuilder;
 import x7.core.bean.condition.RefreshCondition;
-import x7.core.util.HttpClientUtil;
-import x7.core.util.JsonX;
 import x7.core.web.Direction;
 import x7.core.web.ViewEntity;
 
