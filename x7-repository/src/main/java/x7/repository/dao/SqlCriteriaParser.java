@@ -327,15 +327,25 @@ public class SqlCriteriaParser implements CriteriaParser {
     private void x(StringBuilder sb, List<Criteria.X> xList, CriteriaCondition criteria, boolean isWhere) {
         for (Criteria.X x : xList) {
 
+            if (x.getPredicate() == Predicate.X) {
+                appendConjunction(sb, x, criteria, isWhere);
+                sb.append(x.getKey());
+                Object valueObject = x.getValue();
+                if (valueObject != null) {
+                    if (valueObject instanceof List){
+                        criteria.getValueList().addAll((List<Object>)valueObject);
+                    }else{
+                        criteria.getValueList().add(valueObject);
+                    }
+                }
+                continue;
+            }
+
+
             Object v = x.getValue();
             if (Objects.isNull(v))
                 continue;
 
-            if (x.getPredicate() == Predicate.X) {
-                appendConjunction(sb, x, criteria, isWhere);
-                sb.append(x.getValue());
-                continue;
-            }
 
             if (Objects.nonNull(x.getConjunction())) {
 

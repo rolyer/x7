@@ -98,7 +98,7 @@ public class RefreshCondition<T> {
 
         Criteria.X x = new Criteria.X();
         x.setPredicate(Predicate.X);
-        x.setValue(sqlX);
+        x.setKey(sqlX);
         this.refreshList.add(x);
 
         return this;

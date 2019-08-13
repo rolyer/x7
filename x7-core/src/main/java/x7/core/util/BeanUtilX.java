@@ -18,6 +18,7 @@ package x7.core.util;
 
 import x7.core.bean.BeanElement;
 import x7.core.bean.Parsed;
+import x7.core.bean.SqlScript;
 import x7.core.repository.SqlFieldType;
 import x7.core.repository.X;
 import x7.core.search.Search;
@@ -491,6 +492,7 @@ public class BeanUtilX extends BeanUtil {
 			"sum",
 			"avg",
 			"count",
+			"on",
 			"where",
 			"and",
 			"add",
@@ -569,23 +571,86 @@ public class BeanUtilX extends BeanUtil {
 	};
 
 
-	public static String normalizeSql(String manuSql){
-//		StringBuilder valueSb = new StringBuilder();
-//
-//		int length = manuSql.length();
-//		for (int j = 0; j < length; j++){
-//			String strEle = String.valueOf(manuSql.charAt(j));
-//			if (SPACE.equals(strEle))
-//				continue;
-//			if (opMap.containsKey(strEle))
-//				strEle = opMap.get(strEle);
-//			valueSb.append(strEle);
-//		}
-//
-//		String target = valueSb.toString();
-		return manuSql;
+
+	private static Set<String> opSet = new HashSet(){
+		{
+			add("=");
+			add("!");
+			add(">");
+			add("<");
+			add("+");
+			add("-");
+			add("*");
+			add("/");
+			add("(");
+			add(")");
+		}
+	};
+
+	public static String normalizeSql(final String manuSql){
+		StringBuilder valueSb = new StringBuilder();
+
+		boolean ignore = false;
+		int length = manuSql.length();
+		for (int j = 0; j < length; j++){
+			String strEle = String.valueOf(manuSql.charAt(j));
+			if (SqlScript.SPACE.equals(strEle)){
+				ignore = true;
+				continue;
+			}
+			if (opSet.contains(strEle)){
+
+				valueSb.append(SqlScript.SPACE);
+
+				valueSb.append(strEle);
+				if (j+1 < length) {
+					String nextOp = String.valueOf(manuSql.charAt(j + 1));
+					if (opSet.contains(nextOp)) {
+						valueSb.append(nextOp);
+						j++;
+					}
+				}
+				valueSb.append(SqlScript.SPACE);
+			}else {
+				if (ignore)
+					valueSb.append(SqlScript.SPACE);
+				valueSb.append(strEle);
+			}
+			ignore = false;
+		}
+
+		return valueSb.toString();
+
 	}
 
+	public static Map<String,String> parseAliaBySourceScriptSql(String sourceScriptSql) {
+
+		sourceScriptSql = "from User u left join Box b on u.id = b.userId";
+
+		List<String> list = new ArrayList<>();
+		String[] arr = sourceScriptSql.split(SqlScript.SPACE);
+		for (String str : arr){
+			boolean isKeyWord = false;
+			for (String kw : keyWordArr){
+				if (kw.equals(str.toLowerCase())){
+					isKeyWord = true;
+					break;
+				}
+			}
+			if (!isKeyWord){
+				list.add(str);
+				System.out.println("---------------: " + str);
+			}
+		}
+
+
+		Map<String,String> map = new HashMap<>();
+		return map;
+	}
+
+	public static void main(String[] args) {
+		parseAliaBySourceScriptSql("");
+	}
 //
 //	public static String normalizeSql(String sql, Map<String,String> mapperMap) {
 //

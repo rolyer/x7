@@ -224,7 +224,7 @@ public class OracleDialect implements Mapper.Dialect {
 
     @Override
     public String filterResultKey(String mapper, Criteria.ResultMappedCriteria criteria) {
-        Map<String,String> aliaMap = criteria.getAliaMap();
+        Map<String,String> aliaMap = criteria.getResultAliaMap();
         String alian = ALIA_NAME + aliaMap.size();
         aliaMap.put(mapper, alian);
         String target = mapper + SqlScript.AS + alian;

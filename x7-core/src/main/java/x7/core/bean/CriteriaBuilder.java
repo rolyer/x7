@@ -444,7 +444,23 @@ public class CriteriaBuilder {
             sql = BeanUtilX.normalizeSql(sql);
 
             x.setPredicate(Predicate.X);
-            x.setValue(sql);
+            x.setKey(sql);
+            x.setValue(null);
+
+            return instance;
+        }
+
+        @Override
+        public CriteriaBuilder x(String sql, List<Object> valueList) {
+
+            if (StringUtil.isNullOrEmpty(sql))
+                return instance;
+
+            sql = BeanUtilX.normalizeSql(sql);
+
+            x.setPredicate(Predicate.X);
+            x.setKey(sql);
+            x.setValue(valueList);
 
             return instance;
         }
@@ -700,6 +716,8 @@ public class CriteriaBuilder {
         CriteriaBuilder isNull(String property);
 
         CriteriaBuilder x(String sql);
+
+        CriteriaBuilder x(String sql, List<Object> valueList);
 
         void under(X x);
 

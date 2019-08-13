@@ -28,10 +28,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 
 public class SqlUtil {
@@ -141,7 +138,7 @@ public class SqlUtil {
 
 		List<Criteria.X> refreshList = refreshCondition.getRefreshList();
 
-		List<Object> refrshValueList = new ArrayList<>();
+		List<Object> refreshValueList = new ArrayList<>();
 
 		int i=0;
 		int size = refreshList.size();
@@ -149,9 +146,9 @@ public class SqlUtil {
 		for (Criteria.X x : refreshList){
 			if (x.getPredicate() == Predicate.X){
 
-				Object value = x.getValue();
+				Object key = x.getKey();
 
-				String str = value.toString();
+				String str = key.toString();
 
 				if (str.contains(","))
 					throw new RuntimeException("RefreshCondition.refresh(), para can not contains(,)");
@@ -165,14 +162,15 @@ public class SqlUtil {
 			}else{
 				String key = x.getKey();
 				if (key.contains("?")){
-					String sql = SqlParserUtil.mapper(key,parsed);
+					String sql = BeanUtilX.normalizeSql(key);
+					sql = SqlParserUtil.mapper(sql,parsed);
 					sb.append(sql);
 				}else {
 					String mapper = parsed.getMapper(key);
 					sb.append(mapper);
 					sb.append(SqlScript.EQ_PLACE_HOLDER);
 				}
-				refrshValueList.add(x.getValue());
+				refreshValueList.add(x.getValue());
 
 			}
 
@@ -184,8 +182,8 @@ public class SqlUtil {
 
 
 		CriteriaCondition condition = refreshCondition.getCondition();
-		if (!refrshValueList.isEmpty()) {
-			condition.getValueList().addAll(0,refrshValueList);
+		if (!refreshValueList.isEmpty()) {
+			condition.getValueList().addAll(0,refreshValueList);
 		}
 
 		String conditionSql = criteriaParser.parseCondition(condition);
@@ -211,7 +209,5 @@ public class SqlUtil {
 			}
 		}
 	}
-
-
 
 }

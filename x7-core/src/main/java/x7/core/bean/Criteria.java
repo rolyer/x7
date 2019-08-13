@@ -207,6 +207,11 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 		private transient MapMapper mapMapper;
 		@JsonIgnore
 		private transient Map<String,String> aliaMap = new HashMap<>();
+		/*
+		 * only for oracle
+		 */
+		@JsonIgnore
+		private transient Map<String,String> resultAliaMap = new HashMap<>();
 
 		public Distinct getDistinct() {
 			return distinct;
@@ -250,12 +255,20 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 			this.mapMapper = mapMapper;
 		}
 
+		public Map<String, String> getResultAliaMap() {
+			return this.resultAliaMap;
+		}
+
 		public Map<String, String> getAliaMap() {
 			return aliaMap;
 		}
 
 		public void setAliaMap(Map<String, String> aliaMap) {
 			this.aliaMap = aliaMap;
+		}
+
+		public void setResultAliaMap(Map<String, String> aliaMap) {
+			this.resultAliaMap = aliaMap;
 		}
 
 		public String getResultScript() {

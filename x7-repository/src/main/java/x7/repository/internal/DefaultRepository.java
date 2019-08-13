@@ -186,6 +186,10 @@ public abstract class DefaultRepository<T> implements BaseRepository<T> {
 
     @Override
     public boolean remove(String keyOne) {
+
+        if (StringUtil.isNullOrEmpty(keyOne))
+            return false;
+
         return dataRepository.remove(new KeyOne<T>() {
 
             @Override
@@ -202,6 +206,10 @@ public abstract class DefaultRepository<T> implements BaseRepository<T> {
 
     @Override
     public boolean remove(long  keyOne) {
+
+        if (keyOne == 0)
+            return false;
+
         return dataRepository.remove(new KeyOne<T>() {
             @Override
             public Object get() {
@@ -217,6 +225,9 @@ public abstract class DefaultRepository<T> implements BaseRepository<T> {
 
     @Override
     public T get(long idOne) {
+
+        if (idOne == 0)
+            return null;
 
         Parsed parsed = Parser.get(this.clz);
         Field f = parsed.getKeyField(X.KEY_ONE);
@@ -234,6 +245,9 @@ public abstract class DefaultRepository<T> implements BaseRepository<T> {
 
     @Override
     public T get(String idOne) {
+
+        if (StringUtil.isNullOrEmpty(idOne))
+            return null;
 
         Parsed parsed = Parser.get(this.clz);
         Field f = parsed.getKeyField(X.KEY_ONE);

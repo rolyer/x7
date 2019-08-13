@@ -933,7 +933,7 @@ public class DaoImpl implements Dao {
 
                     for (String property : resultKeyList) {
                         String mapper = resultMapped.getMapMapper().mapper(property);
-                        Object obj = this.dialect.mappedResult(property, mapper, resultMapped.getAliaMap(),rs);
+                        Object obj = this.dialect.mappedResult(property, mapper, resultMapped.getResultAliaMap(),rs);
                         mapR.put(property, obj);
                     }
                 }
@@ -1021,7 +1021,7 @@ public class DaoImpl implements Dao {
 
                     for (String property : resultKeyList) {
                         String mapper = resultMapped.getMapMapper().mapper(property);
-                        Object obj = this.dialect.mappedResult(property, mapper, resultMapped.getAliaMap(),rs);
+                        Object obj = this.dialect.mappedResult(property, mapper, resultMapped.getResultAliaMap(),rs);
                         mapR.put(property, obj);
                     }
 
