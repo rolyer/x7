@@ -19,6 +19,7 @@ package x7.core.bean;
 import x7.core.repository.X;
 import x7.core.search.TagParsed;
 import x7.core.util.BeanUtilX;
+import x7.core.util.StringUtil;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -147,6 +148,14 @@ public class Parsed {
 	
 	public void checked(){
 		this.isChecked = true;
+	}
+
+	public String getTableName(String alia) {
+		if (StringUtil.isNullOrEmpty(alia))
+			return tableName;
+		if (! alia.toLowerCase().equals(getClzName().toLowerCase()))
+			return alia;
+		return tableName;
 	}
 
 	public String getTableName() {

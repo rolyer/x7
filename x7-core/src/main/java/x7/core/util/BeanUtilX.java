@@ -17,6 +17,7 @@
 package x7.core.util;
 
 import x7.core.bean.BeanElement;
+import x7.core.bean.Criteria;
 import x7.core.bean.Parsed;
 import x7.core.bean.SqlScript;
 import x7.core.repository.SqlFieldType;
@@ -554,23 +555,6 @@ public class BeanUtilX extends BeanUtil {
 
 
 
-	private final static Map<String,String> opMap = new HashMap<String,String>(){
-		{
-			put("=", " = ");
-			put("+", " + ");
-			put("-", " - ");
-			put("*", " * ");
-			put("/", " / ");
-			put("%", " % ");
-			put("(", "( ");
-			put(")", " )");
-			put(",", " , ");
-			put(";", " ;");
-
-		}
-	};
-
-
 
 	private static Set<String> opSet = new HashSet(){
 		{
@@ -584,6 +568,7 @@ public class BeanUtilX extends BeanUtil {
 			add("/");
 			add("(");
 			add(")");
+			add(";");
 		}
 	};
 
@@ -625,10 +610,15 @@ public class BeanUtilX extends BeanUtil {
 
 	public static Map<String,String> parseAliaBySourceScriptSql(String sourceScriptSql) {
 
-		sourceScriptSql = "from User u left join Box b on u.id = b.userId";
+		Map<String,String> map = new HashMap<>();
 
 		List<String> list = new ArrayList<>();
+		Set<String> tryAliaSet = new HashSet<>();
 		String[] arr = sourceScriptSql.split(SqlScript.SPACE);
+		if (arr.length == 1) {
+			map.put(arr[0],arr[0]);
+			return map;
+		}
 		for (String str : arr){
 			boolean isKeyWord = false;
 			for (String kw : keyWordArr){
@@ -637,20 +627,74 @@ public class BeanUtilX extends BeanUtil {
 					break;
 				}
 			}
+
+			if (opSet.contains(str))
+				continue;
+
 			if (!isKeyWord){
-				list.add(str);
-				System.out.println("---------------: " + str);
+				if (str.contains(".")){
+					str = str.substring(0,str.indexOf("."));
+					tryAliaSet.add(str);
+				}else {
+					if (StringUtil.isNotNull(str)) {
+						list.add(str);
+					}
+				}
 			}
 		}
 
+		int size = list.size();
+		for (int i=0;i<size;i++) {
+			String str = list.get(i);
+			if (tryAliaSet.contains(str)){
+				map.put(str,str);
+			}else{
+				if (i + 1 < size) {
+					String alia = list.get(i + 1);
+					if (tryAliaSet.contains(alia));
+					map.put(alia,str);
+					i++;
+				}
+			}
+		}
 
-		Map<String,String> map = new HashMap<>();
+		System.out.println(map);
 		return map;
 	}
 
-	public static void main(String[] args) {
-		parseAliaBySourceScriptSql("");
+	public static String getClzName(String alia, Criteria criteria) {
+		if (criteria instanceof Criteria.ResultMappedCriteria){
+			Criteria.ResultMappedCriteria resultMappedCriteria = (Criteria.ResultMappedCriteria) criteria;
+			return resultMappedCriteria.getAliaMap().get(alia);
+		}
+		return alia;
 	}
+
+	public static void aliaToClzzForMapResult(Criteria.ResultMappedCriteria resultMapped, List<Map<String,Object>> mapList){
+		Map<String,String> aliaMap = resultMapped.getAliaMap();
+
+		for (Map.Entry<String,String> entry : aliaMap.entrySet()){
+			if (entry.getKey().equals(entry.getValue()))
+				return;
+		}
+
+		for (Map<String,Object> aliaKeyMap : mapList){
+
+			Map<String,Object> clzKeyMap = new HashMap<>();
+
+			for (Map.Entry<String,Object> entry : aliaKeyMap.entrySet()){
+				String alia = entry.getKey();
+				Object obj = entry.getValue();
+				String clzName = aliaMap.get(alia);
+				clzKeyMap.put(clzName,obj);
+			}
+
+			aliaKeyMap.clear();
+			aliaKeyMap.putAll(clzKeyMap);
+		}
+
+	}
+
 //
 //	public static String normalizeSql(String sql, Map<String,String> mapperMap) {
 //

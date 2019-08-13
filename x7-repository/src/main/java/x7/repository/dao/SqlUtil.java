@@ -202,7 +202,12 @@ public class SqlUtil {
 		if (Objects.nonNull(condition)) {
 			for (Object v : condition.getValueList()) {
 				if(Objects.nonNull(v) && v.getClass().isEnum()){
-					pstmt.setObject(i++, v.toString());
+				    try {
+                        Object o = v.getClass().getDeclaredMethod("name").invoke(v);
+                        pstmt.setObject(i++, o.toString());
+                    }catch (Exception e){
+
+                    }
 				}else {
 					pstmt.setObject(i++, v);
 				}

@@ -160,7 +160,82 @@ public class XxxController {
 		//builder.distinct("catTest.id").reduce(Reduce.ReduceType.COUNT,"catTest.id").groupBy("catTest.id");
 		builder.and().in("catTest.catFriendName", inList);
 //		builder.paged().orderIn("catTest.catFriendName",inList);//按IN查询条件排序，有值，就过滤掉orderBy
-		String sourceScript = "catTest LEFT JOIN dogTest on catTest.dogId = dogTest.id";
+		String sourceScript = "    catTest     LEFT JOIN        dogTest  on catTest.dogId =         dogTest.id";
+		Criteria.ResultMappedCriteria resultMapped = builder.get();
+		resultMapped.setSourceScript(sourceScript);
+		Page<Map<String,Object>> page = repository.find(resultMapped);
+
+//		Cat cat = this.catRepository.get(110);
+//
+//		System.out.println("____cat: " + cat);
+//
+//		List<Long> idList = new ArrayList<>();
+//		idList.add(109L);
+//		idList.add(110L);
+//		InCondition inCondition = new InCondition("id",idList);
+//		List<Cat> catList = this.catRepository.in(inCondition);
+
+//		System.out.println("____catList: " + catList);
+
+		return ViewEntity.ok(page);
+
+	}
+
+
+	@RequestMapping("/testAlia")
+	public ViewEntity testAlia(@RequestBody CatRO ro) {
+
+		{// sample, send the json by ajax from web page
+			Map<String, Object> catMap = new HashMap<>();
+			catMap.put("id", "");
+//			catMap.put("catFriendName", "");
+//			catMap.put("time", "");
+
+			Map<String, Object> dogMap = new HashMap<>();
+			dogMap.put("number", "");
+			dogMap.put("userName", "");
+
+			ro.getResultKeyMap().put("c", catMap);
+			ro.getResultKeyMap().put("d", dogMap);
+		}
+
+
+		String[] resultKeys = {
+				"c.id",
+				"c.catFriendName",
+//				"d.number",
+				"d.userName"
+		};
+
+		ro.setResultKeys(resultKeys);
+//		ro.setScroll(true);
+
+//		ro.setResultKeyMap();
+
+		List<Object> inList = new ArrayList<>();
+		inList.add("gggg");
+		inList.add("xxxxx");
+		ro.setOrderBy("c.catFriendName,c.id");
+
+		Sort sort1 = new Sort();
+		sort1.setOrderBy("c.catFriendName");
+		sort1.setDirection(Direction.ASC);
+		Sort sort2 = new Sort();
+		sort2.setOrderBy("c.id");
+		sort2.setDirection(Direction.DESC);
+		List<Sort> sortList = new ArrayList<Sort>();
+		sortList.add(sort1);
+		sortList.add(sort2);
+
+		ro.setOrderBy("c.catFriendName,c.id");
+		ro.setDirection(Direction.DESC);
+//		ro.setSortList(sortList);
+
+		CriteriaBuilder.ResultMappedBuilder builder = CriteriaBuilder.buildResultMapped(CatTest.class,ro);
+		//builder.distinct("catTest.id").reduce(Reduce.ReduceType.COUNT,"catTest.id").groupBy("catTest.id");
+		builder.and().in("c.catFriendName", inList);
+//		builder.paged().orderIn("catTest.catFriendName",inList);//按IN查询条件排序，有值，就过滤掉orderBy
+		String sourceScript = "catTest c LEFT JOIN dogTest d on c.dogId = d.id";
 		Criteria.ResultMappedCriteria resultMapped = builder.get();
 		resultMapped.setSourceScript(sourceScript);
 		Page<Map<String,Object>> page = repository.find(resultMapped);

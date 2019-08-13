@@ -18,6 +18,7 @@ package x7.repository.dialect;
 
 import x7.core.bean.*;
 import x7.core.util.JsonX;
+import x7.core.util.StringUtil;
 import x7.repository.mapper.Mapper;
 
 import java.lang.reflect.Method;
@@ -107,15 +108,19 @@ public class MySqlDialect implements Mapper.Dialect {
     }
 
     @Override
-    public Object mappedResult(String property, String mapper, Map<String, String> aliaMap, ResultSet rs) throws Exception {
+    public Object mappedResult(String property, String mapper,Map<String, String> aliaMap,  Map<String, String> resultAliaMap, ResultSet rs) throws Exception {
 
         if (mapper == null)
             throw new RuntimeException("Result key is empty?");
 
         if (property.contains(".")) {
             String[] arr = property.split("\\.");
-            String clzName = arr[0];
+            String alia = arr[0];
             String p = arr[1];
+            String clzName = aliaMap.get(alia);
+            if (StringUtil.isNullOrEmpty(clzName)){
+                clzName = alia;
+            }
             Parsed parsed = Parser.get(clzName);
             BeanElement element = parsed.getElement(p);
 

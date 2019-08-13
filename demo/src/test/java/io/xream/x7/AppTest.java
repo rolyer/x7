@@ -46,8 +46,10 @@ public class AppTest {
 //        xxxTest.testRefreshCondition();
 
 
-        repositoryTest.refresh();
+//        repositoryTest.refresh();
 
+        xxxTest.testAlia();
+        xxxTest.distinct();
 
     }
 

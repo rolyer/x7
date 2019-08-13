@@ -26,6 +26,7 @@ import x7.repository.CriteriaParser;
 import x7.repository.mapper.Mapper;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class SqlCriteriaParser implements CriteriaParser {
@@ -55,14 +56,16 @@ public class SqlCriteriaParser implements CriteriaParser {
         if (key.contains(SqlScript.POINT)) {
 
             String[] arr = key.split("\\.");
-            String clzName = arr[0];
+            String alia = arr[0];
             String property = arr[1];
+
+            String clzName = BeanUtilX.getClzName(alia, criteria);
 
             Parsed parsed = Parser.get(clzName);
             if (parsed == null)
                 throw new RuntimeException("Entity Bean Not Exist: " + BeanUtil.getByFirstUpper(key));
 
-            String value = parsed.getTableName() + SqlScript.POINT + parsed.getMapper(property);
+            String value = parsed.getTableName(alia) + SqlScript.POINT + parsed.getMapper(property);
 
             return value;
         }
@@ -99,6 +102,8 @@ public class SqlCriteriaParser implements CriteriaParser {
 
     @Override
     public String[] parse(Criteria criteria) {
+
+        parseAlia(criteria);
 
         StringBuilder sb = new StringBuilder();
 
@@ -277,6 +282,16 @@ public class SqlCriteriaParser implements CriteriaParser {
                     }
                 }
             }
+        }
+    }
+
+    private void parseAlia(Criteria criteria) {
+        String script = criteria.sourceScript().trim();
+
+        if (criteria instanceof Criteria.ResultMappedCriteria) {
+            Criteria.ResultMappedCriteria resultMappedCriteria = (Criteria.ResultMappedCriteria) criteria;
+            Map<String, String> aliaMap = BeanUtilX.parseAliaBySourceScriptSql(script);
+            resultMappedCriteria.setAliaMap(aliaMap);
         }
     }
 
@@ -477,7 +492,12 @@ public class SqlCriteriaParser implements CriteriaParser {
             }
 
             if (clz.getSuperclass().isEnum() || clz.isEnum()) {
-                criteria.getValueList().add(v.toString());
+                try {
+                    Object o = clz.getDeclaredMethod("name").invoke(v);//?
+                    criteria.getValueList().add(o.toString());
+                }catch (Exception e){
+
+                }
             } else {
                 criteria.getValueList().add(v);
             }

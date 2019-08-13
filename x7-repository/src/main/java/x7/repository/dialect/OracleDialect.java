@@ -171,15 +171,19 @@ public class OracleDialect implements Mapper.Dialect {
     }
 
     @Override
-    public Object mappedResult(String property, String mapper, Map<String,String> aliaMap, ResultSet rs) throws Exception {
+    public Object mappedResult(String property, String mapper, Map<String,String> aliaMap, Map<String,String> resultAliaMap, ResultSet rs) throws Exception {
 
         if (mapper == null)
             throw new RuntimeException("Result key is empty?");
 
         if (property.contains(".")) {
             String[] arr = property.split("\\.");
-            String clzName = arr[0];
+            String alia = arr[0];
             String p = arr[1];
+            String clzName = aliaMap.get(alia);
+            if (StringUtil.isNullOrEmpty(clzName)){
+                clzName = alia;
+            }
             Parsed parsed = Parser.get(clzName);
             BeanElement element = parsed.getElement(p);
 
@@ -187,7 +191,7 @@ public class OracleDialect implements Mapper.Dialect {
                 mapper = mapper.replace(SqlScript.KEY_SQL, SqlScript.NONE);
             }
 
-            String m = aliaMap.get(mapper);
+            String m = resultAliaMap.get(mapper);
             mapper = (m == null ? mapper : m);
 
             if (element == null) {

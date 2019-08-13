@@ -48,6 +48,16 @@ public class XxxTest {
 
     }
 
+    public  void testAlia() {
+
+        CatRO cat = new CatRO();
+
+        ViewEntity ve = this.controller.testAlia(cat);
+
+        System.out.println("\n______Result: " + ve);
+
+    }
+
     public  void testOne() {
 
         CatRO cat = new CatRO();

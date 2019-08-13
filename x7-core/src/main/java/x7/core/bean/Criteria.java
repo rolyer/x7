@@ -18,6 +18,7 @@ package x7.core.bean;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import x7.core.util.BeanUtil;
+import x7.core.util.BeanUtilX;
 import x7.core.util.StringUtil;
 import x7.core.web.Paged;
 
@@ -206,7 +207,7 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 		@JsonIgnore
 		private transient MapMapper mapMapper;
 		@JsonIgnore
-		private transient Map<String,String> aliaMap = new HashMap<>();
+		private transient Map<String,String> aliaMap;
 		/*
 		 * only for oracle
 		 */
@@ -291,6 +292,7 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 		}
 
 		public void setSourceScript(String sourceScript) {
+			sourceScript = BeanUtilX.normalizeSql(sourceScript);
 			this.sourceScript = sourceScript;
 		}
 		

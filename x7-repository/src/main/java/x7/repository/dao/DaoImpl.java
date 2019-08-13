@@ -22,10 +22,7 @@ import x7.core.bean.condition.InCondition;
 import x7.core.bean.condition.RefreshCondition;
 import x7.core.config.ConfigAdapter;
 import x7.core.repository.X;
-import x7.core.util.BeanMapUtil;
-import x7.core.util.ExceptionUtil;
-import x7.core.util.JsonX;
-import x7.core.util.StringUtil;
+import x7.core.util.*;
 import x7.core.web.Page;
 import x7.repository.CriteriaParser;
 import x7.repository.KeyOne;
@@ -933,7 +930,7 @@ public class DaoImpl implements Dao {
 
                     for (String property : resultKeyList) {
                         String mapper = resultMapped.getMapMapper().mapper(property);
-                        Object obj = this.dialect.mappedResult(property, mapper, resultMapped.getResultAliaMap(),rs);
+                        Object obj = this.dialect.mappedResult(property, mapper,resultMapped.getAliaMap(), resultMapped.getResultAliaMap(),rs);
                         mapR.put(property, obj);
                     }
                 }
@@ -969,6 +966,8 @@ public class DaoImpl implements Dao {
             List<Map<String, Object>> jsonableMapList = BeanMapUtil.toJsonableMapList(stringKeyMapList);
             pagination.reSetList(jsonableMapList);
         }
+
+//        BeanUtilX.aliaToClzzForMapResult(resultMapped,pagination.getList());
 
         return pagination;
     }
@@ -1021,7 +1020,7 @@ public class DaoImpl implements Dao {
 
                     for (String property : resultKeyList) {
                         String mapper = resultMapped.getMapMapper().mapper(property);
-                        Object obj = this.dialect.mappedResult(property, mapper, resultMapped.getResultAliaMap(),rs);
+                        Object obj = this.dialect.mappedResult(property, mapper, resultMapped.getAliaMap(),resultMapped.getResultAliaMap(),rs);
                         mapR.put(property, obj);
                     }
 
@@ -1043,6 +1042,8 @@ public class DaoImpl implements Dao {
             List<Map<String, Object>> mapList = BeanMapUtil.toJsonableMapList(list);
             return mapList;
         }
+
+//        BeanUtilX.aliaToClzzForMapResult(resultMapped,list);
 
         return list;
     }

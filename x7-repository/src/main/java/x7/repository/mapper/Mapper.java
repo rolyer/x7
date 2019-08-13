@@ -107,7 +107,7 @@ public interface Mapper {
 
         void setJSON(int i, String str, PreparedStatement pstmt) throws Exception ;
 
-        Object mappedResult(String property, String mapper, Map<String,String> aliaMap, ResultSet rs) throws Exception;
+        Object mappedResult(String property, String mapper, Map<String,String> aliaMap,Map<String,String> resultAliaMap, ResultSet rs) throws Exception;
 
         Object filterValue(Object value);
 
