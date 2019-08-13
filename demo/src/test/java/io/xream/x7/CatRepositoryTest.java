@@ -28,6 +28,7 @@ public class CatRepositoryTest {
 
     public boolean refresh(){
         RefreshCondition<Cat> refreshCondition = new RefreshCondition<>();
+        refreshCondition.refresh("dogId = dogId * ?", 2);
         refreshCondition.refresh("type = 'XXXX'").refresh("taxType","MOON1");
         refreshCondition.and().eq("id",10);
         boolean flag = this.repository.refresh(refreshCondition);

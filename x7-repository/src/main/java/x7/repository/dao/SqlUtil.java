@@ -156,17 +156,24 @@ public class SqlUtil {
 				if (str.contains(","))
 					throw new RuntimeException("RefreshCondition.refresh(), para can not contains(,)");
 
-				String target = BeanUtilX.normalizeSql(str);
+				String sql = BeanUtilX.normalizeSql(str);
 
-				target = SqlParserUtil.mapper(target,parsed);
+				sql = SqlParserUtil.mapper(sql,parsed);
 
-				sb.append(target);
+				sb.append(sql);
 
 			}else{
-				String mapper = parsed.getMapper(x.getKey());
-				sb.append(mapper);
-				sb.append(SqlScript.EQ_PLACE_HOLDER);
+				String key = x.getKey();
+				if (key.contains("?")){
+					String sql = SqlParserUtil.mapper(key,parsed);
+					sb.append(sql);
+				}else {
+					String mapper = parsed.getMapper(key);
+					sb.append(mapper);
+					sb.append(SqlScript.EQ_PLACE_HOLDER);
+				}
 				refrshValueList.add(x.getValue());
+
 			}
 
 			if (i < size-1){
