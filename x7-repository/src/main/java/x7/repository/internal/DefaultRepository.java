@@ -239,6 +239,9 @@ public abstract class DefaultRepository<T> implements BaseRepository<T> {
     @Override
     public T get(long idOne) {
 
+        if (idOne == 0)
+            return null;
+
         Parsed parsed = Parser.get(this.clz);
         Field f = parsed.getKeyField(X.KEY_ONE);
 
@@ -255,6 +258,9 @@ public abstract class DefaultRepository<T> implements BaseRepository<T> {
 
     @Override
     public T get(String idOne) {
+
+        if (StringUtil.isNullOrEmpty(idOne))
+            return null;
 
         Parsed parsed = Parser.get(this.clz);
         Field f = parsed.getKeyField(X.KEY_ONE);
