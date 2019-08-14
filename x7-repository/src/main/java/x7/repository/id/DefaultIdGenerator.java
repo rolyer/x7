@@ -14,11 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package x7.repository.cache.customizer;
+package x7.repository.id;
 
-import x7.repository.cache.CacheStoragePolicy;
+import x7.repository.Repository;
 
-public interface CacheStoragePolicyCustomizer {
+public class DefaultIdGenerator implements Repository.IdGenerator {
 
-    CacheStoragePolicy customize();
+    private IdGeneratorPolicy idGeneratorPolicy;
+    public void setIdGeneratorPolicy(IdGeneratorPolicy policy){
+        this.idGeneratorPolicy = policy;
+    }
+    @Override
+    public long createId(String clzName) {
+        return this.idGeneratorPolicy.createId(clzName);
+    }
 }

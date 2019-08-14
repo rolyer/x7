@@ -14,12 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package x7.repository;
+package x7.repository.transform;
 
 import x7.core.bean.Criteria;
 import x7.core.bean.condition.InCondition;
 import x7.core.bean.condition.RefreshCondition;
 import x7.core.web.Page;
+import x7.repository.KeyOne;
 import x7.repository.dao.Dao;
 
 import java.util.List;
@@ -28,7 +29,6 @@ import java.util.Map;
 public class SqlDataTransform implements DataTransform {
 
     private Dao dao;
-
     public void setDao(Dao dao) {
         this.dao = dao;
     }

@@ -35,11 +35,6 @@ public class HealthChecker {
 
     private static List<BaseRepository> repositoryList = new ArrayList<BaseRepository>();
 
-    private static DataRepository dataRepository;
-
-    protected static void init(DataRepository repository){
-        dataRepository = repository;
-    }
 
     public static List<BaseRepository> getRepositoryList(){
         return repositoryList;
@@ -91,11 +86,11 @@ public class HealthChecker {
                 final String name = clz.getName();
                 IdGenerator generator = new IdGenerator();
                 generator.setClzName(name);
-                List<IdGenerator> list = dataRepository.list(generator);
+                List<IdGenerator> list = repository.list(generator);
                 if (list.isEmpty()) {
                     logger.info("id init: " + generator.getClzName());
                     generator.setMaxId(0);
-                    dataRepository.create(generator);
+                    repository.create(generator);
                 }
 
             } catch (Exception e) {

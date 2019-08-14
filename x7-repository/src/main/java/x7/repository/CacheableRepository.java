@@ -28,7 +28,7 @@ import x7.core.repository.X;
 import x7.core.util.JsonX;
 import x7.core.web.Page;
 import x7.repository.exception.PersistenceException;
-import x7.repository.id.IdGeneratorPolicy;
+import x7.repository.transform.DataTransform;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -36,37 +36,20 @@ import java.util.*;
 /**
  * @author Sim
  */
-public class DataRepository implements Repository {
+public class CacheableRepository implements Repository {
 
-    private final static Logger logger = LoggerFactory.getLogger(DataRepository.class);
+    private final static Logger logger = LoggerFactory.getLogger(Repository.class);
 
-    public DataRepository() {
+    public CacheableRepository() {
         ManuRepository.init(this);
-        HealthChecker.init(this);
-        RepositoryBooter.init(this);
     }
 
     private DataTransform dataTransform;
-
     public void setDataTransform(DataTransform dataTransform) {
 
         logger.info("X7 Repository on starting....");
 
         this.dataTransform = dataTransform;
-    }
-
-    private IdGeneratorPolicy idGeneratorPolicy;
-
-    public void setIdGeneratorPolicy(IdGeneratorPolicy idGeneratorPolicy){
-        this.idGeneratorPolicy = idGeneratorPolicy;
-    }
-
-    public IdGeneratorPolicy getIdGeneratorPolicy(){
-        return this.idGeneratorPolicy;
-    }
-
-    public long createId(String clzName){
-        return this.idGeneratorPolicy.createId(clzName);
     }
 
     private CacheResolver cacheResolver;

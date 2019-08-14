@@ -14,7 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package x7.repository;
+package x7.repository.transform;
 
-public interface DataTransform extends Repository, Manuable{
+import x7.repository.Manuable;
+import x7.repository.Repository;
+
+public interface DataTransform extends Repository, Manuable {
 }

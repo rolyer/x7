@@ -24,9 +24,9 @@ import x7.core.bean.Parser;
 import x7.core.bean.TransformConfigurable;
 import x7.core.repository.CacheResolver;
 import x7.repository.BaseRepository;
-import x7.repository.DataRepository;
+import x7.repository.CacheableRepository;
 import x7.repository.Repository;
-import x7.repository.RepositoryBooter;
+import x7.repository.RepositoryBootListener;
 import x7.repository.cache.CacheStoragePolicy;
 import x7.repository.cache.LevelTwoCacheResolver;
 import x7.repository.cache.customizer.CacheStoragePolicyCustomizer;
@@ -37,6 +37,8 @@ import x7.repository.schema.SchemaConfig;
 import x7.repository.schema.SchemaTransformRepository;
 import x7.repository.schema.customizer.SchemaTransformCustomizer;
 import x7.repository.schema.customizer.SchemaTransformRepositoryBuilder;
+import x7.repository.transform.DataTransform;
+import x7.repository.transform.customizer.DataTransformCustomizer;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -60,11 +62,34 @@ public class RepositoryListener implements
 
         customizeIdGeneratorPolicy(applicationStartedEvent);
 
-        RepositoryBooter.onStarted();
+        customizeDataTransform(applicationStartedEvent);
+
+        RepositoryBootListener.onStarted(applicationStartedEvent.getApplicationContext());
 
         transform(applicationStartedEvent);
     }
 
+
+    private void customizeDataTransform(ApplicationStartedEvent applicationStartedEvent) {
+        DataTransformCustomizer customizer = null;
+        try {
+            customizer = applicationStartedEvent.getApplicationContext().getBean(DataTransformCustomizer.class);
+        } catch (Exception e) {
+
+        }
+
+        if (customizer == null)
+            return;
+
+        DataTransform dataTransform = customizer.customize();
+        if (dataTransform == null)
+            return;
+
+        Repository repository = applicationStartedEvent.getApplicationContext().getBean(Repository.class);
+        if (repository == null)
+            return;
+        ((CacheableRepository)repository).setDataTransform(dataTransform);
+    }
 
     private void customizeCacheStoragePolicy(ApplicationStartedEvent applicationStartedEvent) {
 
@@ -105,10 +130,10 @@ public class RepositoryListener implements
         if (idGeneratorPolicy == null)
             return;
 
-        DataRepository dataRepository = applicationStartedEvent.getApplicationContext().getBean(DataRepository.class);
-        if (dataRepository == null)
+        Repository.IdGenerator idGenerator = applicationStartedEvent.getApplicationContext().getBean(Repository.IdGenerator.class);
+        if (idGenerator == null)
             return;
-        dataRepository.setIdGeneratorPolicy(idGeneratorPolicy);
+        idGenerator.setIdGeneratorPolicy(idGeneratorPolicy);
 
     }
 
@@ -123,9 +148,9 @@ public class RepositoryListener implements
 
             for (Class<? extends BaseRepository> clzz : clzzList) {
 
-                DataRepository dataRepository = (DataRepository) applicationStartedEvent.getApplicationContext().getBean(Repository.class);
+                Repository depository = applicationStartedEvent.getApplicationContext().getBean(Repository.class);
 
-                List list = list(dataRepository, clzz);//查出所有配置
+                List list = list(depository, clzz);//查出所有配置
                 if (!list.isEmpty()) {
                     reparse(list);
                 }
@@ -207,7 +232,7 @@ public class RepositoryListener implements
         }
     }
 
-    private List list(DataRepository dataRepository, Class<? extends BaseRepository> clzz) {
+    private List list(Repository dataRepository, Class<? extends BaseRepository> clzz) {
 
         Type[] types = clzz.getGenericInterfaces();
 

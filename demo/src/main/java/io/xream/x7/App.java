@@ -32,7 +32,7 @@ public class App {
 //
 //        SchemaTransformCustomizer schemaTransformCustomizer = new SchemaTransformCustomizer() {
 //            @Override
-//            public List<Class<? extends BaseRepository>> customize(SchemaTransformRepositoryBuilder builder) {
+//            public List<Class<? extends BaseRepository>> customizer(SchemaTransformRepositoryBuilder builder) {
 //
 //                List<Class<? extends BaseRepository>> list = new ArrayList<>();
 //                Class<? extends BaseRepository> clzz = builder.build(PigRepository.class);
@@ -50,7 +50,7 @@ public class App {
 //
 //        return new IdGeneratorPolicyCustomizer() {
 //            @Override
-//            public IdGeneratorPolicy customize() {
+//            public IdGeneratorPolicy customizer() {
 //
 //                IdGeneratorPolicy idGeneratorPolicy = null;
 //

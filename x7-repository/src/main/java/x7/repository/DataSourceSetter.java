@@ -23,7 +23,7 @@ import javax.sql.DataSource;
 
 public class DataSourceSetter {
 	
-	protected static void set(DataSource dsW, DataSource dsR){
+	public static void set(DataSource dsW, DataSource dsR){
 		DataSourceHolder.setDataSource(dsW);
 		DataSourceHolder.setReadableDataSource(dsR);
 	}

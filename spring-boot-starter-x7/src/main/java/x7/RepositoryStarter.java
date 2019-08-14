@@ -36,10 +36,14 @@ import x7.repository.cache.LevelTwoCacheResolver;
 import x7.repository.dao.Dao;
 import x7.repository.dao.DaoImpl;
 import x7.repository.dao.SqlCriteriaParser;
+import x7.repository.id.DefaultIdGenerator;
 import x7.repository.id.DefaultIdGeneratorPolicy;
 import x7.repository.id.IdGeneratorPolicy;
+import x7.repository.internal.DomainObjectRepositoy;
 import x7.repository.mapper.Mapper;
 import x7.repository.mapper.MapperFactory;
+import x7.repository.transform.DataTransform;
+import x7.repository.transform.SqlDataTransform;
 import x7.repository.util.ResultSetUtil;
 
 import javax.sql.DataSource;
@@ -115,8 +119,9 @@ public class RepositoryStarter  {
         return criteriaParser;
     }
 
+
     @Bean
-    @Order(5)
+    @Order(6)
     public Dao dao(Mapper.Dialect dialect,CriteriaParser criteriaParser,Environment environment){
 
         String driverClassName = environment.getProperty("spring.datasource.driver-class-name");
@@ -134,7 +139,7 @@ public class RepositoryStarter  {
     }
 
     @Bean
-    @Order(6)
+    @Order(7)
     public CacheResolver cacheResolver(StringRedisTemplate stringRedisTemplate){
 
         DefaultCacheStoragePolicy cacheStoragePolicy = new DefaultCacheStoragePolicy();
@@ -146,7 +151,7 @@ public class RepositoryStarter  {
     }
 
     @Bean
-    @Order(7)
+    @Order(8)
     public IdGeneratorPolicy idGeneratorPolicy(StringRedisTemplate stringRedisTemplate){
         DefaultIdGeneratorPolicy defaultIdGeneratorPolicy =  new DefaultIdGeneratorPolicy();
         defaultIdGeneratorPolicy.setStringRedisTemplate(stringRedisTemplate);
@@ -154,8 +159,16 @@ public class RepositoryStarter  {
     }
 
     @Bean
-    @Order(8)
-    public DataRepository dataRepository(Dao dao, CacheResolver cacheResolver,IdGeneratorPolicy idGeneratorPolicy,Environment environment){
+    @Order(9)
+    public Repository.IdGenerator idGenerator(IdGeneratorPolicy policy){
+        DefaultIdGenerator idGenerator = new DefaultIdGenerator();
+        idGenerator.setIdGeneratorPolicy(policy);
+        return idGenerator;
+    }
+
+    @Bean
+    @Order(10)
+    public Repository dataRepository(Dao dao, CacheResolver cacheResolver,IdGeneratorPolicy idGeneratorPolicy,Environment environment){
 
         String driverClassName = environment.getProperty("spring.datasource.driver-class-name");
 
@@ -167,19 +180,27 @@ public class RepositoryStarter  {
             ((SqlDataTransform) dataTransform).setDao(dao);
         }
 
-        DataRepository repository = new DataRepository();
+        CacheableRepository repository = new CacheableRepository();
         repository.setDataTransform(dataTransform);
         repository.setCacheResolver(cacheResolver);
-        repository.setIdGeneratorPolicy(idGeneratorPolicy);
 
         return repository;
     }
 
 
+    @Bean
+    @Order(11)
+    public DomainObjectRepositoy domainObjectRepositoy(Repository repository) {
+        DomainObjectRepositoy domainObjectRepositoy = new DomainObjectRepositoy();
+        domainObjectRepositoy.setRepository(repository);
+        return domainObjectRepositoy;
+    }
+
     @ConditionalOnMissingBean(X7Data.class)
     @Bean
-    @Order(9)
-    public X7Data enableData(DataSource dataSource,DataSourceProperties_R dataSourceProperties_r,StringRedisTemplate stringRedisTemplate){
+    @Order(12)
+    public X7Data enableData(DataSource dataSource,DataSourceProperties_R dataSourceProperties_r,
+                             StringRedisTemplate stringRedisTemplate){
 
         DataSource writeDataSource = dataSource;
 
@@ -190,12 +211,13 @@ public class RepositoryStarter  {
          */
         DataSource readDataSource = getReadDataSource(dataSourceProperties_r);
 
-        startX7Repsository(writeDataSource, readDataSource);
+        configX7Datasource(writeDataSource, readDataSource);
 
         {//初始化分布式锁
             LockStorage lockStorage = new LockStorage();
             lockStorage.setStringRedisTemplate(stringRedisTemplate);
         }
+
 
         return new X7Data();
     }
@@ -240,7 +262,7 @@ public class RepositoryStarter  {
     }
 
 
-    public void startX7Repsository(DataSource dsW, DataSource dsR) {//FIXME
+    public void configX7Datasource(DataSource dsW, DataSource dsR) {//FIXME
 
         if (Objects.isNull(dsW))
             throw new RuntimeException("Writeable DataSource Got NULL");
@@ -256,9 +278,7 @@ public class RepositoryStarter  {
             logger.info("X7 Repsository will not show SQL, for no config like one of: x7.repository.show-sql=true,spring.jpa.show-sql=true,log4j.logger.org....." );
         }
 
-        RepositoryBooter.boot(dsW,dsR);
-
-
+        DataSourceSetter.set(dsW, dsR);
     }
 
     /**

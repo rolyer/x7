@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package x7.repository.cache.customizer;
+package x7.repository.transform.customizer;
 
-import x7.repository.cache.CacheStoragePolicy;
+import x7.repository.transform.DataTransform;
 
-public interface CacheStoragePolicyCustomizer {
+public interface DataTransformCustomizer {
 
-    CacheStoragePolicy customize();
+    DataTransform customize();
 }
