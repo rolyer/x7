@@ -16,6 +16,9 @@
  */
 package x7.repository;
 
+import x7.core.bean.SqlScript;
+import x7.core.util.StringUtil;
+
 import java.util.List;
 
 public class SqlParsed {
@@ -33,8 +36,39 @@ public class SqlParsed {
         this.countSql = countSql;
     }
 
+
+    public StringBuilder getSql(int page, int rows) {
+        if (sql != null)
+            return sql;
+
+        StringBuilder sb = new StringBuilder();
+        int size = unionSqlList.size();
+        for (int i=0; i<size; i++) {
+            UnionSql unionSql = unionSqlList.get(i);
+            sb.append(SqlScript.LEFT_PARENTTHESIS).append(unionSql.getSql()).append(SqlScript.RIGHT_PARENTTHESIS);
+            if (i < size -1) {
+                sb.append(unionSql.getUnion());
+            }
+        }
+        sb.append(sortScript);
+        return sb;
+    }
+
     public StringBuilder getSql() {
-        return sql;
+        if (sql != null)
+            return sql;
+
+        StringBuilder sb = new StringBuilder();
+        int size = unionSqlList.size();
+        for (int i=0; i<size; i++) {
+            UnionSql unionSql = unionSqlList.get(i);
+            sb.append(SqlScript.LEFT_PARENTTHESIS).append(unionSql.getSql()).append(SqlScript.RIGHT_PARENTTHESIS);
+            if (i < size -1) {
+                sb.append(unionSql.getUnion());
+            }
+        }
+        sb.append(sortScript);
+        return sb;
     }
 
     public void setSql(StringBuilder sql) {

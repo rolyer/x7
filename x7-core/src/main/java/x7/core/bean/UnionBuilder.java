@@ -464,5 +464,11 @@ public class UnionBuilder{
 
     };
 
+    public static class Unsupported extends UnionBuilder {
+
+        private Unsupported(Criteria criteria) {
+            super(criteria);
+        }
+    }
 
 }

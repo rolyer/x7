@@ -20,7 +20,7 @@ import x7.*;
 @EnableCorsConfig
 @EnableDateToLongForJackson
 @EnableSchemaTransform
-@EnableX7L3Caching
+//@EnableX7L3Caching
 public class App {
     public static void main( String[] args )
     {

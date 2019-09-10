@@ -36,7 +36,9 @@ public class RedisCacheConfig extends CachingConfigurerSupport {
     @Bean
     public LettuceConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(hostName, port);
-        return new LettuceConnectionFactory(config);
+        LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(config);
+        connectionFactory.afterPropertiesSet();
+        return connectionFactory;
     }
 
     @Bean

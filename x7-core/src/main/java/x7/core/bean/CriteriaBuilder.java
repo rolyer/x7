@@ -813,6 +813,17 @@ public class CriteriaBuilder {
             return this;
         }
 
+        @Deprecated
+        public UnionBuilder.Unsupported unionAll() {
+            throw new RuntimeException("UnionBuilder Unsupport ResultMappedBuilder");
+        }
+
+        @Deprecated
+        public UnionBuilder.Unsupported union() {
+            throw new RuntimeException("UnionBuilder Unsupport ResultMappedBuilder");
+        }
+
+
     }
 
 
@@ -874,6 +885,15 @@ public class CriteriaBuilder {
             }
         };
 
+        @Deprecated
+        public UnionBuilder.Unsupported unionAll() {
+            throw new RuntimeException("UnionBuilder Unsupport DomainObjectBuilder");
+        }
+
+        @Deprecated
+        public UnionBuilder.Unsupported union() {
+            throw new RuntimeException("UnionBuilder Unsupport DomainObjectBuilder");
+        }
 
     }
 

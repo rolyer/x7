@@ -478,9 +478,9 @@ public class DaoImpl implements Dao {
 
         List<Object> valueList = criteria.getValueList();
 
-        SqlParsed sqlArr = this.criteriaParser.parse(criteria);
+        SqlParsed sqlParsed = this.criteriaParser.parse(criteria);
 
-        String sql = sqlArr.getSql().toString();
+        String sql = sqlParsed.getSql().toString();
 
         int page = criteria.getPage();
         int rows = criteria.getRows();
@@ -538,9 +538,9 @@ public class DaoImpl implements Dao {
 
         List<Object> valueList = criteria.getValueList();
 
-        SqlParsed sqlArr = this.criteriaParser.parse(criteria);
+        SqlParsed sqlParsed = this.criteriaParser.parse(criteria);
 
-        String sql = sqlArr.getSql().toString();
+        String sql = sqlParsed.getSql().toString();
 
         int page = criteria.getPage();
         int rows = criteria.getRows();
@@ -594,7 +594,7 @@ public class DaoImpl implements Dao {
                     if (page == 0) {
                         count = size;
                     } else if (size > 0) {
-                        String sqlCount = sqlArr.getCountSql();
+                        String sqlCount = sqlParsed.getCountSql();
                         count = getCount(sqlCount, valueList);
                     }
                     pagination.setTotalRows(count);
@@ -881,10 +881,10 @@ public class DaoImpl implements Dao {
 
         List<Object> valueList = resultMapped.getValueList();
 
-        SqlParsed  sqlArr = this.criteriaParser.parse(resultMapped);
+        SqlParsed  sqlParsed = this.criteriaParser.parse(resultMapped);
 
-        String sqlCount = sqlArr.getCountSql();
-        String sql = sqlArr.getSql().toString();
+        String sqlCount = sqlParsed.getCountSql();
+        String sql = sqlParsed.getSql().toString();
 
         int page = resultMapped.getPage();
         int rows = resultMapped.getRows();
@@ -976,13 +976,13 @@ public class DaoImpl implements Dao {
     @Override
     public List<Map<String, Object>> list(Criteria.ResultMappedCriteria resultMapped) {
 
-        List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+        List<Map<String, Object>> list = new ArrayList<>();
 
         List<Object> valueList = resultMapped.getValueList();
 
-        SqlParsed sqlArr = this.criteriaParser.parse(resultMapped);
+        SqlParsed sqlParsed = this.criteriaParser.parse(resultMapped);
 
-        String sql = sqlArr.getSql().toString();
+        String sql = sqlParsed.getSql().toString();
 
         int page = resultMapped.getPage();
         int rows = resultMapped.getRows();

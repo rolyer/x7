@@ -143,7 +143,12 @@ public class SqlCriteriaParser implements CriteriaParser {
                 unionSql.setSql(sqlSb);
                 unionSql.setUnion(union.isAll() ? SqlScript.UNION_ALL : SqlScript.UNION);
 
-                sqlParsed.getUnionSqlList().add(unionSql);
+                List<SqlParsed.UnionSql> unionSqlList = sqlParsed.getUnionSqlList();
+                if (unionSqlList == null){
+                    unionSqlList = new ArrayList<>();
+                    sqlParsed.setUnionSqlList(unionSqlList);
+                }
+                unionSqlList.add(unionSql);
             }
 
             /*
