@@ -25,6 +25,7 @@ import x7.core.bean.condition.RefreshCondition;
 import x7.core.config.Configs;
 import x7.core.repository.CacheResolver;
 import x7.core.repository.X;
+import x7.core.util.BeanUtilX;
 import x7.core.util.JsonX;
 import x7.core.web.Page;
 import x7.repository.exception.PersistenceException;
@@ -137,7 +138,7 @@ public class CacheableRepository implements Repository {
 
     @Override
     public long create(Object obj) {
-        testAvailable();
+
         Class clz = obj.getClass();
         Parsed parsed = Parser.get(clz);
         long id = dataTransform.create(obj);
@@ -150,7 +151,7 @@ public class CacheableRepository implements Repository {
 
     @Override
     public <T> boolean refresh(RefreshCondition<T> refreshCondition) {
-        testAvailable();
+
         boolean flag = false;
 
         CriteriaCondition condition = refreshCondition.getCondition();
@@ -199,7 +200,7 @@ public class CacheableRepository implements Repository {
 
     @Override
     public <T> boolean remove(KeyOne<T> keyOne) {
-        testAvailable();
+
         boolean flag = false;
         Class clz = keyOne.getClzz();
         Parsed parsed = Parser.get(clz);
@@ -217,7 +218,7 @@ public class CacheableRepository implements Repository {
 
     @Override
     public <T> List<T> list(Object conditionObj) {
-        testAvailable();
+
         if (conditionObj instanceof CriteriaBuilder || conditionObj instanceof Criteria)
             throw new RuntimeException("Notes: parameter is not Criteria");
 
@@ -261,7 +262,7 @@ public class CacheableRepository implements Repository {
 
     @Override
     public <T> T getOne(T conditionObj) {
-        testAvailable();
+
         Class<T> clz = (Class<T>) conditionObj.getClass();
         Parsed parsed = Parser.get(clz);
 
@@ -285,7 +286,7 @@ public class CacheableRepository implements Repository {
 
     @Override
     public <T> Page<T> find(Criteria criteria) {
-        testAvailable();
+
         Class clz = criteria.getClz();
         Parsed parsed = Parser.get(clz);
 
@@ -345,7 +346,7 @@ public class CacheableRepository implements Repository {
 
     @Override
     public <T> List<T> list(Criteria criteria) {
-        testAvailable();
+
         Class clz = criteria.getClz();
         Parsed parsed = Parser.get(clz);
 
@@ -387,7 +388,7 @@ public class CacheableRepository implements Repository {
 
 
     protected <T> boolean execute(T obj, String sql) {
-        testAvailable();
+
         boolean b;
         Parsed parsed = Parser.get(obj.getClass());
         b = dataTransform.execute(obj, sql);
@@ -462,7 +463,7 @@ public class CacheableRepository implements Repository {
     @Override
     public <T> List<T> in(InCondition inCondition) {
 
-        testAvailable();
+        Parsed parsed = Parser.get(inCondition.getClz());
         if (inCondition.getInList().isEmpty())
             return new ArrayList<T>();
 
@@ -470,6 +471,8 @@ public class CacheableRepository implements Repository {
 
         for (Object obj : inCondition.getInList()) {
             if (Objects.isNull(obj))
+                continue;
+            if (BeanUtilX.isBaseType_0(inCondition.getProperty(),obj,parsed))
                 continue;
             if (!inList.contains(obj)) {
                 inList.add(obj);
@@ -507,13 +510,12 @@ public class CacheableRepository implements Repository {
 
     @Override
     public Page<Map<String, Object>> find(Criteria.ResultMappedCriteria resultMapped) {
-        testAvailable();
         return dataTransform.find(resultMapped);
     }
 
     @Override
     public List<Map<String, Object>> list(Criteria.ResultMappedCriteria resultMapped) {
-        testAvailable();
+
         return dataTransform.list(resultMapped);
     }
 
@@ -521,7 +523,6 @@ public class CacheableRepository implements Repository {
     public boolean createBatch(List<? extends Object> objList) {
         if (objList.isEmpty())
             return false;
-        testAvailable();
 
         Class clz = objList.get(0).getClass();
         Parsed parsed = Parser.get(clz);
@@ -555,10 +556,6 @@ public class CacheableRepository implements Repository {
 
     }
 
-    private void testAvailable() {
-        if (Objects.isNull(this.dataTransform))
-            throw new PersistenceException("X7-Repository does not started");
-    }
 
 
 

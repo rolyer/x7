@@ -26,6 +26,7 @@ import x7.core.util.*;
 import x7.core.web.Page;
 import x7.repository.CriteriaParser;
 import x7.repository.KeyOne;
+import x7.repository.SqlParsed;
 import x7.repository.exception.PersistenceException;
 import x7.repository.exception.RollbackException;
 import x7.repository.mapper.Mapper;
@@ -477,9 +478,9 @@ public class DaoImpl implements Dao {
 
         List<Object> valueList = criteria.getValueList();
 
-        String[] sqlArr = this.criteriaParser.parse(criteria);
+        SqlParsed sqlArr = this.criteriaParser.parse(criteria);
 
-        String sql = sqlArr[1];
+        String sql = sqlArr.getSql().toString();
 
         int page = criteria.getPage();
         int rows = criteria.getRows();
@@ -487,6 +488,8 @@ public class DaoImpl implements Dao {
         int start = (page - 1) * rows;
 
         sql = dialect.match(sql, start, rows);
+        if (ConfigAdapter.isIsShowSql())
+            System.out.println(sql);
 
         List<T> list = new ArrayList<>();
 
@@ -535,9 +538,9 @@ public class DaoImpl implements Dao {
 
         List<Object> valueList = criteria.getValueList();
 
-        String[] sqlArr = this.criteriaParser.parse(criteria);
+        SqlParsed sqlArr = this.criteriaParser.parse(criteria);
 
-        String sql = sqlArr[1];
+        String sql = sqlArr.getSql().toString();
 
         int page = criteria.getPage();
         int rows = criteria.getRows();
@@ -545,6 +548,7 @@ public class DaoImpl implements Dao {
         int start = (page - 1) * rows;
 
         sql = dialect.match(sql, start, rows);
+
         if (ConfigAdapter.isIsShowSql())
             System.out.println(sql);
 
@@ -575,13 +579,10 @@ public class DaoImpl implements Dao {
 
                 List<BeanElement> eles = MapperFactory.getElementList(clz);
 
-
                 while (rs.next()) {
-
                     T obj = (T) clz.newInstance();
                     list.add(obj);
                     initObj(obj, rs, tempEle, eles);
-
                 }
 
                 Parsed parsed = Parser.get(clz);
@@ -593,7 +594,7 @@ public class DaoImpl implements Dao {
                     if (page == 0) {
                         count = size;
                     } else if (size > 0) {
-                        String sqlCount = sqlArr[0];
+                        String sqlCount = sqlArr.getCountSql();
                         count = getCount(sqlCount, valueList);
                     }
                     pagination.setTotalRows(count);
@@ -880,10 +881,10 @@ public class DaoImpl implements Dao {
 
         List<Object> valueList = resultMapped.getValueList();
 
-        String[] sqlArr = this.criteriaParser.parse(resultMapped);
+        SqlParsed  sqlArr = this.criteriaParser.parse(resultMapped);
 
-        String sqlCount = sqlArr[0];
-        String sql = sqlArr[1];
+        String sqlCount = sqlArr.getCountSql();
+        String sql = sqlArr.getSql().toString();
 
         int page = resultMapped.getPage();
         int rows = resultMapped.getRows();
@@ -979,14 +980,13 @@ public class DaoImpl implements Dao {
 
         List<Object> valueList = resultMapped.getValueList();
 
-        String[] sqlArr = this.criteriaParser.parse(resultMapped);
+        SqlParsed sqlArr = this.criteriaParser.parse(resultMapped);
 
-        String sql = sqlArr[1];
+        String sql = sqlArr.getSql().toString();
 
         int page = resultMapped.getPage();
         int rows = resultMapped.getRows();
         int start = (page - 1) * rows;
-
 
         sql = dialect.match(sql, start, rows);
         if (ConfigAdapter.isIsShowSql())

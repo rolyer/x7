@@ -21,4 +21,7 @@ public interface Tokened {
 	long getPassportId();
 	String getToken();
 	String getPassportType();
+	void setPassportId(String passportId);
+	void setToken(String token);
+	void setPassportType(String passportType);
 }

@@ -26,6 +26,5 @@ public interface CriteriaParser {
 
     String parseCondition(CriteriaCondition criteriaCondition) ;
 
-    String[] parse(Criteria criteria) ;
-
+    SqlParsed parse(Criteria criteria) ;
 }

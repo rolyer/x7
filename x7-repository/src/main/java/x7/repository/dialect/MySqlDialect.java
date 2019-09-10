@@ -19,6 +19,7 @@ package x7.repository.dialect;
 import x7.core.bean.*;
 import x7.core.util.JsonX;
 import x7.core.util.StringUtil;
+import x7.repository.SqlParsed;
 import x7.repository.mapper.Mapper;
 
 import java.lang.reflect.Method;
@@ -48,6 +49,12 @@ public class MySqlDialect implements Mapper.Dialect {
         }
 
     };
+
+    public String match(SqlParsed sqlParsed, long start, long rows) {
+
+
+        return null;
+    }
 
     public String match(String sql, long start, long rows) {
 

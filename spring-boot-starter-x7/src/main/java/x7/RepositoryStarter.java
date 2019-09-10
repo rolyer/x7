@@ -31,8 +31,8 @@ import x7.core.config.Configs;
 import x7.core.repository.CacheResolver;
 import x7.distributed.LockStorage;
 import x7.repository.*;
-import x7.repository.cache.DefaultCacheStoragePolicy;
-import x7.repository.cache.LevelTwoCacheResolver;
+import x7.repository.cache.DefaultL2CacheStoragePolicy;
+import x7.repository.cache.DefaultL2CacheResolver;
 import x7.repository.dao.Dao;
 import x7.repository.dao.DaoImpl;
 import x7.repository.dao.SqlCriteriaParser;
@@ -142,9 +142,9 @@ public class RepositoryStarter  {
     @Order(7)
     public CacheResolver cacheResolver(StringRedisTemplate stringRedisTemplate){
 
-        DefaultCacheStoragePolicy cacheStoragePolicy = new DefaultCacheStoragePolicy();
+        DefaultL2CacheStoragePolicy cacheStoragePolicy = new DefaultL2CacheStoragePolicy();
         cacheStoragePolicy.setStringRedisTemplate(stringRedisTemplate);
-        LevelTwoCacheResolver levelTwoCacheResolver = new LevelTwoCacheResolver();
+        DefaultL2CacheResolver levelTwoCacheResolver = new DefaultL2CacheResolver();
         levelTwoCacheResolver.setCacheStoragePolicy(cacheStoragePolicy);
 
         return levelTwoCacheResolver;

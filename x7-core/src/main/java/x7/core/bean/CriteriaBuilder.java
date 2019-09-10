@@ -50,6 +50,34 @@ public class CriteriaBuilder {
         DataPermission.Chain.onBuild(criteria, paged);
     }
 
+    public UnionBuilder union() {
+        List<Criteria.Union> unionList = this.criteria.getUnionList();
+        if (unionList == null){
+            unionList = new ArrayList<>();
+            this.criteria.setUnionList(unionList);
+        }
+
+
+        UnionBuilder unionBuilder = new UnionBuilder(this.criteria);
+        unionList.add(unionBuilder.getUnion());
+
+        return unionBuilder;
+    }
+
+    public UnionBuilder unionAll() {
+        List<Criteria.Union> unionList = this.criteria.getUnionList();
+        if (unionList == null){
+            unionList = new ArrayList<>();
+            this.criteria.setUnionList(unionList);
+        }
+
+        UnionBuilder unionBuilder = new UnionBuilder(this.criteria);
+        unionList.add(unionBuilder.getUnion());
+        unionBuilder.getUnion().setAll(true);
+
+        return unionBuilder;
+    }
+
     public ConditionBuilder and() {
 
         X x = new X();
@@ -167,6 +195,21 @@ public class CriteriaBuilder {
             sortList.add(sort);
             return this;
         }
+
+        @Override
+        public PageBuilder sort(String orderBy, Direction direction, List<Object> optValueList) {
+            if (StringUtil.isNullOrEmpty(orderBy))
+                return this;
+            List<Sort> sortList = criteria.getSortList();
+            if (sortList == null){
+                sortList = new ArrayList<>();
+                criteria.setSortList(sortList);
+            }
+            Sort sort = new Sort(orderBy,direction);
+            sort.setOptValueList(optValueList);
+            sortList.add(sort);
+            return this;
+        }
     };
 
     private ConditionBuilder conditionBuilder = new ConditionBuilder() {
@@ -189,7 +232,7 @@ public class CriteriaBuilder {
             if (value == null)
                 return instance;
             if (Objects.nonNull(criteria.getParsed())) {
-                if (isBaseType_0(property, value))
+                if (BeanUtilX.isBaseType_0(property, value,criteria.getParsed()))
                     return instance;
             }
             if (isNullOrEmpty(value))
@@ -207,7 +250,7 @@ public class CriteriaBuilder {
 
             if (value == null)
                 return instance;
-            if (isBaseType_0(property, value))
+            if (BeanUtilX.isBaseType_0(property, value,criteria.getParsed()))
                 return instance;
             if (isNullOrEmpty(value))
                 return instance;
@@ -225,7 +268,7 @@ public class CriteriaBuilder {
             if (value == null)
                 return instance;
 
-            if (isBaseType_0(property, value))
+            if (BeanUtilX.isBaseType_0(property, value,criteria.getParsed()))
                 return instance;
             if (isNullOrEmpty(value))
                 return instance;
@@ -242,7 +285,7 @@ public class CriteriaBuilder {
 
             if (value == null)
                 return instance;
-            if (isBaseType_0(property, value))
+            if (BeanUtilX.isBaseType_0(property, value,criteria.getParsed()))
                 return instance;
             if (isNullOrEmpty(value))
                 return instance;
@@ -260,7 +303,7 @@ public class CriteriaBuilder {
             if (value == null)
                 return instance;
 
-            if (isBaseType_0(property, value))
+            if (BeanUtilX.isBaseType_0(property, value,criteria.getParsed()))
                 return instance;
             if (isNullOrEmpty(value))
                 return instance;
@@ -278,7 +321,7 @@ public class CriteriaBuilder {
             if (value == null)
                 return instance;
 
-            if (isBaseType_0(property, value))
+            if (BeanUtilX.isBaseType_0(property, value,criteria.getParsed()))
                 return instance;
             if (isNullOrEmpty(value))
                 return instance;
@@ -335,7 +378,7 @@ public class CriteriaBuilder {
             if (min == null || max == null)
                 return instance;
 
-            if (isBaseType_0(property, max))
+            if (BeanUtilX.isBaseType_0(property, max,criteria.getParsed()))
                 return instance;
             if (isNullOrEmpty(max))
                 return instance;
@@ -362,6 +405,8 @@ public class CriteriaBuilder {
             List<Object> tempList = new ArrayList<Object>();
             for (Object obj : list) {
                 if (Objects.isNull(obj))
+                    continue;
+                if (BeanUtilX.isBaseType_0(property,obj,criteria.getParsed()))
                     continue;
                 if (!tempList.contains(obj)) {
                     tempList.add(obj);
@@ -590,91 +635,7 @@ public class CriteriaBuilder {
     }
 
 
-    private BeanElement getBeanElement(String property) {
-
-        String str = null;
-        if (property.contains(SqlScript.SPACE)) {
-            String[] arr = property.split(SqlScript.SPACE);
-            str = arr[0];
-        } else {
-            str = property;
-        }
-        if (str.contains(SqlScript.POINT)) {
-            String[] xxx = str.split("\\.");
-            if (xxx.length == 1)
-                property = xxx[0];
-            else
-                property = xxx[1];
-        } else {
-            property = str;
-        }
-
-        BeanElement be = criteria.getParsed().getElement(property);
-
-        return be;
-
-    }
-
-    private boolean isBaseType_0(String property, Object v) {
-
-        if (v instanceof String)
-            return false;
-
-        BeanElement be = getBeanElement(property);
-
-        if (be == null) {
-
-            String s = v.toString();
-            boolean isNumeric = NumberUtil.isNumeric(s);
-            if (isNumeric) {
-
-                if (s.contains(SqlScript.POINT)) {
-                    return Double.valueOf(s) == 0;
-                }
-                return Long.valueOf(s) == 0;
-            }
-            return false;
-        }
-
-        Class<?> vType = be.clz;
-
-        String s = v.toString();
-
-        if (vType == int.class) {
-            if (s.contains(SqlScript.POINT)) {
-                s = s.substring(0, s.indexOf(SqlScript.POINT));
-            }
-            return Integer.valueOf(s) == 0;
-        }
-        if (vType == long.class) {
-            if (s.contains(SqlScript.POINT)) {
-                s = s.substring(0, s.indexOf(SqlScript.POINT));
-            }
-            return Long.valueOf(s) == 0;
-        }
-        if (vType == float.class) {
-            return Float.valueOf(s) == 0;
-        }
-        if (vType == double.class) {
-            return Double.valueOf(s) == 0;
-        }
-        if (vType == short.class) {
-            return Short.valueOf(s) == 0;
-        }
-        if (vType == byte.class) {
-            return Byte.valueOf(s) == 0;
-        }
-        if (vType == boolean.class) {
-            if (s.contains(SqlScript.POINT)) {
-                s = s.substring(0, s.indexOf(SqlScript.POINT));
-            }
-            return Integer.valueOf(s) == 0;
-        }
-
-        return false;
-    }
-
-    private boolean isNullOrEmpty(Object v) {
+    protected static boolean isNullOrEmpty(Object v) {
 
         Class<?> vType = v.getClass();
 
@@ -684,6 +645,7 @@ public class CriteriaBuilder {
 
         return false;
     }
+
 
     public interface ConditionBuilder {
 

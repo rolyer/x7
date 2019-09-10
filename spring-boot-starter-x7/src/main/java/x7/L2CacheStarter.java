@@ -19,7 +19,7 @@ package x7;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.type.AnnotationMetadata;
-import x7.repository.cache.LevelTwoCacheResolver;
+import x7.repository.cache.DefaultL2CacheResolver;
 
 import java.util.Map;
 
@@ -29,12 +29,12 @@ public class L2CacheStarter implements ImportBeanDefinitionRegistrar {
 
     @Override
     public void registerBeanDefinitions(AnnotationMetadata annotationMetadata, BeanDefinitionRegistry beanDefinitionRegistry) {
-        Map<String, Object> attributes = annotationMetadata.getAnnotationAttributes(EnableX7L2Cache.class.getName());
+        Map<String, Object> attributes = annotationMetadata.getAnnotationAttributes(EnableX7L2Caching.class.getName());
 
         Object obj = attributes.get("timeSeconds");
 
-        LevelTwoCacheResolver.setValidSecond(Integer.valueOf(obj.toString()));
-        LevelTwoCacheResolver.enabled();
+        DefaultL2CacheResolver.setValidSecond(Integer.valueOf(obj.toString()));
+        DefaultL2CacheResolver.enabled();
 
     }
 }

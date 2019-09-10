@@ -48,9 +48,11 @@ public class AppTest {
 
 //        repositoryTest.refresh();
 
-        xxxTest.testAlia();
-        xxxTest.distinct();
+//        xxxTest.testAlia();
+//        xxxTest.distinct();
 
+//        xxxTest.testUnion();
+          xxxTest.test();
     }
 
 

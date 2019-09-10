@@ -18,6 +18,7 @@ package x7;
 
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import x7.core.bean.BeanElement;
 import x7.core.bean.Parsed;
 import x7.core.bean.Parser;
@@ -27,9 +28,10 @@ import x7.repository.BaseRepository;
 import x7.repository.CacheableRepository;
 import x7.repository.Repository;
 import x7.repository.RepositoryBootListener;
-import x7.repository.cache.CacheStoragePolicy;
-import x7.repository.cache.LevelTwoCacheResolver;
-import x7.repository.cache.customizer.CacheStoragePolicyCustomizer;
+import x7.repository.cache.*;
+import x7.repository.cache.customizer.L2CacheStoragePolicyCustomizer;
+import x7.repository.cache.customizer.L3CacheArgsToStringCustomizer;
+import x7.repository.cache.customizer.L3CacheStoragePolicyCustomizer;
 import x7.repository.id.IdGeneratorPolicy;
 import x7.repository.id.customizer.IdGeneratorPolicyCustomizer;
 import x7.repository.mapper.MapperFactory;
@@ -55,6 +57,10 @@ public class RepositoryListener implements
     @Override
     public void onApplicationEvent(ApplicationStartedEvent applicationStartedEvent) {
 
+
+        customizeL3CacheArgsToString(applicationStartedEvent);
+        customizeL3CacheStoragePolicy(applicationStartedEvent);
+
         if (!X7Data.isEnabled)
             return;
 
@@ -67,6 +73,64 @@ public class RepositoryListener implements
         RepositoryBootListener.onStarted(applicationStartedEvent.getApplicationContext());
 
         transform(applicationStartedEvent);
+    }
+
+    private void customizeL3CacheStoragePolicy(ApplicationStartedEvent applicationStartedEvent) {
+
+        try {
+            L3CacheAspect bean = applicationStartedEvent.getApplicationContext().getBean(L3CacheAspect.class);
+            if (bean == null)
+                return;
+
+            L3CacheStoragePolicyCustomizer customizer = null;
+            try {
+                customizer = applicationStartedEvent.getApplicationContext().getBean(L3CacheStoragePolicyCustomizer.class);
+            } catch (Exception e) {
+            }
+
+            final L3CacheStoragePolicy storagePolicy;
+            if (customizer == null) {
+                storagePolicy = new DefaultL3CacheStoragePolicy();
+                StringRedisTemplate stringRedisTemplate = applicationStartedEvent.getApplicationContext().getBean(StringRedisTemplate.class);
+                ((DefaultL3CacheStoragePolicy) storagePolicy).setStringRedisTemplate(stringRedisTemplate);
+            } else {
+                storagePolicy = customizer.customize();
+            }
+
+            L3CacheResolver resolver = () -> storagePolicy;
+
+            bean.setResolver(resolver);
+
+        } catch (Exception e) {
+
+        }
+    }
+
+    private void customizeL3CacheArgsToString(ApplicationStartedEvent applicationStartedEvent) {
+
+        try {
+            L3CacheAspect bean = applicationStartedEvent.getApplicationContext().getBean(L3CacheAspect.class);
+            if (bean == null)
+                return;
+
+            L3CacheArgsToStringCustomizer customizer = null;
+            try {
+                customizer = applicationStartedEvent.getApplicationContext().getBean(L3CacheArgsToStringCustomizer.class);
+            } catch (Exception e) {
+
+            }
+
+            ArgsToString argsToString = null;
+            if (customizer == null) {
+                argsToString = new DefaultArgsToString();
+            } else {
+                argsToString = customizer.customize();
+            }
+            bean.setArgsToString(argsToString);
+        } catch (Exception e) {
+
+        }
+
     }
 
 
@@ -88,14 +152,14 @@ public class RepositoryListener implements
         Repository repository = applicationStartedEvent.getApplicationContext().getBean(Repository.class);
         if (repository == null)
             return;
-        ((CacheableRepository)repository).setDataTransform(dataTransform);
+        ((CacheableRepository) repository).setDataTransform(dataTransform);
     }
 
     private void customizeCacheStoragePolicy(ApplicationStartedEvent applicationStartedEvent) {
 
-        CacheStoragePolicyCustomizer customizer = null;
+        L2CacheStoragePolicyCustomizer customizer = null;
         try {
-            customizer = applicationStartedEvent.getApplicationContext().getBean(CacheStoragePolicyCustomizer.class);
+            customizer = applicationStartedEvent.getApplicationContext().getBean(L2CacheStoragePolicyCustomizer.class);
         } catch (Exception e) {
 
         }
@@ -103,14 +167,14 @@ public class RepositoryListener implements
         if (customizer == null)
             return;
 
-        CacheStoragePolicy cacheStoragePolicy = customizer.customize();
+        L2CacheStoragePolicy cacheStoragePolicy = customizer.customize();
         if (cacheStoragePolicy == null)
             return;
 
         CacheResolver levelTwoCacheResolver = applicationStartedEvent.getApplicationContext().getBean(CacheResolver.class);
         if (levelTwoCacheResolver == null)
             return;
-        ((LevelTwoCacheResolver)levelTwoCacheResolver).setCacheStoragePolicy(cacheStoragePolicy);
+        ((DefaultL2CacheResolver) levelTwoCacheResolver).setCacheStoragePolicy(cacheStoragePolicy);
 
     }
 

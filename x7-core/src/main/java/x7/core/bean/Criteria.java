@@ -41,12 +41,13 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 	private List<Sort> sortList;
 	private List<KV> fixedSortList = new ArrayList();
 	private List<X> listX = new ArrayList<X>();
+	private List<Union> unionList;
 	private DataPermission dataPermission;//String,Or List<String>   LikeRight | In
 
 	@JsonIgnore
 	private transient Parsed parsed;
 	@JsonIgnore
-	public transient boolean isWhere = true;
+	private transient boolean isWhere = true;
 	@JsonIgnore
 	private transient List<Object> valueList = new ArrayList<Object>();
 	@JsonIgnore
@@ -91,6 +92,14 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 	}
 	public String getCountDistinct(){
 		return this.countDistinct;
+	}
+
+	public boolean isWhere() {
+		return isWhere;
+	}
+
+	public void setWhere(boolean where) {
+		isWhere = where;
 	}
 
 	public List<Sort> getSortList() {
@@ -171,12 +180,27 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 		return !this.fixedSortList.isEmpty();
 	}
 
+	public List<Union> getUnionList() {
+		return unionList;
+	}
+
+	public void setUnionList(List<Union> unionList) {
+		this.unionList = unionList;
+	}
+
+	public Map<String, String> getAliaMap() {
+		return null;
+	}
 	public void paged(Paged paged) {
 
 		this.isScroll = paged.isScroll();
 		this.page = paged.getPage();
 		this.rows = paged.getRows();
 		this.sortList = paged.getSortList();
+	}
+
+	public boolean isUnion(){
+		return unionList != null && unionList.size() > 1;
 	}
 
 	@Override
@@ -500,6 +524,53 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 		}
 	}
 
+
+	public static class Union implements Serializable{
+		private static final long serialVersionUID = 2575361941127084529L;
+
+		private boolean isAll;
+		private List<X> listX = new ArrayList<>();
+		@JsonIgnore
+		private transient List<Object> valueList = new ArrayList<Object>();
+
+
+		public boolean isAll() {
+			return isAll;
+		}
+
+		public void setAll(boolean all) {
+			isAll = all;
+		}
+
+		public List<X> getListX() {
+			return listX;
+		}
+
+		public void setListX(List<X> listX) {
+			this.listX = listX;
+		}
+
+		public void add(X x) {
+			this.listX.add(x);
+		}
+
+		public List<Object> getValueList() {
+			return valueList;
+		}
+
+		public void setValueList(List<Object> valueList) {
+			this.valueList = valueList;
+		}
+
+		@Override
+		public String toString() {
+			return "Union{" +
+					"isAll=" + isAll +
+					", listX=" + listX +
+					", valueList=" + valueList +
+					'}';
+		}
+	}
 
 
 }

@@ -16,10 +16,7 @@
  */
 package x7.core.util;
 
-import x7.core.bean.BeanElement;
-import x7.core.bean.Criteria;
-import x7.core.bean.Parsed;
-import x7.core.bean.SqlScript;
+import x7.core.bean.*;
 import x7.core.repository.SqlFieldType;
 import x7.core.repository.X;
 import x7.core.search.Search;
@@ -662,10 +659,11 @@ public class BeanUtilX extends BeanUtil {
 		return map;
 	}
 
-	public static String getClzName(String alia, Criteria criteria) {
-		if (criteria instanceof Criteria.ResultMappedCriteria){
-			Criteria.ResultMappedCriteria resultMappedCriteria = (Criteria.ResultMappedCriteria) criteria;
-			return resultMappedCriteria.getAliaMap().get(alia);
+	public static String getClzName(String alia, CriteriaCondition criteria) {
+		if (criteria.getAliaMap() != null){
+			String a = criteria.getAliaMap().get(alia);
+			if (StringUtil.isNotNull(a))
+				return a;
 		}
 		return alia;
 	}
@@ -693,6 +691,90 @@ public class BeanUtilX extends BeanUtil {
 			aliaKeyMap.putAll(clzKeyMap);
 		}
 
+	}
+
+	private static BeanElement getBeanElement(String property,Parsed parsed) {
+
+		String str = null;
+		if (property.contains(SqlScript.SPACE)) {
+			String[] arr = property.split(SqlScript.SPACE);
+			str = arr[0];
+		} else {
+			str = property;
+		}
+		if (str.contains(SqlScript.POINT)) {
+			String[] xxx = str.split("\\.");
+			if (xxx.length == 1)
+				property = xxx[0];
+			else
+				property = xxx[1];
+		} else {
+			property = str;
+		}
+
+		BeanElement be = parsed.getElement(property);
+
+		return be;
+
+	}
+
+	public static boolean isBaseType_0(String property, Object v,Parsed parsed) {
+
+		if (v instanceof String)
+			return false;
+
+		BeanElement be = getBeanElement(property,parsed);
+
+		if (be == null) {
+
+			String s = v.toString();
+			boolean isNumeric = NumberUtil.isNumeric(s);
+			if (isNumeric) {
+
+				if (s.contains(SqlScript.POINT)) {
+					return Double.valueOf(s) == 0;
+				}
+				return Long.valueOf(s) == 0;
+			}
+			return false;
+		}
+
+		Class<?> vType = be.clz;
+
+		String s = v.toString();
+
+		if (vType == int.class) {
+			if (s.contains(SqlScript.POINT)) {
+				s = s.substring(0, s.indexOf(SqlScript.POINT));
+			}
+			return Integer.valueOf(s) == 0;
+		}
+		if (vType == long.class) {
+			if (s.contains(SqlScript.POINT)) {
+				s = s.substring(0, s.indexOf(SqlScript.POINT));
+			}
+			return Long.valueOf(s) == 0;
+		}
+		if (vType == float.class) {
+			return Float.valueOf(s) == 0;
+		}
+		if (vType == double.class) {
+			return Double.valueOf(s) == 0;
+		}
+		if (vType == short.class) {
+			return Short.valueOf(s) == 0;
+		}
+		if (vType == byte.class) {
+			return Byte.valueOf(s) == 0;
+		}
+		if (vType == boolean.class) {
+			if (s.contains(SqlScript.POINT)) {
+				s = s.substring(0, s.indexOf(SqlScript.POINT));
+			}
+			return Integer.valueOf(s) == 0;
+		}
+
+		return false;
 	}
 
 

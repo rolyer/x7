@@ -13,13 +13,14 @@ import x7.*;
 @SpringBootApplication
 @EnableTransactionManagement
 @EnableTransactionManagementReadable
-@EnableX7L2Cache(timeSeconds = 120)
+@EnableX7L2Caching(timeSeconds = 120)
 @EnableX7Repository(mappingPrefix = "t_",mappingSpec = "_")
 @EnableReyClient
 @EnableTracingServlet
 @EnableCorsConfig
 @EnableDateToLongForJackson
 @EnableSchemaTransform
+@EnableX7L3Caching
 public class App {
     public static void main( String[] args )
     {
@@ -58,4 +59,6 @@ public class App {
 //            }
 //        };
 //    }
+
+
 }

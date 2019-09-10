@@ -18,6 +18,7 @@ package x7.repository.mapper;
 
 import x7.core.bean.BeanElement;
 import x7.core.bean.Criteria;
+import x7.repository.SqlParsed;
 
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
@@ -52,7 +53,7 @@ public interface Mapper {
         String getTagSql(Class clz);
     }
 
-    public static String getSqlTypeRegX(BeanElement be) {
+    static String getSqlTypeRegX(BeanElement be) {
 
         Class clz = be.clz;
         if (clz == Date.class || clz == java.sql.Date.class || clz == java.sql.Timestamp.class) {
@@ -95,6 +96,7 @@ public interface Mapper {
         String INCREAMENT = " ${INCREAMENT}";
         String ENGINE = " ${ENGINE}";
 
+        String match(SqlParsed sql, long start, long rows);
         String match(String sql, long start, long rows);
 
         String match(String sql, String sqlType);

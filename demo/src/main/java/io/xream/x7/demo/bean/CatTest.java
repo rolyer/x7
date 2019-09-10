@@ -11,6 +11,7 @@ public class CatTest {
 	private long dogId;
 	private String catFriendName;
 	private Timestamp time;
+	private String type;
 	public long getId() {
 		return id;
 	}
@@ -35,6 +36,15 @@ public class CatTest {
 	public void setTime(Timestamp time) {
 		this.time = time;
 	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
 	@Override
 	public String toString() {
 		return "CatTest [id=" + id + ", dogId=" + dogId + ", catFriendName=" + catFriendName + ", time=" + time + "]";
