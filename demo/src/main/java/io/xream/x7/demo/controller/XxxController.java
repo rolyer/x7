@@ -350,4 +350,11 @@ public class XxxController {
 		return ViewEntity.ok(refreshCondition);
 	}
 
+	@RequestMapping("/list")
+	public ViewEntity list(){
+		CatTest catTest = new CatTest();
+		List<CatTest> list = this.repository.list(catTest);
+		return ViewEntity.ok(list);
+	}
+
 }

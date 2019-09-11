@@ -3,6 +3,7 @@ package io.xream.x7.demo.bean;
 import x7.core.repository.X;
 
 import java.sql.Timestamp;
+import java.util.Date;
 
 public class CatTest {
 
@@ -10,7 +11,7 @@ public class CatTest {
 	private long id;
 	private long dogId;
 	private String catFriendName;
-	private Timestamp time;
+	private Date time;
 	public long getId() {
 		return id;
 	}
@@ -29,10 +30,10 @@ public class CatTest {
 	public void setCatFriendName(String catFriendName) {
 		this.catFriendName = catFriendName;
 	}
-	public Timestamp getTime() {
+	public Date getTime() {
 		return time;
 	}
-	public void setTime(Timestamp time) {
+	public void setTime(Date time) {
 		this.time = time;
 	}
 	@Override

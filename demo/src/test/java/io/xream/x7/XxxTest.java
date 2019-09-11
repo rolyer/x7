@@ -148,4 +148,9 @@ public class XxxTest {
         return testServiceRemote.testRefreshConditionn(refreshCondition);
     }
 
+
+    public ViewEntity testList(){
+        return this.controller.list();
+    }
+
 }
