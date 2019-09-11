@@ -53,6 +53,7 @@ public class AppTest {
 
 //        xxxTest.testUnion();
           xxxTest.test();
+//          xxxTest.testListCriteria();
     }
 
 

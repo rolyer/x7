@@ -31,6 +31,6 @@ import java.util.concurrent.TimeUnit;
 @Target(ElementType.METHOD)
 @Documented
 public @interface CacheableL3 {
-    int expireTime() default  60000;
-    TimeUnit timeUnit() default TimeUnit.MICROSECONDS;
+    int expireTime() default  0;
+    TimeUnit timeUnit() default TimeUnit.MILLISECONDS;
 }

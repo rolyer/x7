@@ -22,6 +22,7 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.beans.factory.annotation.Value;
 import x7.core.repository.CacheableL3;
 import x7.core.util.ExceptionUtil;
 import x7.core.util.JsonX;
@@ -38,6 +39,37 @@ import java.util.concurrent.TimeUnit;
  */
 @Aspect
 public class L3CacheAspect {
+
+    @Value("${x7.cache.l3.expire-time:'6000ms'}")
+    private String expireTime = "6000ms";
+
+    private long getExpireTime(){
+        expireTime = expireTime.toLowerCase();
+        if (expireTime.contains("ms")){
+            expireTime = expireTime.replace("ms","");
+            return Long.valueOf(expireTime);
+        }
+        if (expireTime.contains("s")){
+            expireTime = expireTime.replace("s","");
+            return Long.valueOf(expireTime) * 1000;
+        }
+        if (expireTime.contains("m")){
+            expireTime = expireTime.replace("m","");
+            return Long.valueOf(expireTime) * 1000 * 60;
+        }
+        if (expireTime.contains("h")){
+            expireTime = expireTime.replace("h","");
+            return Long.valueOf(expireTime) * 1000 * 60 * 60;
+        }
+        if (expireTime.contains("d")){
+            expireTime = expireTime.replace("d","");
+            return Long.valueOf(expireTime) * 1000 * 60 * 60 * 24;
+        }
+
+
+        return 6000;
+    }
+
 
     private ArgsToString argsToString;
 
@@ -76,6 +108,12 @@ public class L3CacheAspect {
         String key = argsToString.get(methodName, argArr);
         long expireTime = cacheableL3.expireTime();
         TimeUnit timeUnit = cacheableL3.timeUnit();
+
+        if (expireTime == 0) {
+            expireTime = getExpireTime();
+            timeUnit = TimeUnit.MILLISECONDS;
+        }
+
         String value = resolver.resolve(key, expireTime, timeUnit,
                 () -> {
                     try {

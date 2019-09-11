@@ -160,4 +160,9 @@ public class XxxTest {
         return this.controller.testUnion(ro);
     }
 
+
+    public ViewEntity testListCriteria(){
+        return this.controller.listCriteria();
+    }
+
 }

@@ -509,4 +509,22 @@ public class XxxController {
 		return ViewEntity.ok(refreshCondition);
 	}
 
+	@RequestMapping("/listCriteria")
+	public ViewEntity listCriteria() {
+		//		CriteriaBuilder.ResultMappedBuilder builder = CriteriaBuilder.buildResultMapped(Cat.class);
+		CriteriaBuilder builder = CriteriaBuilder.build(Cat.class);
+
+//		builder.resultKey("id").resultKey("type");
+		List<Object> inList = new ArrayList<>();
+		inList.add("BL");
+		inList.add("NL");
+		builder.and().in("type",inList);
+		builder.paged().orderIn("type",inList);
+
+//		Criteria.ResultMappedCriteria criteria = builder.get();
+		Criteria criteria = builder.get();
+		List<Cat> list = catRepository.list(criteria);
+
+		return ViewEntity.ok(list);
+	}
 }
