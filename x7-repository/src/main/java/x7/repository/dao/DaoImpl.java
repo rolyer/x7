@@ -22,8 +22,10 @@ import x7.core.bean.condition.InCondition;
 import x7.core.bean.condition.RefreshCondition;
 import x7.core.config.ConfigAdapter;
 import x7.core.repository.X;
-import x7.core.util.*;
-import x7.core.web.Direction;
+import x7.core.util.BeanMapUtil;
+import x7.core.util.ExceptionUtil;
+import x7.core.util.JsonX;
+import x7.core.util.StringUtil;
 import x7.core.web.Page;
 import x7.repository.CriteriaParser;
 import x7.repository.exception.PersistenceException;
@@ -403,8 +405,9 @@ public class DaoImpl implements Dao {
 
         } catch (Exception e) {
             e.printStackTrace();
+            String str = tempEle==null?"":(tempEle.property+"|"+tempEle.getMapper());
             throw new RollbackException(
-                    "Exception occured by class = " + clz.getName() + ",column："+ (tempEle!=null?(tempEle.property+"|"+tempEle.getMapper()):"") + ", message: " + e.getMessage());
+                    "Exception occured by class = " + clz.getName() + ",column："+ str + ", message: " + e.getMessage());
 
         } finally {
             close(pstmt);
@@ -520,8 +523,9 @@ public class DaoImpl implements Dao {
 
         } catch (Exception e) {
             e.printStackTrace();
+            String str = tempEle==null?"":(tempEle.property+"|"+tempEle.getMapper());
             throw new RollbackException(
-                    "Exception occured by class = " + clz.getName() + ",column："+ (tempEle!=null?(tempEle.property+"|"+tempEle.getMapper()):"") +", message: " + ExceptionUtil.getMessage(e));
+                    "Exception occured by class = " + clz.getName() + ",column："+ str +", message: " + ExceptionUtil.getMessage(e));
         } finally {
             close(pstmt);
             close(conn);
@@ -584,8 +588,9 @@ public class DaoImpl implements Dao {
 
         } catch (Exception e) {
             e.printStackTrace();
+            String str = tempEle==null?"":(tempEle.property+"|"+tempEle.getMapper());
             throw new RollbackException(
-                    "Exception occured by class = " + clz.getName() + ",column："+ (tempEle!=null?(tempEle.property+"|"+tempEle.getMapper()):"" )+ ", message: " + e.getMessage());
+                    "Exception occured by class = " + clz.getName() + ",column："+ str + ", message: " + e.getMessage());
         } finally {
             close(pstmt);
             close(conn);
