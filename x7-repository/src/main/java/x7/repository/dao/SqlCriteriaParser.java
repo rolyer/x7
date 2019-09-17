@@ -105,8 +105,6 @@ public class SqlCriteriaParser implements CriteriaParser {
     @Override
     public SqlParsed parse(Criteria criteria) {
 
-        beforeOptimize(criteria);
-
         parseAlia(criteria);
 
         StringBuilder sb = new StringBuilder();
@@ -123,70 +121,6 @@ public class SqlCriteriaParser implements CriteriaParser {
          */
         sourceScript(sb, criteria);
 
-        if (criteria.isUnion()) {
-
-            SqlParsed sqlParsed = new SqlParsed();
-
-            for (Criteria.Union union : criteria.getUnionList()){
-                StringBuilder csb = new StringBuilder(sb);
-                List<Criteria.X> xList = new ArrayList<>();
-                xList.addAll(criteria.getListX());
-                xList.addAll(union.getListX());
-                x(csb,xList,criteria);
-
-                groupBy(csb, criteria);
-
-                StringBuilder sqlSb = new StringBuilder();
-                sqlSb.append(SqlScript.SELECT).append(SqlScript.SPACE).append(criteria.resultAllScript()).append(SqlScript.SPACE).append(csb);
-
-                SqlParsed.UnionSql unionSql = new SqlParsed.UnionSql();
-                unionSql.setSql(sqlSb);
-                unionSql.setUnion(union.isAll() ? SqlScript.UNION_ALL : SqlScript.UNION);
-
-                List<SqlParsed.UnionSql> unionSqlList = sqlParsed.getUnionSqlList();
-                if (unionSqlList == null){
-                    unionSqlList = new ArrayList<>();
-                    sqlParsed.setUnionSqlList(unionSqlList);
-                }
-                unionSqlList.add(unionSql);
-            }
-
-            /*
-             * unionCountSql
-             */
-            StringBuilder unionCountSql = new StringBuilder();
-            int size = sqlParsed.getUnionSqlList().size();
-            for (int i = 0; i < size; i++) {//countSql
-
-                SqlParsed.UnionSql unionSql = sqlParsed.getUnionSqlList().get(i);
-
-                StringBuilder countSql = count(unionSql.getSql(),criteria);
-
-                StringBuilder cSql = new StringBuilder();
-                cSql.append(SqlScript.LEFT_PARENTTHESIS);
-                cSql.append(countSql);
-                cSql.append(SqlScript.RIGHT_PARENTTHESIS);
-
-                if (i < size -1 ){
-                    cSql.append(unionSql.getUnion());
-                }
-
-                unionCountSql.append(cSql);
-            }
-
-            sqlParsed.setCountSql(unionCountSql.toString());
-
-            /*
-             * sort
-             */
-            StringBuilder sortScript = sortScript(criteria);
-            sqlParsed.setSortScript(sortScript);
-            for (SqlParsed.UnionSql unionSql : sqlParsed.getUnionSqlList()){
-                unionSql.getSql().append(sortScript);
-            }
-
-            return sqlParsed;
-        }
         /*
          * StringList
          */
@@ -353,65 +287,6 @@ public class SqlCriteriaParser implements CriteriaParser {
         }
     }
 
-    private void beforeOptimizeUnion(Criteria criteria) {
-        List<Criteria.Union> list = criteria.getUnionList();
-        if (list == null)
-            return;
-        if (list.size() > 1)
-            return;
-        Criteria.Union union = list.get(0);
-        list.clear();
-        criteria.getListX().addAll(union.getListX());
-    }
-
-    private void beforeOptimizeSort(Criteria criteria){
-        List<Sort> sortList = criteria.getSortList();
-        if (sortList == null || sortList.size() < 2)
-            return;
-        Sort sort = sortList.get(0);
-        List<Object> optValueList = sort.getOptValueList();
-        if (optValueList == null || optValueList.size() < 2)
-            return;
-        String orderBy = sort.getOrderBy();
-        for (Criteria.X x : criteria.getListX()){
-            if (x.getKey().equals(orderBy))
-                return;
-        }
-
-
-        /*
-         * union
-         */
-        List<Criteria.Union> unionList = criteria.getUnionList();
-        if (unionList == null){
-            unionList = new ArrayList<>();
-            criteria.setUnionList(unionList);
-        }
-        for (Object obj : optValueList){
-            Criteria.Union union = new Criteria.Union();
-            union.setAll(true);
-            unionList.add(union);
-            Criteria.X x = new Criteria.X();
-            x.setKey(orderBy);
-            x.setValue(obj);
-            x.setPredicate(Predicate.EQ);
-            x.setConjunction(Conjunction.AND);
-            union.add(x);
-        }
-
-    }
-
-    private void beforeOptimizeJoin(Criteria criteria) {
-        /*
-         * TODO:
-         */
-    }
-
-    private void beforeOptimize(Criteria criteria) {
-        beforeOptimizeJoin(criteria);//step 1
-        beforeOptimizeSort(criteria);//step 2
-        beforeOptimizeUnion(criteria);//step 3
-    }
 
     private void parseAlia(Criteria criteria) {
         String script = criteria.sourceScript().trim();

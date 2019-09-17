@@ -66,8 +66,11 @@ public class L3CacheAspect {
             return Long.valueOf(expireTime) * 1000 * 60 * 60 * 24;
         }
 
-
-        return 6000;
+        try {
+            return Long.valueOf(expireTime);
+        }catch (Exception e){
+            return 6000;
+        }
     }
 
 
@@ -129,9 +132,10 @@ public class L3CacheAspect {
 
             Type gt = ms.getMethod().getGenericReturnType();
             ParameterizedType pt = (ParameterizedType) gt;
-            Type t = pt.getActualTypeArguments()[0];
+            Type[] tt = pt.getActualTypeArguments();
+            Type t = tt[0];
             if (t instanceof ParameterizedType) {
-                return JSON.parseArray(value,pt.getActualTypeArguments());
+                return JSON.parseArray(value,tt);
             }
 
             Class genericClz = (Class) t;

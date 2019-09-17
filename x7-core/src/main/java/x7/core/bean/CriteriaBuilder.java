@@ -50,34 +50,6 @@ public class CriteriaBuilder {
         DataPermission.Chain.onBuild(criteria, paged);
     }
 
-    public UnionBuilder union() {
-        List<Criteria.Union> unionList = this.criteria.getUnionList();
-        if (unionList == null){
-            unionList = new ArrayList<>();
-            this.criteria.setUnionList(unionList);
-        }
-
-
-        UnionBuilder unionBuilder = new UnionBuilder(this.criteria);
-        unionList.add(unionBuilder.getUnion());
-
-        return unionBuilder;
-    }
-
-    public UnionBuilder unionAll() {
-        List<Criteria.Union> unionList = this.criteria.getUnionList();
-        if (unionList == null){
-            unionList = new ArrayList<>();
-            this.criteria.setUnionList(unionList);
-        }
-
-        UnionBuilder unionBuilder = new UnionBuilder(this.criteria);
-        unionList.add(unionBuilder.getUnion());
-        unionBuilder.getUnion().setAll(true);
-
-        return unionBuilder;
-    }
-
     public ConditionBuilder and() {
 
         X x = new X();
@@ -813,15 +785,6 @@ public class CriteriaBuilder {
             return this;
         }
 
-        @Deprecated
-        public UnionBuilder.Unsupported unionAll() {
-            throw new RuntimeException("UnionBuilder Unsupport ResultMappedBuilder");
-        }
-
-        @Deprecated
-        public UnionBuilder.Unsupported union() {
-            throw new RuntimeException("UnionBuilder Unsupport ResultMappedBuilder");
-        }
 
 
     }
@@ -884,16 +847,6 @@ public class CriteriaBuilder {
                 return instance;
             }
         };
-
-        @Deprecated
-        public UnionBuilder.Unsupported unionAll() {
-            throw new RuntimeException("UnionBuilder Unsupport DomainObjectBuilder");
-        }
-
-        @Deprecated
-        public UnionBuilder.Unsupported union() {
-            throw new RuntimeException("UnionBuilder Unsupport DomainObjectBuilder");
-        }
 
     }
 

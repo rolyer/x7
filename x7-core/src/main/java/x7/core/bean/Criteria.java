@@ -39,9 +39,8 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 	private int page;
 	private int rows;
 	private List<Sort> sortList;
-	private List<KV> fixedSortList = new ArrayList();
-	private List<X> listX = new ArrayList<X>();
-	private List<Union> unionList;
+	private List<KV> fixedSortList = new ArrayList<>();
+	private List<X> listX = new ArrayList<>();
 	private DataPermission dataPermission;//String,Or List<String>   LikeRight | In
 
 	@JsonIgnore
@@ -180,13 +179,6 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 		return !this.fixedSortList.isEmpty();
 	}
 
-	public List<Union> getUnionList() {
-		return unionList;
-	}
-
-	public void setUnionList(List<Union> unionList) {
-		this.unionList = unionList;
-	}
 
 	public Map<String, String> getAliaMap() {
 		return null;
@@ -199,9 +191,6 @@ public class Criteria implements CriteriaCondition, Paged, Serializable {
 		this.sortList = paged.getSortList();
 	}
 
-	public boolean isUnion(){
-		return unionList != null && unionList.size() > 1;
-	}
 
 	@Override
 	public String toString() {
