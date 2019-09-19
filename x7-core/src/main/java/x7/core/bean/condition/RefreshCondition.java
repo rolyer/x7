@@ -118,4 +118,5 @@ public class RefreshCondition<T> {
         return this;
     }
 
+
 }
