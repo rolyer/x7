@@ -718,6 +718,7 @@ public class BeanUtilX extends BeanUtil {
 
 	}
 
+
 	public static boolean isBaseType_0(String property, Object v,Parsed parsed) {
 
 		if (v instanceof String)

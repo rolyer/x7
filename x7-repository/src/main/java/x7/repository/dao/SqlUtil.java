@@ -21,6 +21,7 @@ import x7.core.bean.condition.RefreshCondition;
 import x7.core.util.BeanUtil;
 import x7.core.util.BeanUtilX;
 import x7.core.util.ExceptionUtil;
+import x7.core.util.StringUtil;
 import x7.repository.CriteriaParser;
 import x7.repository.util.SqlParserUtil;
 
@@ -167,7 +168,7 @@ public class SqlUtil {
                     sb.append(sql);
                 } else {
 
-                    if (BeanUtilX.isBaseType_0(key,x.getValue(),parsed)) {
+                    if (StringUtil.isNullOrEmpty(x.getValue().toString()) || BeanUtilX.isBaseType_0(key,x.getValue(),parsed)) {
                         i++;
                         continue;
                     }
@@ -177,9 +178,13 @@ public class SqlUtil {
                     sb.append(SqlScript.EQ_PLACE_HOLDER);
 
                     BeanElement be = parsed.getElementMap().get(key);
-                    if (be.clz == Date.class || be.clz == Timestamp.class) {
+                    if (be.clz == Date.class ) {
                         if (x.getValue() instanceof Long) {
                             x.setValue(new Date(((Long) x.getValue()).longValue()));
+                        }
+                    }else if (be.clz == Timestamp.class){
+                        if (x.getValue() instanceof Long) {
+                            x.setValue(new Timestamp(((Long) x.getValue()).longValue()));
                         }
                     }
 
