@@ -20,6 +20,7 @@ import x7.core.bean.*;
 import x7.core.bean.condition.RefreshCondition;
 import x7.core.util.BeanUtil;
 import x7.core.util.BeanUtilX;
+import x7.core.util.ExceptionUtil;
 import x7.repository.CriteriaParser;
 import x7.repository.util.SqlParserUtil;
 
@@ -33,66 +34,65 @@ import java.util.*;
 
 public class SqlUtil {
 
-	protected static void adpterSqlKey(PreparedStatement pstmt, String keyOne, Object obj, int i)
-			throws SQLException, NoSuchMethodException, SecurityException, IllegalAccessException,
-			IllegalArgumentException, InvocationTargetException {
-		/*
-		 * 处理KEY
-		 */
-		Method method = null;
-		try {
-			method = obj.getClass().getDeclaredMethod(BeanUtil.getGetter(keyOne));
-		} catch (NoSuchMethodException e) {
-			method = obj.getClass().getSuperclass().getDeclaredMethod(BeanUtil.getGetter(keyOne));
-		}
-		Object value = method.invoke(obj);
-		pstmt.setObject(i++, value);
+    protected static void adpterSqlKey(PreparedStatement pstmt, String keyOne, Object obj, int i)
+            throws SQLException, NoSuchMethodException, SecurityException, IllegalAccessException,
+            IllegalArgumentException, InvocationTargetException {
+        /*
+         * 处理KEY
+         */
+        Method method = null;
+        try {
+            method = obj.getClass().getDeclaredMethod(BeanUtil.getGetter(keyOne));
+        } catch (NoSuchMethodException e) {
+            method = obj.getClass().getSuperclass().getDeclaredMethod(BeanUtil.getGetter(keyOne));
+        }
+        Object value = method.invoke(obj);
+        pstmt.setObject(i++, value);
 
-	}
+    }
 
-	protected static void adpterSqlKey(PreparedStatement pstmt, Field keyOneF,  Object obj, int i)
-			throws SQLException, SecurityException, IllegalAccessException,
-			IllegalArgumentException{
-		/*
-		 * 处理KEY
-		 */
-		Object value = keyOneF.get(obj);
+    protected static void adpterSqlKey(PreparedStatement pstmt, Field keyOneF, Object obj, int i)
+            throws SQLException, SecurityException, IllegalAccessException,
+            IllegalArgumentException {
+        /*
+         * 处理KEY
+         */
+        Object value = keyOneF.get(obj);
 
-		pstmt.setObject(i++, value);
+        pstmt.setObject(i++, value);
 
-	}
+    }
 
-	/**
-	 * 拼接SQL
-	 *
-	 */
-	protected static String concat(Parsed parsed, String sql, Map<String, Object> queryMap) {
-		
-		StringBuilder sb = new StringBuilder();
+    /**
+     * 拼接SQL
+     */
+    protected static String concat(Parsed parsed, String sql, Map<String, Object> queryMap) {
 
-		boolean flag = (sql.contains(SqlScript.WHERE) || sql.contains(SqlScript.WHERE.toLowerCase()));
+        StringBuilder sb = new StringBuilder();
 
-		for (String key : queryMap.keySet()) {
+        boolean flag = (sql.contains(SqlScript.WHERE) || sql.contains(SqlScript.WHERE.toLowerCase()));
 
-			String mapper = parsed.getMapper(key);
-			if (flag) {
-				sb.append(Conjunction.AND.sql()).append(mapper).append(SqlScript.EQ_PLACE_HOLDER);
-			}else{
-				sb.append(SqlScript.WHERE).append(mapper).append(SqlScript.EQ_PLACE_HOLDER);
-				flag = true;
-			}
+        for (String key : queryMap.keySet()) {
 
-		}
+            String mapper = parsed.getMapper(key);
+            if (flag) {
+                sb.append(Conjunction.AND.sql()).append(mapper).append(SqlScript.EQ_PLACE_HOLDER);
+            } else {
+                sb.append(SqlScript.WHERE).append(mapper).append(SqlScript.EQ_PLACE_HOLDER);
+                flag = true;
+            }
 
-		sql += sb.toString();
+        }
 
-		return sql;
-	}
+        sql += sb.toString();
 
-	/**
-	 * 拼接SQL
-	 *
-	 */
+        return sql;
+    }
+
+    /**
+     * 拼接SQL
+     *
+     */
 //	protected static String concatRefresh(StringBuilder sb, Parsed parsed, Map<String, Object> refreshMap) {
 //
 //		String keyOne = parsed.getKey(X.KEY_ONE);
@@ -127,92 +127,98 @@ public class SqlUtil {
 //		return sb.toString();
 //	}
 
-	/**
-	 * 拼接SQL
-	 *
-	 */
-	protected static String concatRefresh(StringBuilder sb, Parsed parsed,
-										  RefreshCondition refreshCondition, CriteriaParser criteriaParser) {
+    /**
+     * 拼接SQL
+     */
+    protected static String concatRefresh(StringBuilder sb, Parsed parsed,
+                                          RefreshCondition refreshCondition, CriteriaParser criteriaParser) {
 
-		sb.append(SqlScript.SET);
+        sb.append(SqlScript.SET);
 
-		List<Criteria.X> refreshList = refreshCondition.getRefreshList();
+        List<Criteria.X> refreshList = refreshCondition.getRefreshList();
 
-		List<Object> refreshValueList = new ArrayList<>();
+        List<Object> refreshValueList = new ArrayList<>();
 
-		int i=0;
-		int size = refreshList.size();
+        int i = 0;
+        int size = refreshList.size();
 
-		for (Criteria.X x : refreshList){
-			if (x.getPredicate() == Predicate.X){
+        for (Criteria.X x : refreshList) {
+            if (x.getPredicate() == Predicate.X) {
 
-				Object key = x.getKey();
+                Object key = x.getKey();
 
-				String str = key.toString();
+                String str = key.toString();
 
-				if (str.contains(","))
-					throw new RuntimeException("RefreshCondition.refresh(), para can not contains(,)");
+                if (str.contains(","))
+                    throw new RuntimeException("RefreshCondition.refresh(), para can not contains(,)");
 
-				String sql = BeanUtilX.normalizeSql(str);
+                String sql = BeanUtilX.normalizeSql(str);
 
-				sql = SqlParserUtil.mapper(sql,parsed);
+                sql = SqlParserUtil.mapper(sql, parsed);
 
-				sb.append(sql);
+                sb.append(sql);
 
-			}else{
-				String key = x.getKey();
-				if (key.contains("?")){
-					String sql = BeanUtilX.normalizeSql(key);
-					sql = SqlParserUtil.mapper(sql,parsed);
-					sb.append(sql);
-				}else {
-					String mapper = parsed.getMapper(key);
-					sb.append(mapper);
-					sb.append(SqlScript.EQ_PLACE_HOLDER);
-				}
-				refreshValueList.add(x.getValue());
+            } else {
+                String key = x.getKey();
+                if (key.contains("?")) {
+                    String sql = BeanUtilX.normalizeSql(key);
+                    sql = SqlParserUtil.mapper(sql, parsed);
+                    sb.append(sql);
+                } else {
+                    String mapper = parsed.getMapper(key);
+                    sb.append(mapper);
+                    sb.append(SqlScript.EQ_PLACE_HOLDER);
+                }
+                refreshValueList.add(x.getValue());
 
-			}
+            }
 
-			if (i < size-1){
-				sb.append(SqlScript.COMMA).append(SqlScript.SPACE);
-			}
-			i++;
-		}
+            if (i < size - 1) {
+                sb.append(SqlScript.COMMA).append(SqlScript.SPACE);
+            }
+            i++;
+        }
 
 
-		CriteriaCondition condition = refreshCondition.getCondition();
-		if (!refreshValueList.isEmpty()) {
-			condition.getValueList().addAll(0,refreshValueList);
-		}
+        CriteriaCondition condition = refreshCondition.getCondition();
+        if (!refreshValueList.isEmpty()) {
+            condition.getValueList().addAll(0, refreshValueList);
+        }
 
-		String conditionSql = criteriaParser.parseCondition(condition);
+        String conditionSql = criteriaParser.parseCondition(condition);
 
-		conditionSql = SqlParserUtil.mapper(conditionSql,parsed);
+        conditionSql = SqlParserUtil.mapper(conditionSql, parsed);
 
-		sb.append(conditionSql);
+        sb.append(conditionSql);
 
-		return sb.toString();
-	}
+        return sb.toString();
+    }
 
-	protected static void adpterRefreshCondition(PreparedStatement pstmt,
-			int i, CriteriaCondition condition) throws SQLException, SecurityException,
-			IllegalArgumentException {
+    protected static void adpterRefreshCondition(PreparedStatement pstmt,
+                                                 int i, CriteriaCondition condition) {
 
-		if (Objects.nonNull(condition)) {
-			for (Object v : condition.getValueList()) {
-				if(Objects.nonNull(v) && v.getClass().isEnum()){
-				    try {
-                        Object o = v.getClass().getDeclaredMethod("name").invoke(v);
-                        pstmt.setObject(i++, o.toString());
-                    }catch (Exception e){
+        if (Objects.nonNull(condition)) {
+            for (Object v : condition.getValueList()) {
+                setValue(i,pstmt,v);
+                i++;
+            }
+        }
+    }
 
-                    }
-				}else {
-					pstmt.setObject(i++, v);
-				}
-			}
-		}
-	}
+    public static void setValue(int i, PreparedStatement pstmt, Object obj) {
+        try {
+            if (Objects.nonNull(obj) && obj.getClass().isEnum()) {
+
+                Object o = obj.getClass().getDeclaredMethod("name").invoke(obj);
+                pstmt.setObject(i, o.toString());
+
+            } else {
+                pstmt.setObject(i, obj);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(ExceptionUtil.getMessage(e));
+        }
+    }
+
 
 }

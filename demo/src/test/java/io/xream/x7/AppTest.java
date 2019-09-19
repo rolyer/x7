@@ -52,8 +52,8 @@ public class AppTest {
 //        xxxTest.distinct();
 
 //        xxxTest.testUnion();
-          xxxTest.test();
-//          xxxTest.testListCriteria();
+//          xxxTest.test();
+          xxxTest.testListCriteria();
     }
 
 

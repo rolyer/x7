@@ -154,11 +154,6 @@ public class XxxTest {
         return testServiceRemote.testRefreshConditionn(refreshCondition);
     }
 
-    public ViewEntity testUnion(){
-
-        CatRO ro = new CatRO();
-        return this.controller.testUnion(ro);
-    }
 
 
     public ViewEntity testListCriteria(){
