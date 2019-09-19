@@ -141,9 +141,7 @@ public class SqlUtil {
 
         List<Object> refreshValueList = new ArrayList<>();
 
-        int i = 0;
-        int size = refreshList.size();
-
+        boolean isNotFirst = false;
         for (Criteria.X x : refreshList) {
             if (x.getPredicate() == Predicate.X) {
 
@@ -169,9 +167,14 @@ public class SqlUtil {
                 } else {
 
                     if (StringUtil.isNullOrEmpty(x.getValue().toString()) || BeanUtilX.isBaseType_0(key,x.getValue(),parsed)) {
-                        i++;
                         continue;
                     }
+
+                    if (isNotFirst){
+                        sb.append(SqlScript.COMMA).append(SqlScript.SPACE);
+                    }
+
+                    isNotFirst = true;
 
                     String mapper = parsed.getMapper(key);
                     sb.append(mapper);
@@ -193,10 +196,6 @@ public class SqlUtil {
 
             }
 
-            if (i < size - 1) {
-                sb.append(SqlScript.COMMA).append(SqlScript.SPACE);
-            }
-            i++;
         }
 
 
