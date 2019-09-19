@@ -59,12 +59,14 @@ public class ClientResolver {
     private static BraveHttpResponseInterceptor responseInterceptor;
 
     private static HttpClientProperies properies;
+    private static ReyClientProperties reyClientProperties;
 
 
-    public static void init(HttpClientProperies p, CircuitBreakerRegistry c, RetryRegistry r) {
+    public static void init(HttpClientProperies p, ReyClientProperties reyProperties, CircuitBreakerRegistry c, RetryRegistry r) {
         circuitBreakerRegistry = c;
         properies = p;
         retryRegistry = r;
+        reyClientProperties = reyProperties;
     }
 
     public static void initInterceptor(BraveHttpRequestInterceptor req, BraveHttpResponseInterceptor rep) {
@@ -263,11 +265,13 @@ public class ClientResolver {
         if (result == null)
             return;
 
+
         if (result.contains("RemoteServiceException")
                 || result.contains("RuntimeException")
                 || result.contains("BizException")
                 || result.contains(".Exception")
-                || result.contains(".Throwable")) {
+                || result.contains(".Throwable")
+                || result.contains(reyClientProperties.getRemoteException())) {
 
             if (logger.isErrorEnabled()) {
                 logger.error(result);

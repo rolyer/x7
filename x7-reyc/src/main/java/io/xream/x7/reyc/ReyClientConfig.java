@@ -22,17 +22,19 @@ import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.github.resilience4j.retry.RetryRegistry;
 import io.xream.x7.reyc.internal.ClientResolver;
 import io.xream.x7.reyc.internal.HttpClientProperies;
+import io.xream.x7.reyc.internal.ReyClientProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 
-@Import({HttpClientProperies.class})
+@Import({HttpClientProperies.class,ReyClientProperties.class})
 public class ReyClientConfig {
 
-    public ReyClientConfig(HttpClientProperies properies, CircuitBreakerRegistry circuitBreakerRegistry){
+
+    public ReyClientConfig(HttpClientProperies properies, ReyClientProperties reyClientProperties,CircuitBreakerRegistry circuitBreakerRegistry){
 
         RetryRegistry retryRegistry = RetryRegistry.ofDefaults();
-        ClientResolver.init(properies, circuitBreakerRegistry, retryRegistry);
+        ClientResolver.init(properies, reyClientProperties,circuitBreakerRegistry, retryRegistry);
 
     }
 
