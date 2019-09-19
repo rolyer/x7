@@ -266,7 +266,8 @@ public class ClientResolver {
         if (result.contains("RemoteServiceException")
                 || result.contains("RuntimeException")
                 || result.contains("BizException")
-                || result.contains("\"status\":\"FAIL\"")) {
+                || result.contains(".Exception")
+                || result.contains(".Throwable")) {
 
             if (logger.isErrorEnabled()) {
                 logger.error(result);
