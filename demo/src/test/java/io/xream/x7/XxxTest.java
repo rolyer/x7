@@ -122,6 +122,11 @@ public class XxxTest {
         return testServiceRemote.getBase();
     }
 
+
+    public ViewEntity refresh(){
+        return this.controller.refreshByCondition(null);
+    }
+
     public ViewEntity testCriteria(){
 
         CriteriaBuilder builder = CriteriaBuilder.build(CatTest.class);

@@ -75,12 +75,16 @@ public class XxxController {
 
 //		this.catRepository.create(cat);
 
-		RefreshCondition refreshCondition = new RefreshCondition();
-		refreshCondition.and().eq("type","NL");
+		RefreshCondition<Cat> refreshCondition = new RefreshCondition();
+		refreshCondition.and().eq("id",3);
 		//refreshCondition.refresh("test=test+1");//表达式更新
 		refreshCondition.refresh("test",3333).refresh("type","XL");//赋值更新
-//		this.catRepository.refresh(refreshCondition);//必须带ID更新，没ID报错
-		this.catRepository.refreshUnSafe(refreshCondition);//可以多条更新
+
+//		String str = JsonX.toJson(refreshCondition);
+//		refreshCondition = JsonX.toObject(str,RefreshCondition.class);
+
+		this.catRepository.refresh(refreshCondition);//必须带ID更新，没ID报错
+//		this.catRepository.refreshUnSafe(refreshCondition);//可以多条更新
 
 //		if (true){
 //			throw new RuntimeException("xxxxxxxxxxxxxxxxxxxx");

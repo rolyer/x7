@@ -17,6 +17,7 @@
         <maven.test.skip>true</maven.test.skip>
         <docker.image.prefix>xreamio</docker.image.prefix>
         <x7.version>2.2.0.M</x7.version>
+        <fastjson.version>1.2.60</fastjson.version>
     </properties>
 
     <dependencyManagement>
@@ -109,6 +110,12 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>${fastjson.version}</version>
         </dependency>
 
         <!--

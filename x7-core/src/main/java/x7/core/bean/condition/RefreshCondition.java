@@ -43,7 +43,6 @@ public class RefreshCondition<T> {
 
     public void setClz(Class clz) {
         this.clz = clz;
-
     }
 
     public List<Criteria.X> getRefreshList() {
@@ -64,8 +63,11 @@ public class RefreshCondition<T> {
 
     public Criteria getCondition() {
 
-        if (Objects.nonNull(this.builder)) {
-            this.condition = builder.get();
+        if (this.condition == null) {
+
+            if (Objects.nonNull(this.builder)) {
+                this.condition = builder.get();
+            }
         }
 
         return this.condition;
@@ -76,14 +78,20 @@ public class RefreshCondition<T> {
     }
 
     public RefreshCondition(){
-        CriteriaBuilder builder = CriteriaBuilder.buildCondition();
-        this.builder = builder;
+    }
+
+    private CriteriaBuilder getBuilder(){
+        if (this.builder == null) {
+            CriteriaBuilder builder = CriteriaBuilder.buildCondition();
+            this.builder = builder;
+        }
+        return this.builder;
     }
 
 
     public CriteriaBuilder.ConditionBuilder  and(){
 
-        return this.builder.and();
+        return this.getBuilder().and();
     }
 
     /**
