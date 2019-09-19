@@ -22,6 +22,7 @@ import x7.core.util.BeanUtil;
 import x7.core.util.BeanUtilX;
 import x7.core.util.StringUtil;
 import x7.core.web.Direction;
+import x7.core.web.Viewable;
 import x7.repository.CriteriaParser;
 import x7.repository.SqlParsed;
 import x7.repository.mapper.Mapper;
@@ -535,8 +536,7 @@ public class SqlCriteriaParser implements CriteriaParser {
 
             if (clz.getSuperclass().isEnum() || clz.isEnum()) {
                 try {
-                    Object o = clz.getDeclaredMethod("name").invoke(v);//?
-                    criteria.getValueList().add(o.toString());
+                    criteria.getValueList().add(v.toString());
                 }catch (Exception e){
 
                 }

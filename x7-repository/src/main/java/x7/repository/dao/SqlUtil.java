@@ -208,10 +208,7 @@ public class SqlUtil {
     public static void setValue(int i, PreparedStatement pstmt, Object obj) {
         try {
             if (Objects.nonNull(obj) && obj.getClass().isEnum()) {
-
-                Object o = obj.getClass().getDeclaredMethod("name").invoke(obj);
-                pstmt.setObject(i, o.toString());
-
+                pstmt.setObject(i, obj.toString());
             } else {
                 pstmt.setObject(i, obj);
             }
@@ -219,6 +216,5 @@ public class SqlUtil {
             throw new RuntimeException(ExceptionUtil.getMessage(e));
         }
     }
-
 
 }
