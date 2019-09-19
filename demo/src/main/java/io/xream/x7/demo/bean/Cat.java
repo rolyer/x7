@@ -5,6 +5,7 @@ import x7.core.repository.X;
 import x7.core.web.IdView;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +21,7 @@ public class Cat implements Serializable, IdView {
 	private long dogId;
 	private long test;
 	private List<Long> list;
+	private Date createAt;
 
 	private transient Map<Object,Object> viewMap;
 	@Override
@@ -79,6 +81,14 @@ public class Cat implements Serializable, IdView {
 	public void setList(List<Long> list) {
 
 		this.list = list;
+	}
+
+	public Date getCreateAt() {
+		return createAt;
+	}
+
+	public void setCreateAt(Date createAt) {
+		this.createAt = createAt;
 	}
 
 	@Override

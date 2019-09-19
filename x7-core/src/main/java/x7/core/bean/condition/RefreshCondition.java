@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import x7.core.bean.Criteria;
 import x7.core.bean.CriteriaBuilder;
 import x7.core.bean.Predicate;
+import x7.core.util.BeanUtilX;
 
 import java.util.ArrayList;
 import java.util.List;

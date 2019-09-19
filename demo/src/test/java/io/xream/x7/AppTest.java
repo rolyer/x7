@@ -35,7 +35,7 @@ public class AppTest {
 //        xxxTest.domain();
 
 
-        xxxTest.testReyClient();
+//        xxxTest.testReyClient();
 //        xxxTest.testTime();
 //        xxxTest.getBase();
 

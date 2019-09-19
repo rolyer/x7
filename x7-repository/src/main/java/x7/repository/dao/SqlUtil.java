@@ -29,6 +29,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.*;
 
 
@@ -165,9 +166,23 @@ public class SqlUtil {
                     sql = SqlParserUtil.mapper(sql, parsed);
                     sb.append(sql);
                 } else {
+
+                    if (BeanUtilX.isBaseType_0(key,x.getValue(),parsed)) {
+                        i++;
+                        continue;
+                    }
+
                     String mapper = parsed.getMapper(key);
                     sb.append(mapper);
                     sb.append(SqlScript.EQ_PLACE_HOLDER);
+
+                    BeanElement be = parsed.getElementMap().get(key);
+                    if (be.clz == Date.class || be.clz == Timestamp.class) {
+                        if (x.getValue() instanceof Long) {
+                            x.setValue(new Date(((Long) x.getValue()).longValue()));
+                        }
+                    }
+
                 }
                 refreshValueList.add(x.getValue());
 

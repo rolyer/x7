@@ -77,6 +77,8 @@ public class XxxController {
 
 		RefreshCondition<Cat> refreshCondition = new RefreshCondition();
 		refreshCondition.and().eq("id",3);
+		refreshCondition.refresh("dogId",0);
+		refreshCondition.refresh("createAt",new Date());
 		//refreshCondition.refresh("test=test+1");//表达式更新
 		refreshCondition.refresh("test",3333).refresh("type","XL");//赋值更新
 
