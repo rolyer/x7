@@ -26,7 +26,6 @@ public class InCondition {
     private String property;
     private List<? extends Object> inList;
 
-    private String transformAlia;
 
     @JsonIgnore
     private transient Class clz;
@@ -55,13 +54,6 @@ public class InCondition {
         this.clz = clz;
     }
 
-    public String getTransformAlia() {
-        return transformAlia;
-    }
-
-    public void setTransformAlia(String transformAlia) {
-        this.transformAlia = transformAlia;
-    }
 
     public InCondition(){
     }
@@ -76,7 +68,6 @@ public class InCondition {
         return "InCondition{" +
                 "property='" + property + '\'' +
                 ", inList=" + inList +
-                ", transformAlia='" + transformAlia + '\'' +
                 ", clz=" + clz +
                 '}';
     }

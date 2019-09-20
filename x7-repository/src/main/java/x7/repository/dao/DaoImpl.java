@@ -801,10 +801,6 @@ public class DaoImpl implements Dao {
 
         sb.append(sql).append(SqlScript.WHERE);
 
-        if (inCondition.getTransformAlia()!= null){
-            sb.append("alia = ").append(inCondition.getTransformAlia());
-        }
-
         sb.append(mapper).append(SqlScript.IN).append(SqlScript.LEFT_PARENTTHESIS);//" IN ("
 
         Class<?> keyType = be.getMethod.getReturnType();

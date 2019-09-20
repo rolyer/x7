@@ -23,8 +23,7 @@ public class FieldAndMethod{
 	private Field field;
 	private Method setter;
 	private Method getter;
-	
-	
+
 	private String property;
 	private String setterName;
 	private String getterName;

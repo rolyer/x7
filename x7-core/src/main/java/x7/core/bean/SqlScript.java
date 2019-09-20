@@ -32,7 +32,6 @@ public interface SqlScript {
 	String NONE = "";
 	String SPACE = " ";
 	String PLACE_HOLDER = "?";
-	String PAGE_PLACE_HOLDER = " #{PAGE}";
 	String EQ_PLACE_HOLDER = " = ?";
 	String LIKE_HOLDER = "%";
 	String POINT = ".";
@@ -44,8 +43,6 @@ public interface SqlScript {
 	String WELL_NO = "#";
 	String SINGLE_QUOTES = "'";
 	String KEY_SQL = "`";
-	String UNION = " UNION ";
-	String UNION_ALL = " UNION ALL ";
 
 	String sql();
 }

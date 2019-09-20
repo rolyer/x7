@@ -178,7 +178,6 @@ public class CriteriaBuilder {
                 criteria.setSortList(sortList);
             }
             Sort sort = new Sort(orderBy,direction);
-            sort.setOptValueList(optValueList);
             sortList.add(sort);
             return this;
         }

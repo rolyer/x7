@@ -349,7 +349,6 @@ public class Parser {
         inConditionTransformed.setClz(parsedTransformed.getClz());
         inConditionTransformed.setProperty(propertyTransformed);
         inConditionTransformed.setInList(inCondition.getInList());
-        inConditionTransformed.setTransformAlia(parsed.getTransformedAlia());
 
         return inConditionTransformed;
     }

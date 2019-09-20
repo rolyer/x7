@@ -21,16 +21,11 @@ import x7.core.web.Direction;
 import java.io.Serializable;
 import java.util.List;
 
-public class Sort implements QueryOptimizer, Serializable {
+public class Sort implements Serializable {
     private static final long serialVersionUID = 7492946384236689679L;
 
     private Direction direction = Direction.DESC;
     private String orderBy;
-    /**
-     * multi order by, opitimize the first Sort,<br>
-     * union all each query<br>
-     */
-    private List<Object> optValueList;
 
     public Sort(){}
 
@@ -55,24 +50,13 @@ public class Sort implements QueryOptimizer, Serializable {
         this.orderBy = orderBy;
     }
 
-    /**
-     * multi order by, opitimize the first Sort,<br>
-     * union all each query<br>
-     */
-    public List<Object> getOptValueList() {
-        return optValueList;
-    }
 
-    public void setOptValueList(List<Object> optValueList) {
-        this.optValueList = optValueList;
-    }
 
     @Override
     public String toString() {
         return "Sort{" +
                 "direction=" + direction +
                 ", orderBy='" + orderBy + '\'' +
-                ", optValueList='" + optValueList + '\'' +
                 '}';
     }
 }
