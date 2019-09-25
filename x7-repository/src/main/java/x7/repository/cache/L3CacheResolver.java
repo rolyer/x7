@@ -83,14 +83,14 @@ public interface L3CacheResolver {
     class Count {
 
         private final static Map<String, Long> countMap = new ConcurrentHashMap<>();
-        private final static long MAX_COUNT = 10;
+        private final static long MAX_COUNT = 40;
 
         private static void increment(String key) {
             key = wrapKey(key);
             long count = MapUtils.getLongValue(countMap, key);
             if (count >= MAX_COUNT) {
                 reset(key);
-                throw new L3CacheException();
+                throw new L3CacheException("SERVER BUSY");
             }
 
             countMap.put(key,count + 1);
