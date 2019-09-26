@@ -33,21 +33,19 @@ import java.util.concurrent.TimeUnit;
 
 public interface L3CacheResolver {
 
-    long WAIT_PERIOD_MILLIS = 300;
-
     L3CacheStoragePolicy getStorage();
 
     default String resolve(String key, long expireTime, TimeUnit timeUnit, Callable caller) {
         try {
             String value = getStorage().get(key, expireTime, timeUnit); //从缓存里获取
             if (StringUtil.isNotNull(value)) {//如果有
-                Count.reset(key);
+                PeriodCounter.reset(key);
                 if (L3CacheStoragePolicy.DEFAULT_VALUE.equals(value)) //防止缓存击穿
                     return null;
                 return value;//就返回缓存结果
             }
         }catch (Exception e) {
-            Count.reset(key);
+            PeriodCounter.reset(key);
             throw new RuntimeException(ExceptionUtil.getMessage(e));
         }
 
@@ -61,29 +59,30 @@ public interface L3CacheResolver {
                 } catch (Throwable e) {
                     throw new RuntimeException(ExceptionUtil.getMessage(e));
                 }finally {
-                    Count.reset(key);
+                    PeriodCounter.reset(key);
                 }
             });
         } catch (DistributionLockException dle) { // 如果别的请求已经锁了资源
-            Count.increment(key);
+            PeriodCounter.increment(key);
             try {
-                Thread.sleep(WAIT_PERIOD_MILLIS);
+                Thread.sleep(PeriodCounter.SLEEP_MILLIS);
             } catch (InterruptedException e) {
-                Count.reset(key);
+                PeriodCounter.reset(key);
                 throw new RuntimeException(ExceptionUtil.getMessage(e));
             }
             return resolve(key, expireTime, timeUnit, caller);//递归请求
         } catch (Exception e) {
-            Count.reset(key);
+            PeriodCounter.reset(key);
             throw new RuntimeException(ExceptionUtil.getMessage(e));
         }
     }
 
 
-    class Count {
+    class PeriodCounter {
 
         private final static Map<String, Long> countMap = new ConcurrentHashMap<>();
         private final static long MAX_COUNT = 40;
+        private final static long SLEEP_MILLIS = 300;
 
         private static void increment(String key) {
             key = wrapKey(key);
