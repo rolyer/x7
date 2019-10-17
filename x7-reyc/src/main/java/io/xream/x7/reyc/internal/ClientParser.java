@@ -111,12 +111,18 @@ public class ClientParser {
             Class<?> returnType = method.getReturnType();
 
             Annotation mappingAnno = method.getAnnotation(RequestMapping.class);
-            if (mappingAnno == null)
-                throw new RuntimeException(clz.getName()+"."+methodName+ ", Not Found Annotation: " + RequestMapping.class.getName());
+            if (mappingAnno == null) {
+                logger.info(clz.getName() + "." + methodName + ", Not Found Annotation: " + RequestMapping.class.getName());
+                logger.error(clz.getName() + "." + methodName + ", Not Found Annotation: " + RequestMapping.class.getName());
+                System.exit(0);
+            }
 
             RequestMapping requestMapping = (RequestMapping) mappingAnno;
-            if (requestMapping.value() == null || requestMapping.value().length ==0)
-                throw new RuntimeException(clz.getName()+"."+methodName+ " RequestMapping, no mapping value");
+            if (requestMapping.value() == null || requestMapping.value().length ==0) {
+                logger.info(clz.getName() + "." + methodName + " RequestMapping, no mapping value");
+                logger.error(clz.getName() + "." + methodName + " RequestMapping, no mapping value");
+                System.exit(0);
+            }
 
             String mapping = requestMapping.value()[0];
 
@@ -144,17 +150,24 @@ public class ClientParser {
                 }
             }
 
-            if (returnType == Map.class)
-                throw new RuntimeException("ReyClient not support  genericReturnType of Map，while parsing " + method);
+            if (returnType == Map.class) {
+                logger.info("ReyClient not support  genericReturnType of Map，while parsing " + method);
+                logger.error("ReyClient not support  genericReturnType of Map，while parsing " + method);
+                System.exit(0);
+            }
 
             Class gtc = null;
             if (returnType == List.class) {
                 Type gt = method.getGenericReturnType();
                 ParameterizedType pt = (ParameterizedType)gt;
                 Type t = pt.getActualTypeArguments()[0];
-                if (t instanceof ParameterizedType)
-                    throw new RuntimeException("ReyClient not support complex genericReturnType, like List<List<?>>, or" +
+                if (t instanceof ParameterizedType) {
+                    logger.info("ReyClient not support complex genericReturnType, like List<List<?>>, or" +
                             "List<Map>，while parsing " + method);
+                    logger.error("ReyClient not support complex genericReturnType, like List<List<?>>, or" +
+                            "List<Map>，while parsing " + method);
+                    System.exit(0);
+                }
                 gtc = (Class)t;
             }
 
