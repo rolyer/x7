@@ -17,6 +17,8 @@
 package io.xream.x7.reyc.internal;
 
 import io.xream.x7.reyc.ReyClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -34,6 +36,8 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 public class ClientParser {
+
+    private static Logger logger = LoggerFactory.getLogger(ClientParser.class);
 
     protected static Pattern pattern1 = Pattern.compile("\\$\\{[\\s\\S]*\\}");
 
@@ -63,8 +67,11 @@ public class ClientParser {
                         String key = regx.replace("${", "").replace("}", "");
                         String value = environment.getProperty(key);
 
-                        if (value == null)
-                            throw new RuntimeException("Can't find the config of key: " + key);
+                        if (value == null) {
+                            logger.info("ReyClient Fatal Error, Can't find the config of key: '" + key +"', App will shutdown");
+                            logger.error("ReyClient Fatal Error, Can't find the config of key: '" + key +"', App will shutdown");
+                            System.exit(0);
+                        }
 
                         url = url.replace(regx, value);
                     }
