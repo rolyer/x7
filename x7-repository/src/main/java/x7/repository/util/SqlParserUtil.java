@@ -93,7 +93,7 @@ public class SqlParserUtil {
                     }
                 } else if (type.isEnum()){
                     if (value != null) {
-                        map.put(property, value.toString());
+                        map.put(property, ((Enum)value).name());
                     }
                 }else if (type == Date.class || clz == java.sql.Date.class || type == Timestamp.class) {
                     if (value != null) {
@@ -153,7 +153,7 @@ public class SqlParserUtil {
                     }
                 }else if (type.isEnum()){
                     if (value != null) {
-                        map.put(property, value.toString());
+                        map.put(property, ((Enum)value).name());
                     }
                 } else if (type == int.class) {
                     if ((int) value != 0) {

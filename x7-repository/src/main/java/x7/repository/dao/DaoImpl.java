@@ -134,7 +134,7 @@ public class DaoImpl implements Dao {
                             String str = JsonX.toJson(value);
                             this.dialect.setJSON(i++, str, pstmt);
                         } else if (ele.clz.isEnum()) {
-                            String str = value.toString();
+                            String str = ((Enum)value).name();
                             pstmt.setObject(i++, str);
                         } else {
                             value = this.dialect.filterValue(value);
@@ -248,7 +248,7 @@ public class DaoImpl implements Dao {
                         String str = JsonX.toJson(value);
                         this.dialect.setJSON(i++, str, pstmt);
                     } else if (ele.clz.isEnum()) {
-                        String str = value.toString();
+                        String str = ((Enum)value).name();
                         pstmt.setObject(i++, str);
                     } else {
                         value = this.dialect.filterValue(value);

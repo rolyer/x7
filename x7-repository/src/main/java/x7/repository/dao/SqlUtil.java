@@ -18,10 +18,7 @@ package x7.repository.dao;
 
 import x7.core.bean.*;
 import x7.core.bean.condition.RefreshCondition;
-import x7.core.util.BeanUtil;
-import x7.core.util.BeanUtilX;
-import x7.core.util.ExceptionUtil;
-import x7.core.util.StringUtil;
+import x7.core.util.*;
 import x7.repository.CriteriaParser;
 import x7.repository.util.SqlParserUtil;
 
@@ -189,8 +186,20 @@ public class SqlUtil {
                         if (x.getValue() instanceof Long) {
                             x.setValue(new Timestamp(((Long) x.getValue()).longValue()));
                         }
+                    }else if (be.isJson){
+                        Object v = x.getValue();
+                        if (v != null){
+                            String str = JsonX.toJson(v);
+                            x.setValue(str);
+                        }
                     }
 
+                }
+
+                Object v = x.getValue();
+                if (v instanceof Enum){
+                    String name = ((Enum) v).name();
+                    x.setValue(name);
                 }
                 refreshValueList.add(x.getValue());
 
@@ -227,7 +236,7 @@ public class SqlUtil {
     public static void setValue(int i, PreparedStatement pstmt, Object obj) {
         try {
             if (Objects.nonNull(obj) && obj.getClass().isEnum()) {
-                pstmt.setObject(i, obj.toString());
+                pstmt.setObject(i, ((Enum)obj).name());
             } else {
                 pstmt.setObject(i, obj);
             }

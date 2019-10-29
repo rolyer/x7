@@ -536,7 +536,7 @@ public class SqlCriteriaParser implements CriteriaParser {
 
             if (clz.getSuperclass().isEnum() || clz.isEnum()) {
                 try {
-                    criteria.getValueList().add(v.toString());
+                    criteria.getValueList().add(((Enum)v).name());
                 }catch (Exception e){
 
                 }

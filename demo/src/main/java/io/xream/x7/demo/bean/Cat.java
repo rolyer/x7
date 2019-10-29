@@ -22,6 +22,7 @@ public class Cat implements Serializable, IdView {
 	private long test;
 	private List<Long> list;
 	private Date createAt;
+	private TestBoo testBoo;
 
 	private transient Map<Object,Object> viewMap;
 	@Override
@@ -89,6 +90,14 @@ public class Cat implements Serializable, IdView {
 
 	public void setCreateAt(Date createAt) {
 		this.createAt = createAt;
+	}
+
+	public TestBoo getTestBoo() {
+		return testBoo;
+	}
+
+	public void setTestBoo(TestBoo testBoo) {
+		this.testBoo = testBoo;
 	}
 
 	@Override
