@@ -40,23 +40,12 @@ public class XxxController {
 		Cat cat = new Cat();
 		cat.setId(245);
 		cat.setDogId(2);
+		cat.setTestBoo(TestBoo.TEST);
 
-//		this.catRepository.create(cat);
+		this.catRepository.create(cat);
 
-		Cat cat2 = new Cat();
-		cat2.setId(246);
-		cat2.setDogId(2);
-//
-//		this.catRepository.create(cat2);
 
-		List<Cat> catList = new ArrayList<>();
-		for (int i = 0; i< 500; i++){
-			Cat cat3 = new Cat();
-			cat3.setId(5448 + i);
-			cat3.setDogId(2);
-			catList.add(cat3);
-		}
-		this.catRepository.createBatch(catList);
+
 //		throw new RuntimeException("-----------------------------> test wawawawa");
 
 		return ViewEntity.ok();
@@ -75,9 +64,19 @@ public class XxxController {
 
 //		this.catRepository.create(cat);
 
+		List<String> testList = new ArrayList<>();
+		testList.add("1111");
+		testList.add("2222");
+
+		Dark dark = new Dark();
+		dark.setId("33");
+		dark.setTest("testKKKKK");
+
 		RefreshCondition<Cat> refreshCondition = new RefreshCondition();
 		refreshCondition.and().eq("id",4);
 		refreshCondition.refresh("testBoo",TestBoo.TEST);
+		refreshCondition.refresh("testList",testList);
+		refreshCondition.refresh("testObj",dark);
 //		refreshCondition.refresh("createAt",new Date());
 		//refreshCondition.refresh("test=test+1");//表达式更新
 //		refreshCondition.refresh("test",3333).refresh("type","XL");//赋值更新
@@ -85,7 +84,7 @@ public class XxxController {
 //		String str = JsonX.toJson(refreshCondition);
 //		refreshCondition = JsonX.toObject(str,RefreshCondition.class);
 
-		this.catRepository.refresh(refreshCondition);//必须带ID更新，没ID报错
+		boolean flag = this.catRepository.refresh(refreshCondition);//必须带ID更新，没ID报错
 //		this.catRepository.refreshUnSafe(refreshCondition);//可以多条更新
 
 //		if (true){

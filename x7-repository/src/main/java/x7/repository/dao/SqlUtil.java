@@ -140,14 +140,22 @@ public class SqlUtil {
 
         boolean isNotFirst = false;
         for (Criteria.X x : refreshList) {
+
+
             if (x.getPredicate() == Predicate.X) {
+
+                if (isNotFirst){
+                    sb.append(SqlScript.COMMA).append(SqlScript.SPACE);
+                }
+
+                isNotFirst = true;
 
                 Object key = x.getKey();
 
                 String str = key.toString();
 
-                if (str.contains(","))
-                    throw new RuntimeException("RefreshCondition.refresh(), para can not contains(,)");
+//                if (str.contains(","))
+//                    throw new RuntimeException("RefreshCondition.refresh(), para can not contains(,)");
 
                 String sql = BeanUtilX.normalizeSql(str);
 
@@ -158,6 +166,13 @@ public class SqlUtil {
             } else {
                 String key = x.getKey();
                 if (key.contains("?")) {
+
+                    if (isNotFirst){
+                        sb.append(SqlScript.COMMA).append(SqlScript.SPACE);
+                    }
+
+                    isNotFirst = true;
+
                     String sql = BeanUtilX.normalizeSql(key);
                     sql = SqlParserUtil.mapper(sql, parsed);
                     sb.append(sql);

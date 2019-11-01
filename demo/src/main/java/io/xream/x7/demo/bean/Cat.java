@@ -5,6 +5,7 @@ import x7.core.repository.X;
 import x7.core.web.IdView;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,8 @@ public class Cat implements Serializable, IdView {
 	private List<Long> list;
 	private Date createAt;
 	private TestBoo testBoo;
+	private List<String> testList = new ArrayList<>();
+	private Dark testObj;
 
 	private transient Map<Object,Object> viewMap;
 	@Override
@@ -98,6 +101,22 @@ public class Cat implements Serializable, IdView {
 
 	public void setTestBoo(TestBoo testBoo) {
 		this.testBoo = testBoo;
+	}
+
+	public List<String> getTestList() {
+		return testList;
+	}
+
+	public void setTestList(List<String> testList) {
+		this.testList = testList;
+	}
+
+	public Dark getTestObj() {
+		return testObj;
+	}
+
+	public void setTestObj(Dark testObj) {
+		this.testObj = testObj;
 	}
 
 	@Override

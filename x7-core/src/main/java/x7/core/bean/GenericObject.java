@@ -17,44 +17,59 @@
 package x7.core.bean;
 
 import com.alibaba.fastjson.JSON;
+import x7.core.util.ExceptionUtil;
 import x7.core.util.JsonX;
 
 import java.util.Objects;
 
 public class GenericObject<T> {
 
-	private Class<T> clzz;
-	private T obj;
+	private String clzz;
+	private Object obj;
 
 	public GenericObject(){}
 	public GenericObject(T t){
 		this.obj = t;
 	}
 
-	public Class<T> getClzz() {
+	public String getClzz() {
 		if (this.clzz == null) {
-			this.clzz = (Class<T>) obj.getClass();
+			this.clzz =  obj.getClass().getName();
 		}
 		return this.clzz;
 	}
-	public void setClzz(Class<T> clz) {
-		this.clzz = clz;
+	public void setClzz(String clzz) {
+		this.clzz = clzz;
 	}
 
-	public T getObj() {
-		if (Objects.nonNull(obj) ){
-			if (this.obj instanceof JSON) {
-				this.obj = JsonX.toObject(obj, clzz);
-			}
-		}
+	public Object getObj() {
+//		if (Objects.nonNull(obj) ){
+//			if (this.obj instanceof JSON) {
+//				this.obj = JsonX.toObject(obj, clzz);
+//			}
+//		}
 		return obj;
 	}
-	public void setObj(T obj) {
+	public void setObj(Object obj) {
 		this.obj = obj;
 	}
+
+	public T get(){
+		if (this.clzz == null)
+			throw new RuntimeException("clzz is null");
+		try {
+			Class<T> clz = (Class<T>)Class.forName(this.clzz);
+			return JsonX.toObject(this.obj,clz);
+		}catch (Exception e) {
+			throw new RuntimeException(ExceptionUtil.getMessage(e));
+		}
+
+	}
+
 	@Override
 	public String toString() {
 		return ""+getObj();
 	}
+
 	
 }

@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import x7.core.bean.Criteria;
+import x7.core.bean.GenericObject;
+import x7.core.bean.KV;
 import x7.core.util.JsonX;
 
 import java.util.concurrent.Executor;
@@ -56,7 +58,9 @@ public class AppTest {
 //        xxxTest.testUnion();
 //        xxxTest.test();
 //        xxxTest.testListCriteria();
+//        xxxTest.create();
         xxxTest.refresh();
+
     }
 
 

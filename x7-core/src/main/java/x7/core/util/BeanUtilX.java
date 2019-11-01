@@ -292,15 +292,6 @@ public class BeanUtilX extends BeanUtil {
 	}
 
 
-
-	public static String getIndexClzName(Class clz) {
-		String name = clz.getName();
-		name = name + "Index";
-		return name;
-	}
-
-
-
 	public static void parseSearch(Parsed parsed, Class clz) {
 
 		Search pClz = (Search) clz.getAnnotation(Search.class);
@@ -549,7 +540,6 @@ public class BeanUtilX extends BeanUtil {
 		}
 		return mapper;
 	}
-
 
 
 
