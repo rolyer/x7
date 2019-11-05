@@ -76,7 +76,9 @@ public class HealthChecker {
                 }
 
                 if (DbType.value.equals(DbType.MYSQL)) {
-                    ManuRepository.execute(clz.newInstance(), createSql);
+                    if (StringUtil.isNotNull(createSql)) {
+                        ManuRepository.execute(clz.newInstance(), createSql);
+                    }
                 }
 
                 Parsed clzParsed = Parser.get(clz);
