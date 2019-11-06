@@ -2,6 +2,10 @@ package io.xream.x7.reliable.api;
 
 import java.util.concurrent.Callable;
 
+/**
+ * @author Sim 8966188@qq.com
+ * @apiNote to use @EnableReliableManagement, has to implements ReliableBackend and develop 'Reliable Message Center'
+ */
 public interface ReliableBackend {
 
     /**
