@@ -20,22 +20,19 @@ import x7.core.bean.*;
 import x7.core.bean.condition.RefreshCondition;
 import x7.core.util.*;
 import x7.repository.CriteriaParser;
+import x7.repository.exception.PersistenceException;
 import x7.repository.util.SqlParserUtil;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.*;
 
 
 public class SqlUtil {
 
-    protected static void adpterSqlKey(PreparedStatement pstmt, String keyOne, Object obj, int i)
-            throws SQLException, NoSuchMethodException, SecurityException, IllegalAccessException,
-            IllegalArgumentException, InvocationTargetException {
+    protected static void adpterSqlKey(PreparedStatement pstmt, String keyOne, Object obj, int i) {
         /*
          * 处理KEY
          */
@@ -43,22 +40,32 @@ public class SqlUtil {
         try {
             method = obj.getClass().getDeclaredMethod(BeanUtil.getGetter(keyOne));
         } catch (NoSuchMethodException e) {
-            method = obj.getClass().getSuperclass().getDeclaredMethod(BeanUtil.getGetter(keyOne));
+            try {
+                method = obj.getClass().getSuperclass().getDeclaredMethod(BeanUtil.getGetter(keyOne));
+            }catch (Exception ee){
+                throw new RuntimeException(ExceptionUtil.getMessage(ee));
+            }
         }
-        Object value = method.invoke(obj);
-        pstmt.setObject(i++, value);
+        try {
+            Object value = method.invoke(obj);
+            pstmt.setObject(i++, value);
+        }catch (Exception e) {
+            throw new PersistenceException(ExceptionUtil.getMessage(e));
+        }
 
     }
 
-    protected static void adpterSqlKey(PreparedStatement pstmt, Field keyOneF, Object obj, int i)
-            throws SQLException, SecurityException, IllegalAccessException,
-            IllegalArgumentException {
-        /*
-         * 处理KEY
-         */
-        Object value = keyOneF.get(obj);
+    protected static void adpterSqlKey(PreparedStatement pstmt, Field keyOneF, Object obj, int i){
+        try {
+            /*
+             * 处理KEY
+             */
+            Object value = keyOneF.get(obj);
 
-        pstmt.setObject(i++, value);
+            pstmt.setObject(i++, value);
+        }catch (Exception e){
+            throw new PersistenceException(ExceptionUtil.getMessage(e));
+        }
 
     }
 
@@ -88,43 +95,7 @@ public class SqlUtil {
         return sql;
     }
 
-    /**
-     * 拼接SQL
-     *
-     */
-//	protected static String concatRefresh(StringBuilder sb, Parsed parsed, Map<String, Object> refreshMap) {
-//
-//		String keyOne = parsed.getKey(X.KEY_ONE);
-//		refreshMap.remove(keyOne);
-//
-//		sb.append(SqlScript.SET);
-//		int size = refreshMap.size();
-//		int i = 0;
-//		for (String key : refreshMap.keySet()) {
-//
-//			BeanElement element = parsed.getElement(key);
-//			if (element.isJson && DbType.ORACLE.equals(DbType.value)){
-//				Object obj = refreshMap.get(key);
-//				Reader reader = new StringReader(obj.toString());
-//				refreshMap.put(key,reader);
-//			}
-//
-//			String mapper = parsed.getMapper(key);
-//			sb.append(mapper);
-//			sb.append(SqlScript.EQ_PLACE_HOLDER);
-//			if (i < size - 1) {
-//				sb.append(SqlScript.COMMA);
-//			}
-//			i++;
-//		}
-//
-//
-//		sb.append(SqlScript.WHERE);
-//		String mapper = parsed.getMapper(keyOne);
-//		sb.append(mapper).append(SqlScript.EQ_PLACE_HOLDER);
-//
-//		return sb.toString();
-//	}
+
 
     /**
      * 拼接SQL

@@ -16,13 +16,18 @@
  */
 package x7.repository.dao;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import x7.core.bean.*;
 import x7.core.bean.condition.InCondition;
 import x7.core.bean.condition.RefreshCondition;
 import x7.core.config.ConfigAdapter;
 import x7.core.repository.X;
-import x7.core.util.*;
+import x7.core.util.BeanMapUtil;
+import x7.core.util.ExceptionUtil;
+import x7.core.util.JsonX;
+import x7.core.util.StringUtil;
 import x7.core.web.Page;
 import x7.repository.CriteriaParser;
 import x7.repository.KeyOne;
@@ -44,6 +49,9 @@ import java.util.*;
  * @author Sim
  */
 public class DaoImpl implements Dao {
+
+
+    private final static Logger logger = LoggerFactory.getLogger(Dao.class);
 
     public DaoImpl() {
     }
