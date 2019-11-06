@@ -1,7 +1,8 @@
 package io.xream.x7.reliable;
 
-public interface TCCTopic {
+public enum TCCTopic {
 
-    String SUFFIX_CONFIRM = "_TCC_CONFIRM";
-    String SUFFIX_CANCEL = "_TCC_CANCEL";
+    _TCC_TRY,
+    _TCC_CONFIRM,
+    _TCC_CANCEL;
 }
