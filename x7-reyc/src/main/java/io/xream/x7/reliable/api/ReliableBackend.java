@@ -11,7 +11,7 @@ public interface ReliableBackend {
      * <br>
      * Anyway, if no deed to check all resources, not value it
      */
-    Object produceReliably(Boolean isTcc, String topic, Object body, String[] svcList, Callable callable);
+    Object produceReliably(Boolean isTcc, String topic, Object body, String[] svcs, Callable callable);
 
     void onConsumed(String svc, Object message, Runnable runnable);
 }

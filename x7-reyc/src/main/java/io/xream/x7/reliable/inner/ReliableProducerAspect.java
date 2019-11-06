@@ -52,7 +52,7 @@ public class ReliableProducerAspect {
                 reliableProducer.isTcc(),//
                 reliableProducer.topic(),//
                 body,//
-                reliableProducer.svcList(),//
+                reliableProducer.svcs(),//
                 () -> {
                     try {
                         org.aspectj.lang.Signature signature = proceedingJoinPoint.getSignature();

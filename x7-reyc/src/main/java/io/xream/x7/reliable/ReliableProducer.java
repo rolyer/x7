@@ -18,6 +18,6 @@ public @interface ReliableProducer {
      */
     String topic() default "";
     Class<?> type()  default Void.class;
-    String[] svcList() default {};
+    String[] svcs() default {};
     boolean isTcc() default false;
 }
