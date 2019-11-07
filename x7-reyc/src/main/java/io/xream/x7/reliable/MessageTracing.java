@@ -16,17 +16,7 @@
  */
 package io.xream.x7.reliable;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+public interface MessageTracing {
 
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD})
-public @interface ReliableProducer {
-
-    boolean isTcc() default false;
-    String topic() default "";
-    Class<?> type()  default Void.class;
-    String[] svcs() default {};
+    String getTracingId();
 }

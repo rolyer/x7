@@ -16,6 +16,8 @@
  */
 package io.xream.x7.reliable.api;
 
+import io.xream.x7.reliable.MessageTracing;
+
 import java.util.concurrent.Callable;
 
 /**
@@ -34,10 +36,11 @@ public interface ReliableBackend {
      *     anyway, when isTcc = true, has to prepare 3 listeners to listener<br>
      * @param topic message topic
      * @param body  message body
+     * @param messageTracing getMsgId(), set tracingId
      * @param svcs  the nameList of other listening domain service
      * @param callable  the service or controller handle the bisiness
      */
-    Object produceReliably(Boolean isTcc, String topic, Object body, String[] svcs, Callable callable);
+    Object produceReliably(Boolean isTcc, String topic, Object body, MessageTracing messageTracing, String[] svcs, Callable callable);
 
     /**
      *

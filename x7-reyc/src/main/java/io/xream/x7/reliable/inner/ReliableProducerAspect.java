@@ -16,6 +16,7 @@
  */
 package io.xream.x7.reliable.inner;
 
+import io.xream.x7.reliable.MessageTracing;
 import io.xream.x7.reliable.ReliableProducer;
 import io.xream.x7.reliable.api.ReliableBackend;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -64,10 +65,19 @@ public class ReliableProducerAspect {
         if (body == null)
             throw new RuntimeException("ReliableMessage No Body: " + Arrays.asList(proceedingJoinPoint.getArgs()));
 
+        MessageTracing tracing = null;
+        for (Object arg : args) {
+            if (arg instanceof MessageTracing) {
+                tracing = (MessageTracing) arg;
+                break;
+            }
+        }
+
         Object result = this.backend.produceReliably(
                 reliableProducer.isTcc(),//
                 reliableProducer.topic(),//
                 body,//
+                tracing,//
                 reliableProducer.svcs(),//
                 () -> {
                     try {
