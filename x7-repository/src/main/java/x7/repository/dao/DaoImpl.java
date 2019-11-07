@@ -315,52 +315,6 @@ public class DaoImpl implements Dao {
         return remove(keyOne, conn);
     }
 
-    protected <T> T get(Class<T> clz, long idOne, Connection conn) {
-
-        List<T> list = new ArrayList<T>();
-
-        String sql = MapperFactory.getSql(clz, Mapper.QUERY);
-        List<BeanElement> eles = MapperFactory.getElementList(clz);
-
-        if (ConfigAdapter.isIsShowSql())
-            System.out.println(sql);
-
-        PreparedStatement pstmt = null;
-        BeanElement tempEle = null;
-        try {
-            conn.setAutoCommit(true);
-            pstmt = conn.prepareStatement(sql);
-
-            int i = 1;
-
-            pstmt.setObject(i++, idOne);
-
-            ResultSet rs = pstmt.executeQuery();
-
-            if (rs != null) {
-                while (rs.next()) {
-                    T obj = clz.newInstance();
-                    list.add(obj);
-                    initObj(obj, rs, tempEle, eles);
-                }
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            String str = tempEle==null?"":(tempEle.property+"|"+tempEle.getMapper());
-            throw new RollbackException(
-                    "Exception occured by class = " + clz.getName() + ",column："+ str + ", message: " + e.getMessage());
-
-        } finally {
-            close(pstmt);
-            close(conn);
-        }
-
-        if (list.isEmpty())
-            return null;
-        return list.get(0);
-    }
-
 
     protected List<Map<String, Object>> list(Class clz, String sql, List<Object> conditionList, Connection conn) {
 
@@ -454,8 +408,9 @@ public class DaoImpl implements Dao {
                 this.dialect.setObject(i++, value, pstmt);
             }
 
-            List<BeanElement> eles = parsed.getBeanElementList();
             ResultSet rs = pstmt.executeQuery();
+
+            List<BeanElement> eles = parsed.getBeanElementList();
             if (rs != null) {
                 while (rs.next()) {
                     T obj = (T) clz.newInstance();

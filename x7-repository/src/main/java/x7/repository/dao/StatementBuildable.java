@@ -16,20 +16,10 @@
  */
 package x7.repository.dao;
 
-import x7.core.web.Page;
-
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.util.List;
-import java.util.Map;
 
-public interface DaoBuildable {
+public interface StatementBuildable {
 
     void buildStatement(PreparedStatement pstmt);
 
-    long buildId(PreparedStatement pstmt);
-    Page<Map<String, Object>>   buildResultMapPage(ResultSet resultSet);
-    List<Map<String, Object>> buildResultMapList(ResultSet resultSet);
-    <T> Page<T> buildPage(ResultSet resultSet);
-    <T> List<T> buildList(ResultSet resultSet);
 }
